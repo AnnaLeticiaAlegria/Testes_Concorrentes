@@ -1,0 +1,6 @@
+EscritorComeca
+LeitorComeca
+EscritorTermina
+LeitorTermina
+LeitorComeca
+LeitorTermina
