@@ -6,6 +6,8 @@
 #include <unistd.h>
 #include <semaphore.h>
 
+#include "stateManager.h"
+
 #define N_READERS 2
 #define N_WRITERS 1
 #define BUFFER_SIZE 40
@@ -20,14 +22,6 @@ int active_readers = 0;
 sem_t * rw ;
 sem_t * mutexR;
 sem_t * mutexState;
-
-int currentState = 0;
-int totalStates = 0;
-char ** statesArray;
-
-pthread_cond_t condition = PTHREAD_COND_INITIALIZER;
-
-pthread_mutex_t conditionLock = PTHREAD_MUTEX_INITIALIZER;
 
 /* Protótipos de funções */
 
@@ -59,11 +53,12 @@ int main()
   semInit ();
 	
 	for (i=0;i<N_READERS;i++) {
-		pthread_create(&readers_thread[i], NULL, readTask, (void*) i);
+    int * num =;
+		pthread_create(&readers_thread[i], NULL, readTask, (void*) num);
 	}
 	
 	for (i=0;i<N_WRITERS;i++) {
-		pthread_create(&writers_thread[i], NULL, writeTask, (void*) i);
+		pthread_create(&writers_thread[i], NULL, writeTask, (void*) &i);
 	}
 
 	for(i=0;i<N_READERS;i++)
@@ -79,33 +74,6 @@ int main()
 }
 
 /* Funções auxiliares */
-
-void checkState (char * state) {
-
-  while (1) {
-    pthread_mutex_lock(&conditionLock); //P(conditionLock)
-
-    /* in case there are no states left */
-    if (currentState == totalStates) {
-      pthread_mutex_unlock(&conditionLock); //V(conditionLock)
-      pthread_exit(NULL); //end thread
-    }
-
-    if(!strcmp(state, statesArray[currentState])) {
-      printf("%s\n", state);
-      currentState ++;
-      pthread_cond_broadcast(&condition);
-      pthread_mutex_unlock(&conditionLock); //V(conditionLock)
-      return;
-    }
-
-    pthread_cond_wait(&condition, &conditionLock);
-
-    pthread_mutex_unlock(&conditionLock); //V(conditionLock)
-  }
-  
-}
-
 
 void* writeTask (void * num)
 {
@@ -189,32 +157,4 @@ void semFree (void) {
   sem_close(rw);
   sem_close(mutexR);
   sem_close(mutexState);
-}
-
-void readFile (FILE * statesFile) {
-  int count = 0;
-  char state [80];
-
-  while (fscanf(statesFile, " %[^\n]", state) == 1) {
-    totalStates ++;
-  }
-
-  statesArray = (char**) malloc (totalStates * sizeof(char*));
-  if (statesArray == NULL) {
-    printf("Erro na alocação do vetor\n");
-    exit(0);
-  }
-
-  rewind(statesFile); //reset pointer of the file
-
-  while (fscanf(statesFile, " %[^\n]", state) == 1) {
-    statesArray[count] = (char*) malloc ((strlen(state) + 1) * sizeof(char*));
-    if (statesArray[count] == NULL) {
-      printf("Erro na alocação da entrada do vetor\n");
-      exit(0);
-    }
-
-    strcpy(statesArray[count], state);
-    count ++;
-  }
 }

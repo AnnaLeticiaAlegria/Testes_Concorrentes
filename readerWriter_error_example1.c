@@ -1,3 +1,8 @@
+/*
+Testing error example 1:
+  Accessing active_readers without protection (no mutexR)
+*/
+
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -6,7 +11,7 @@
 #include <unistd.h>
 #include <semaphore.h>
 
-#define N_READERS 2
+#define N_READERS 10
 #define N_WRITERS 1
 #define BUFFER_SIZE 40
 
@@ -18,7 +23,6 @@ int n, m;
 int active_readers = 0;
 
 sem_t * rw ;
-sem_t * mutexR;
 sem_t * mutexState;
 
 int currentState = 0;
@@ -100,8 +104,6 @@ void checkState (char * state) {
     }
 
     pthread_cond_wait(&condition, &conditionLock);
-
-    pthread_mutex_unlock(&conditionLock); //V(conditionLock)
   }
   
 }
@@ -146,13 +148,12 @@ void* readTask (void * num)
 	{
     checkState("LeitorQuerComecar");
 
-    sem_wait(mutexR); //P(mutexR)
-
     active_readers ++;
+
     if (active_readers == 1) { //if first, get lock
+
       sem_wait(rw); //P(rw)
     }
-    sem_post(mutexR); //V(mutexR)
 
     checkState("LeitorComeca");
 
@@ -163,7 +164,6 @@ void* readTask (void * num)
 			m = (m+1)%BUFFER_SIZE;
       printf("Leitor leu %d\n", element);
 		}
-    sem_wait(mutexR);
     active_readers --;
     if (active_readers == 0) { //if last, release lock
       sem_post(rw); //V(rw)
@@ -171,23 +171,19 @@ void* readTask (void * num)
 
     checkState("LeitorTermina");
     
-    sem_post(mutexR); //V(mutexR)
 	}
 
 	pthread_exit(NULL); 
 }
 
 void semInit (void) {
-  rw = sem_open("lockDatabase19", O_CREAT, S_IRUSR | S_IWUSR, 1); 
+  rw = sem_open("lockDatabaseError24", O_CREAT, S_IRUSR | S_IWUSR, 1); 
 
-  mutexR = sem_open("lockActiveReaders19", O_CREAT, S_IRUSR | S_IWUSR, 1); 
-
-  mutexState = sem_open("lockState19", O_CREAT, S_IRUSR | S_IWUSR, 1); 
+  mutexState = sem_open("lockStateError24", O_CREAT, S_IRUSR | S_IWUSR, 1); 
 }
 
 void semFree (void) {
   sem_close(rw);
-  sem_close(mutexR);
   sem_close(mutexState);
 }
 
