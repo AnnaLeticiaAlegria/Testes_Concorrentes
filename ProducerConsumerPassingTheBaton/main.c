@@ -5,6 +5,8 @@
 #include <string.h>
 #include <time.h>
 
+#include "stateManager.h"
+
 /* Variáveis globais */
 
 pthread_t * threads = NULL;
@@ -40,14 +42,17 @@ int main (int argc, char** argv) {
   int N, P, C, I;
   int i;
 
-  if (argc != 5) {
-    printf("Parâmetros passados incorretamente! (N P C I)\n");
+  srand(time(NULL));
+
+  if (argc != 6) {
+    printf("Parâmetros passados incorretamente! (N P C I F)\n");
     return 0;
   }
   N = strtol(argv[1], NULL, 10);
   P = strtol(argv[2], NULL, 10);
   C = strtol(argv[3], NULL, 10);
   I = strtol(argv[4], NULL, 10);
+  initializeManager (argv[5], P + C);
 
   numPos = N;
   numProd = P;
@@ -80,12 +85,14 @@ int * alocaVetorInteiro (int n) {
   return vet;
 }
 
-void preencheVetor (int * vetor, int n, int num) {
+int * preencheVetor (int * vetor, int n, int num) {
   int i;
 
   for(i = 0 ; i < n ; i++) {
     vetor[i] = num;
   }
+
+  return vetor;
 }
 
 char * randomizaNome (char * nome, int nLetras) {
@@ -100,10 +107,10 @@ char * randomizaNome (char * nome, int nLetras) {
 
   strcpy(nomeRandomizado, nome);
   for(i=0;i<nLetras;i++){
-    srand(time(NULL));
-    nomeRandomizado[tamNome + i] = 'A' + (char) rand()%46;
+    nomeRandomizado[tamNome + i] = 'A' + rand()%26;
   }
-  nomeRandomizado[i] = '\0';
+  nomeRandomizado[tamNome + i] = '\0';
+
   return nomeRandomizado;
 }
 
@@ -113,13 +120,13 @@ void inicializaVetores(int numpos, int numprod, int numcons) {
   buffer = alocaVetorInteiro(numpos);
 
   consEsperando = alocaVetorInteiro(numcons);
-  preencheVetor (consEsperando, numcons, 0);
+  consEsperando = preencheVetor (consEsperando, numcons, 0);
 
-  lidos = alocaVetorInteiro(numpos);
-  preencheVetor (lidos, numpos, 0);
+  lidos = alocaVetorInteiro(numcons);
+  lidos = preencheVetor (lidos, numcons, 0);
 
   faltaLer = alocaVetorInteiro(numpos);
-  preencheVetor (faltaLer, numpos, 0);
+  faltaLer = preencheVetor (faltaLer, numpos, 0);
 
   threadConsId = (int **) malloc (numcons * sizeof(int*));
   threadProdId = (int **) malloc (numprod * sizeof(int*));
@@ -129,22 +136,39 @@ void iniciaSemaforos (void) {
   char * nomeSemaforo;
   int numLetras;
 
-  srand(time(NULL));
-  numLetras = (rand()%50) + 1;
+  numLetras = (rand()%20) + 1;
 
-  nomeSemaforo = randomizaNome ("semEntrada", numLetras);
-  e = sem_open(nomeSemaforo, O_CREAT, S_IRUSR | S_IWUSR, 1); 
+  nomeSemaforo = randomizaNome ("/semmE", numLetras);
+  sem_unlink(nomeSemaforo);
+  e = sem_open(nomeSemaforo, O_CREAT|O_EXCL, S_IRUSR | S_IWUSR, 1);
+  if (e == SEM_FAILED){
+    printf("Erro ao abrir semaforo e. Nome: %s\n", nomeSemaforo);
+    free(nomeSemaforo);
+    exit(0);
+  }
   free(nomeSemaforo);
   //semaforo e criado como um named semaphore, com permissão de escrita e leitura, inicializado com valor 1
 
-  nomeSemaforo = randomizaNome ("semProdutor", numLetras);
-  semProd = sem_open(nomeSemaforo, O_CREAT, S_IRUSR | S_IWUSR, 0); 
+  nomeSemaforo = randomizaNome ("/semmP", numLetras);
+  sem_unlink(nomeSemaforo);
+  semProd = sem_open(nomeSemaforo, O_CREAT|O_EXCL, S_IRUSR | S_IWUSR, 0); 
+  if (semProd == SEM_FAILED){
+    printf("Erro ao abrir semaforo semProd. Nome: %s\n", nomeSemaforo);
+    free(nomeSemaforo);
+    exit(0);
+  }
   free(nomeSemaforo);
 
   semCons = (sem_t **) malloc (numCons * sizeof(sem_t*));
   for (int i = 0; i< numCons; i++) {
-    nomeSemaforo = randomizaNome ("vetorSemConsumidor", numLetras + i);
-    semCons[i] = sem_open(nomeSemaforo, O_CREAT, S_IRUSR | S_IWUSR, 0); 
+    nomeSemaforo = randomizaNome ("/semmC", numLetras + i);
+    sem_unlink(nomeSemaforo);
+    semCons[i] = sem_open(nomeSemaforo, O_CREAT|O_EXCL, S_IRUSR | S_IWUSR, 0); 
+    if (semCons[i] == SEM_FAILED){
+      printf("Erro ao abrir semaforo semCons[%d]. Nome: %s\n", i, nomeSemaforo);
+      free(nomeSemaforo);
+      exit(0);
+    }
     free(nomeSemaforo);
     //controla o acesso dos consumidores. Inicializado com valor 0
   }
@@ -178,7 +202,6 @@ void iniciaThreads (int numprod, int numcons) {
 void * produtor (void * p_Id) {
   int item;
   int id = *((int *) p_Id);
-  printf("Produtor %d iniciando\n", id);
 
   while(1) {
     item = rand() % 200;
@@ -189,12 +212,11 @@ void * produtor (void * p_Id) {
 void * consumidor (void * p_Id) {
   int item;
   int id = *((int *) p_Id);
-  printf("Consumidor %d iniciando\n", id);
 
   while(1) {
     item = consome (id);
     if (item >= 0) {
-      printf("Consumidor %d consumiu %d\n", id, item);
+      printf("---Consumidor %d consumiu %d\n", id, item);
     }
   }
 }
@@ -202,53 +224,60 @@ void * consumidor (void * p_Id) {
 void deposita (int item, int id) {
   int pos, flagTermina;
 
+  checkState("ProdutorQuerComecar");
   sem_wait(e); //P(e)
-  printf("%d - Produtor na RC\n", id);
+  checkState("ProdutorComeca");
   pos = escritos % numPos;
 
   if (faltaLer[pos] > 0) { //checa se todos os consumidores já leram aquela posição
     prodEsperando ++;
-    printf("%d - Produtores esperando inicio: %d\n", id, prodEsperando);
     sem_post(e); //V(e)
 
+    checkState("ProdutorAguarda");
     sem_wait(semProd); //P(semProd)
   }
 
   flagTermina = (escritos >= numItens) ? 1 : 0;
+
   if (!flagTermina) {
+    checkState("ProdutorProduz");
     pos = escritos % numPos;
-    printf("%d - FaltaLer = %d, pos = %d, escritos = %d\n", id, faltaLer[pos], pos, escritos);
     buffer[pos] = item;
-    printf("Produtor %d escreveu %d\n", id, item);
+    printf("---Produtor %d escreveu %d\n", id, item);
+
 
     faltaLer[pos] = numCons; //atribui com o número de consumidores a consumirem o item daquela posição
     escritos ++;
   }
-  else {
-    printf("%d - Produtor vai terminar\n", id);
-  }
+
+  flagTermina = (escritos >= numItens) ? 1 : 0;
 
   //signal --> libera todos os consumidores
   for (int c = 0; c < numCons; c++) {
     if (consEsperando[c] && escritos > lidos[c]) {
       consEsperando[c] = 0;
       sem_post(semCons[c]); //V(semCons)
-      printf("%d - Produtor liberou consumidor %d\n", id, c);
+      sem_post(e); //V(e)
+      if (flagTermina) {
+        printf("---Produtor %d finalizando\n", id);
+        sem_post(semProd); 
+        checkState("ProdutorFinaliza");
+        pthread_exit(NULL);
+      }
       return;
     }
   }
 
   if(faltaLer[escritos%numPos] == 0 && prodEsperando > 0) { //se todos os consumidores já leram e tem algum produtor esperando
     prodEsperando --;
-    printf("%d - Produtores esperando final: %d\n", id, prodEsperando);
     sem_post(semProd); 
   }
   else {
-    printf("%d - Nao tinha produtor esperando: %d\n", id, prodEsperando);
     sem_post(e); //V(e)
   }
   if (flagTermina) {
-    printf("Produtor %d finalizando\n", id);
+    checkState("ProdutorFinaliza");
+    printf("---Produtor %d finalizando\n", id);
     sem_post(semProd); 
     pthread_exit(NULL);
   }
@@ -259,33 +288,54 @@ int consome (int meuid) {
   int flagTermina;
 
   pos = lidos[meuid] % numPos;
+  checkState("ConsumidorQuerComecar");
   sem_wait(e); //P(e)
-  printf("%d - Consumidor na RC\n", meuid);
+  checkState("ConsumidorComeca");
+
+  if(escritos <= lidos[meuid]) { //checa se tem algo para ler
+    consEsperando[meuid] = 1;
+    sem_post(e); //V(e)
+
+    checkState("ConsumidorAguarda");
+    sem_wait(semCons[meuid]); //P(semCons) ---> espera produtor liberar para ler
+  }
 
   flagTermina = (lidos[meuid] >= numItens) ? 1 : 0;
-  if(!flagTermina) {
-      
-    if(escritos <= lidos[meuid]) { //checa se tem algo para ler
-      consEsperando[meuid] = 1;
-      printf("%d - Consumidor esperando %d\n", meuid, consEsperando[meuid]);
-      sem_post(e); //V(e)
-      sem_wait(semCons[meuid]); //P(semCons) ---> espera produtor liberar para ler
-    }
-    printf("%d - Consumidor pegou item\n", meuid);
+
+  if (!flagTermina) {
+    checkState("ConsumidorConsome");
+    pos = lidos[meuid] % numPos;
     item = buffer[pos];
 
-    printf("%d - Consumidor pos: %d\n", meuid, pos);
-    faltaLer[pos] --; //indica ao produtor que um consumidor já leu dessa posição
-    lidos[meuid] ++; //número de itens que esse consumidor leu
-  }
-  else {
-    printf("%d - Consumidor vai terminar\n", meuid);
+    faltaLer[pos] --;
+    lidos[meuid] ++;
   }
 
+  flagTermina = (escritos >= numItens) ? 1 : 0;
+
+  //signal
+  for (int c = 0; c < numCons; c++) {
+    if (consEsperando[c] && escritos > lidos[c]) {
+      consEsperando[c] = 0;
+      if (flagTermina) {
+        checkState("ConsumidorFinaliza");
+        printf("---Consumidor %d finalizando\n", meuid);
+        pthread_exit(NULL);
+      }
+      sem_post(semCons[c]); //V(semCons)
+      return item;
+    }
+  }
+
+  if(faltaLer[escritos%numPos] == 0 && prodEsperando > 0) { //se todos os consumidores já leram e tem algum produtor esperando
+    prodEsperando --;
+    sem_post(semProd); 
+  }
   sem_post(e); //V(e)
 
   if (flagTermina) {
-    printf("Consumidor %d finalizando\n", meuid);
+    checkState("ConsumidorFinaliza");
+    printf("---Consumidor %d finalizando\n", meuid);
     pthread_exit(NULL);
   }
 
