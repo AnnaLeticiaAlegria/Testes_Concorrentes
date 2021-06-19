@@ -28,6 +28,8 @@ by this module.
 #include <lua.h>
 #include <lauxlib.h>
 #include <lualib.h>
+#include <signal.h>
+#include <unistd.h>
 
 /* 
 ----------------------------------------------------------------------------------------------------------------------
@@ -54,6 +56,7 @@ Encapsulated function's declaration
 
 void getLuaResults (lua_State *LState);
 int compareStates (const char * state, int currentState);
+void signal_handler(int signum);
 
 /*
 ----------------------------------------------------------------------------------------------------------------------
@@ -71,10 +74,14 @@ Then, call this module's function getLuaResults. This function obtains the retur
 the global variables of this module.
 After closing the LuaState, this function allocates the threadIdArray with length of nThreads and inserts 0 at each
 position.
+Lastly, it sets an alarm with time 'deadLockDetectTime' (which is, by default, 5 seconds)
 ----------------------------------------------------------------------------------------------------------------------
 */
 void initializeManager (char * fileName, int nThreads) {
   lua_State *LState;
+
+  /* Set SIGALRM handler */
+  signal(SIGALRM,signal_handler);
 
   /* Open Lua State */
   LState = luaL_newstate();
@@ -119,6 +126,9 @@ void initializeManager (char * fileName, int nThreads) {
   for(int i = 0; i<nThreads; i++){
     threadIdArray[i] = 0;
   }
+
+  /* Set alarm of 'deadLockDetectTime' seconds */
+  alarm(deadLockDetectTime);
 }
 
 
@@ -134,6 +144,12 @@ the id's condition. For more details about the id's condition, check the functio
 If so, it prints the state, updates the current state and calls the pthread function that sends a message in broadcast
 to all the waiting threads so they can stop waiting and check if its their turn now.
 If it isn't this state's turn, the thread keeps waiting until another thread sinalize that it can stop waiting.
+
+There is an alarm with time of 'deadLockDetectTime' seconds declared everytime a state begins it's turn. If this time 
+runs out, it means no other state started a turn for the last 'deadLockDetectTime' seconds. This means that every 
+thread is waiting for the turn of their state and none of them has been accepted. This indicate that the sequence
+in the state File is not a valid sequence for the user's program. So, the handler of the SIGALRM ends the manager
+and the user's program.
 ----------------------------------------------------------------------------------------------------------------------
 */
 void checkState (const char * state) {
@@ -153,6 +169,7 @@ void checkState (const char * state) {
       currentState ++;
       pthread_cond_broadcast(&condition); // Tell to the awaiting threads that they can go on
       pthread_mutex_unlock(&conditionLock); // V(conditionLock)
+      alarm(deadLockDetectTime);
       return;
     }
 
@@ -178,6 +195,7 @@ void finalizeManager (void) {
   free(threadIdArray);
   free(statesArray);
   free(statesIdArray);
+  alarm(0);
 }
 
 /*
@@ -317,4 +335,22 @@ int compareStates (const char * state, int currentState) {
 
   /* In case it didn't passed any of the conditions, returns 0 */
   return 0;
+}
+
+/*
+----------------------------------------------------------------------------------------------------------------------
+Function: signal_handler
+Parameters: 
+  -> signum: number of the signal that caused this handler to be called
+Returns: nothing
+
+Description: This handler is called whenever the SIGALRM reaches the time that it was specified. If another call of
+alarm is done, the time will reset (only one alarm can be active at the same time)
+----------------------------------------------------------------------------------------------------------------------
+*/
+void signal_handler(int signum){
+  printf("\n\n\nDeadLock detected!!\n");
+  printf("Expected event %d called %s\n\n\n", currentState + 1, statesArray[currentState]);
+  finalizeManager ();
+  exit(0);
 }

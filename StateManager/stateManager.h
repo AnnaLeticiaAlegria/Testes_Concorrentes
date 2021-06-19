@@ -51,6 +51,9 @@ Change the readStatesFilePath accordingly if it is not the case
 */
 static char * readStatesFilePath = "../StateManager/readStates.lua";
 
+/* Time that the program can wait a thread until it considers as a deadlock. Default is 5 seconds */
+static int deadLockDetectTime = 5;
+
 /*
 ----------------------------------------------------------------------------------------------------------------------
 Function: initializeManager
