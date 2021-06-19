@@ -1,4 +1,4 @@
-# Documentação do módulo State Manager
+# Módulo State Manager
 
 ## Descrição
 Este módulo contém o código do projeto 'Determinando ordens de execução para testes de programas concorrentes'.
