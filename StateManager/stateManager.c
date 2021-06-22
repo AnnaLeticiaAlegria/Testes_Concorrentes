@@ -56,7 +56,7 @@ Encapsulated function's declaration
 
 void getLuaResults (lua_State *LState);
 int compareStates (const char * state, int currentState);
-void signal_handler(int signum);
+void signalHandler(int signum);
 
 /*
 ----------------------------------------------------------------------------------------------------------------------
@@ -81,7 +81,7 @@ void initializeManager (char * fileName, int nThreads) {
   lua_State *LState;
 
   /* Set SIGALRM handler */
-  signal(SIGALRM,signal_handler);
+  signal(SIGALRM,signalHandler);
 
   /* Open Lua State */
   LState = luaL_newstate();
@@ -339,7 +339,7 @@ int compareStates (const char * state, int currentState) {
 
 /*
 ----------------------------------------------------------------------------------------------------------------------
-Function: signal_handler
+Function: signalHandler
 Parameters: 
   -> signum: number of the signal that caused this handler to be called
 Returns: nothing
@@ -348,7 +348,7 @@ Description: This handler is called whenever the SIGALRM reaches the time that i
 alarm is done, the time will reset (only one alarm can be active at the same time)
 ----------------------------------------------------------------------------------------------------------------------
 */
-void signal_handler(int signum){
+void signalHandler(int signum){
   printf("\n\n\nDeadLock detected!!\n");
   printf("Expected event %d called %s\n\n\n", currentState + 1, statesArray[currentState]);
   finalizeManager ();
