@@ -20,15 +20,15 @@ A seguir, uma breve descrição dos componentes do módulo _StateManager_. Estes
 ### stateManager.h
 Contém as declarações das funções e variáveis exportadas pelo módulo. Nele, o usuário pode modificar o caminho para o arquivo readStates.lua, caso esteja utilizando o módulo com uma organização de diretórios diferente da padrão:
 
-.
-|---Diretório externo
-| |---Pasta com programa do usuário
-| | |---main.c
-| | |---statesFile.txt
-| |---StateManager
-| | |---stateManager.c
-| | |---stateManager.h
-| | |---readStates.lua
+. <br/>
+|---Diretório externo <br/>
+| |---Pasta com programa do usuário <br/>
+| | |---main.c <br/>
+| | |---statesFile.txt <br/>
+| |---StateManager <br/>
+| | |---stateManager.c <br/>
+| | |---stateManager.h <br/>
+| | |---readStates.lua <br/>
 
 
 Além disso, o usuário também pode modificar o tempo a partir do qual o programa considera que houve um _deadlock_. Basta modificar a variável _deadLockDetectTime_ para algum número inteiro que represente este tempo em segundos.
