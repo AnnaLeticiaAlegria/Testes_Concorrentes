@@ -2,7 +2,7 @@
 
 ## Descrição
 Este módulo contém o código do projeto 'Determinando ordens de execução para testes de programas concorrentes'.
-Ele permite que o usuário defina estados (ou eventos) em seu programa concorrente e a ordem na qual estes estados devem ser executados. O usuário pode definir se deseja que dois ou mais estados sejam executados pela mesma thread ou se não podem ser executados por uma thread específica. Para entender como escrever o arquivo de ordem de estados, [clique aqui](../README.md#-Como-escrever-o-arquivo-stateFile.txt).
+Ele permite que o usuário defina estados (ou eventos) em seu programa concorrente e a ordem na qual estes estados devem ser executados. O usuário pode definir se deseja que dois ou mais estados sejam executados pela mesma thread ou se não podem ser executados por uma thread específica. Para entender como escrever o arquivo de ordem de estados, também chamado de arquivo de configuração, [clique aqui](../README.md#-Como-escrever-o-arquivo-de-configuração).
 É importante ressaltar que o programa do usuário precisa implementar a concorrência utilizando a biblioteca pthread em C.
 Este módulo foi implementado em alguns programas reais. Para saber mais sobre estes exemplos, [clique aqui](../README.md#-Exemplos-de-uso).
 
@@ -54,7 +54,7 @@ Na função _finalizeManager_, o programa libera os espaços alocados por ele e 
 
 A função _getLuaResults_ é uma função auxiliar para retirar da pilha de execução os resultados da chamada da função em Lua.
 
-Para seu funcionamento, a função _compareStates_ precisa receber o nome do estado que deseja executar e a posição do estado atual. O usuário pode definir no arquivo de ordem de estados se deseja que uma thread específica execute uma sequência de estados, se quer que algum estado seja executado por qualquer thread menos por alguma em específico ou se aquele estado pode ser executado por qualquer thread (Mais detalhes podem ser encontrados em [Como escrever o arquivo stateFile.txt](../README.md#-Como-escrever-o-arquivo-stateFile.txt).). Assim, essa função precisa checar, além do nome, o _id_ do estado:
+Para seu funcionamento, a função _compareStates_ precisa receber o nome do estado que deseja executar e a posição do estado atual. O usuário pode definir no arquivo de ordem de estados se deseja que uma thread específica execute uma sequência de estados, se quer que algum estado seja executado por qualquer thread menos por alguma em específico ou se aquele estado pode ser executado por qualquer thread (Mais detalhes podem ser encontrados em [Como escrever o arquivo de configuração](../README.md#-Como-escrever-o-arquivo-de-configuração).). Assim, essa função precisa checar, além do nome, o _id_ do estado:
   * Caso o estado possua _id_ igual a 0, ele pode ser executado por qualquer thread. Por isso, a função somente compara se o nome do estado passado como parâmetro é igual ao nome do próximo estado a ser executado.
   * Caso o estado possua _id_ positivo, ele deve ser executado pela thread com aquele _id_. É importante notar que, por exemplo, se _id_ for igual a 1, não é garantido que aquela thread é a primeira a ser executada. Porém, ela vai ser considerada a primeira quando entrar nesta função e não existir nenhuma thread associada ainda como primeira thread no vetor _threadIdArray_, preenchendo esta posição do vetor com seu _id_ real.
   * Caso o estado possua _id_ negativo, ele pode ser executado por qualquer thread menos pela thread que possui aquele _id_.
@@ -65,6 +65,6 @@ Por último, a função _signalHandler_ é a função que manipula o sinal SIGAL
 ### readStates.lua
 Este arquivo contém a função readStates. Esta função é chamada pelo código em C e utiliza a biblioteca LPeg de Lua para realizar a leitura do arquivo e converter para um vetor com a ordem dos estados e seus _ids_. 
 
-Por enquanto, a função detecta o caracter do espaço em branco e utiliza isso para separar o nome do estado de seu _id_. Além disso, converte a linguagem que define o _id_ para um número inteiro. (Mais detalhes sobre essa linguagem podem ser encontrados em [Como escrever o arquivo stateFile.txt](../README.md#-Como-escrever-o-arquivo-stateFile.txt).)
+Por enquanto, a função detecta o caracter do espaço em branco e utiliza isso para separar o nome do estado de seu _id_. Além disso, converte a linguagem que define o _id_ para um número inteiro. (Mais detalhes sobre essa linguagem podem ser encontrados em [Como escrever o arquivo de configuração](../README.md#-Como-escrever-o-arquivo-de-configuração).)
 
 Isto é algo simples para o número de possibilidades que a biblioteca LPeg oferece. Entretanto, foi importante começar a utilizá-la para permitir uma implementação mais simples dos [passos futuros](../README.md#-Passos-futuros).
