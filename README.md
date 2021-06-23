@@ -115,10 +115,28 @@ Cabe ao usuário interpretar os resultados obtidos. Uma sequência de estados é
 
 Caso ele tenha feito uma sequência de eventos que sabe ser válida e o programa não aceitou, sabe que seu programa está errado. Entretanto, caso o programa tenha aceitado a sequência inteira, isto não significa, necessariamente, que o programa do usuário está correto. É necessário checar outras sequências de estados.
 
-Caso o programa aceite alguma sequência que o usuário sabe estar errada, é garantido que o programa do usuário possui algum erro. Na próxima seção, são apresentados exemplos de uso que mostram
+Caso o programa aceite alguma sequência que o usuário sabe estar errada, é garantido que o programa do usuário possui algum erro. Na próxima seção, são apresentados exemplos de uso que mostram testes realizados e seus resultados.
 
 ## Exemplos de uso
 
 ## Testes
 
 ## Passos futuros
+
+Os passos futuros envolvem melhorias no arquivo de configuração. O objetivo é que ele consiga expressar mais casos de testes.
+
+Uma ideia é separar o arquivo de configuração do arquivo de ordem de estados. No arquivo de configuração, o usuário escreve todos os eventos possíveis que podem aparecer no seu programa e talvez outras informações. Assim, o _StateManager_ só aceitaria estados do arquivo de ordem de estados que estivessem declarados no arquivo de configuração. Isso evitaria problemas causados por erros de digitação do nome do estado, por exemplo.
+
+Como é possível observar nos [exemplos de uso](#exemplos-de-uso), alguns estados são necessários estarem em pares (Como os estados que englobam uma chamada a uma função sem_wait de um semáforo. Mais detalhes podem ser encontrados no exemplo [FirstExample](./FirstExample/README.md)). Uma melhoria seria uma forma melhor do usuário representar que estes eventos formam um par e que não pode haver nenhum evento entre eles.
+
+Da forma como o módulo está implementado atualmente, o usuário poderia fazer uma regra de execução de uma thread especificando que não quer que uma thread específica execute o estado antes de especificar um evento para esta thread. Ou seja, caso ele insira no arquivo de configuração algum estado com regra '!1' antes de um estado com regra '1', por exemplo, o programa aceitaria mas causaria erros de execução. Um passo futuro é fazer uma varredura no arquivo para verificar se casos semelhantes ocorrem.
+
+Como foi comentado na seção [Como escrever o arquivo de configuração](#como-escrever-o-arquivo-de-configuração), o programa permitiria que a thread associada ao _id_ 1 fosse a mesma a ser associada as _id_ 2, por exemplo. Isto poderia ser evitado percorrendo o vetor de _ids_ de threads cada vez que uma nova thread tentasse salvar seu _id_ no vetor.
+
+Para representar mais possibilidades, seria necessário criar uma linguagem para o arquivo de configuração a ser interpretada pelo arquivo em Lua a fim de gerar a ordem dos eventos em C. Pensando nisso, este módulo já foi implementado utilizando a biblioteca LPeg desde o início, o que permite modificações de forma mais fácil.
+
+Uma modificação seria permitir o uso de _loops_ de estados no arquivo, para facilitar o entendimento e ser menos trabalhoso ao usuário. Outra melhoria seria a utilização de variáveis. Elas poderiam ser utilizadas para associar que a quantidade de threads que realizaram tal evento deve ser a mesma a realizar outro evento, por exemplo.
+
+Com uma linguagem também seria possível especificar um grupo de threads que poderia executar determinado evento ou um grupo que seria proibido de executar outro evento. Atualmente, o programa só permite que uma thread seja escolhida para essas funcionalidades.
+
+Percebe-se que há muitas possibilidades de melhorias que, certamente, trarão novas ideias quando forem implementadas, mostrando como este projeto ainda pode crescer e se tornar mais complexo e mais completo como uma ferramenta de teste.
