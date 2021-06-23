@@ -99,9 +99,23 @@ Agora, o usuário está pronto para compilar, executar e interpretar os resultad
 
 ###Compilando e executando
 
-É necessário compilar o código do _StateManager_ em conjunto com o código do usuário. Caso a disposição das pastas esteja de acordo com o que é mostrado em [Projeto do programa](#projeto-do-programa),
+É necessário compilar o código do _StateManager_ em conjunto com o código do usuário. Caso a disposição das pastas esteja de acordo com o que é mostrado em [Projeto do programa](#projeto-do-programa), para compilar o código, basta escrever o seguinte comando no terminal bash:
+
+> gcc -Wall -o programa main.c ../StateManager/stateManager.c -I/caminho/para/bibliotecas/Lua -llua5.3
+
+O caminho para as bibliotecas em Lua deve ser o local no qual os arquivos lua.h, lauxlib.h e lualib.h se encontram.
+
+Após compilado o programa, basta executar, passando os argumentos pedidos pelo programa do usuário via linha de comando.
+
+> ./programa arg1 arg2
 
 ##Sobre os resultados
+
+Cabe ao usuário interpretar os resultados obtidos. Uma sequência de estados é dita aceita pelo programa caso ele tenha conseguido executar todos os estados da sequência sem entrar em _deadlock_.
+
+Caso ele tenha feito uma sequência de eventos que sabe ser válida e o programa não aceitou, sabe que seu programa está errado. Entretanto, caso o programa tenha aceitado a sequência inteira, isto não significa, necessariamente, que o programa do usuário está correto. É necessário checar outras sequências de estados.
+
+Caso o programa aceite alguma sequência que o usuário sabe estar errada, é garantido que o programa do usuário possui algum erro. Na próxima seção, são apresentados exemplos de uso que mostram
 
 ##Exemplos de uso
 
