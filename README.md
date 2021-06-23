@@ -1,11 +1,11 @@
-#Testes_Concorrentes
-##Descrição
+# Testes_Concorrentes
+## Descrição
 
 Este projeto tem como objetivo testar programas concorrentes desenvolvidos por alunos de graduação. Ele consiste em um módulo com funções a serem chamadas pelo programa do aluno que garantem que o mesmo siga uma determinada ordem de eventos. Essa ordem de eventos é criada em um arquivo de configuração e, se ela for aceita pelo programa do aluno ou não, é possível tirar conclusões acerca de sua corretude. 
 
 Apesar de ter sido desenvolvido pensando em ser utilizado em disciplinas de graduação, o módulo pode ser utilizado em qualquer programa concorrente que utilize a biblioteca pthread em C.
 
-###Escopo
+### Escopo
 
 O escopo do projeto consiste em desenvolver alguma ferramenta que fosse capaz de obrigar as threads de um programa a seguir determinada ordem de eventos, a fim de checar sua corretude. Assim, foi desenvolvido o módulo _StateManager_, cujas funções são chamadas pelo programa do usuário. 
 
@@ -15,7 +15,7 @@ O projeto inclui alguns exemplos de uso que podem ajudar o usuário a determinar
 
 Além disso, na seção [Como utilizar o módulo StateManager](#como-utilizar-o-módulo-statemanager), o usuário encontra explicações de como aplicar o módulo a fim de testar seu próprio programa.
 
-###Requisitos funcionais
+### Requisitos funcionais
 
   * Fazer a leitura do arquivo de configuração do usuário.
   * Garantir que o programa do usuário siga a ordem especificada pelo arquivo de configuração.
@@ -24,14 +24,14 @@ Além disso, na seção [Como utilizar o módulo StateManager](#como-utilizar-o-
   * Finalizar o programa do usuário caso algum estado demore mais do que o tempo especificado.
   * Mostrar o próximo estado esperado caso o programa seja encerrado por conta de algum estado demorar demais.
 
-###Requisitos não funcionais
+### Requisitos não funcionais
 
   * O programa do usuário deve implementar a concorrência utilizando a linguagem de programação C e a biblioteca pthread.
   * O programa deve executar em uma máquina com sistema operacional Linux ou MacOS.
   * O usuário deve instalar Lua 5.3 na máquina, caso já não esteja instalado.
   * O usuário deve produzir um arquivo de configuração válido. Mais detalhes na seção [Como escrever o arquivo de configuração](#como-escrever-o-arquivo-de-configuração).
 
-###Projeto do programa
+### Projeto do programa
 
 Este projeto consiste no módulo _StateManager_ que deve ser chamado pelo programa do usuário. O usuário pode nomear o arquivo de configuração (Arquivo de ordem dos estados) da forma que quiser, só deve informar ao módulo o caminho para o arquivo.
 
@@ -52,15 +52,15 @@ A imagem a seguir contém a arquitetura do projeto.
 ![Arquitetura](./arquitetura.png)
 
 
-##Como utilizar o módulo StateManager
+## Como utilizar o módulo StateManager
 
-###Configuração
+### Configuração
 
 Primeiramente, o usuário deve baixar a pasta com o módulo _StateManager_ e, idealmente, organizá-la como é descrito na seção [Projeto do programa](#projeto-do-programa). Para casos diferentes de organização, basta modificar a variável _readStatesFilePath_, presente no arquivo _stateManager.h_.
 
 Além disso, o usuário deve se certificar de que todos os [requisitos não funcionais](#requisitos-não-funcionais) foram cumpridos.
 
-###Como escrever o arquivo de configuração
+### Como escrever o arquivo de configuração
 
 O próximo passo é escrever um arquivo de configuração válido. Este arquivo contém a ordem de todos os estados do programa e regras de execução para as threads.
 
@@ -83,7 +83,7 @@ Quanto ao EstadoE, por enquanto, o programa aceitaria que a mesma thread que exe
 
 Já o EstadoF poderia ser executado por qualquer thread menos pela thread que executou os estados EstadoB e EstadoC.
 
-###Chamadas às funções
+### Chamadas às funções
 
 Para utilizar o _StateManager_, o usuário deve fazer chamadas às suas funções no seu programa.
 
@@ -97,7 +97,7 @@ Para mais detalhes acerca destas funções, cheque a [documentação](./StateMan
 
 Agora, o usuário está pronto para compilar, executar e interpretar os resultados obtidos.
 
-###Compilando e executando
+### Compilando e executando
 
 É necessário compilar o código do _StateManager_ em conjunto com o código do usuário. Caso a disposição das pastas esteja de acordo com o que é mostrado em [Projeto do programa](#projeto-do-programa), para compilar o código, basta escrever o seguinte comando no terminal bash:
 
@@ -109,7 +109,7 @@ Após compilado o programa, basta executar, passando os argumentos pedidos pelo 
 
 > ./programa arg1 arg2
 
-##Sobre os resultados
+## Sobre os resultados
 
 Cabe ao usuário interpretar os resultados obtidos. Uma sequência de estados é dita aceita pelo programa caso ele tenha conseguido executar todos os estados da sequência sem entrar em _deadlock_.
 
@@ -117,8 +117,8 @@ Caso ele tenha feito uma sequência de eventos que sabe ser válida e o programa
 
 Caso o programa aceite alguma sequência que o usuário sabe estar errada, é garantido que o programa do usuário possui algum erro. Na próxima seção, são apresentados exemplos de uso que mostram
 
-##Exemplos de uso
+## Exemplos de uso
 
-##Testes
+## Testes
 
-##Passos futuros
+## Passos futuros
