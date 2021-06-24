@@ -1,15 +1,15 @@
 WriterWantsToStart
 WriterStarts
 WriterWrites
-----Writer 0 writes 97
+----Writer 0 writes 103
 WriterEnds
 ReaderWantsToStart
 ReaderWantsToStart
 ReaderStarts
 ReaderStarts
 ReaderReads
-----Reader 1 reads 97
 ReaderReads
-----Reader 0 reads 97
+----Reader 0 reads 103
+----Reader 1 reads 103
 ReaderEnds
 ReaderEnds

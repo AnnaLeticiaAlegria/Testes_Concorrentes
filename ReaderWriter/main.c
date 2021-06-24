@@ -29,7 +29,7 @@ This variable is accessed only on reader's code.
 
 #include "../StateManager/stateManager.h"
 
-#define BUFFER_SIZE 40
+#define BUFFER_SIZE 5
 
 
 /* Global variable's declaration */

@@ -36,7 +36,7 @@ Assim como no arquivo anterior, na _main_, o código trata o caso do programa te
 
 Cada thread deste arquivo executa a mesma função: a _threadFunction_. Nela, a thread imprime seu _id_ e espera o estado _ThreadStarts_ ser o próximo da ordem de estados para começar. A thread espera o semáforo _semaphoreE_ liberar seu acesso para a região crítica. Em seguida, a thread espera o estado _ReadCount_, para armazenar o valor de _count_ na variável auxiliar _aux_. Depois, a thread espera a vez do estado _UpdateCount_ para armazenar o novo valor de _count_, imprimindo na tela o valor armazenado. Assim, ela pode informar ao semáforo que está saindo da região crítica e ele liberar o acesso para outra thread acessar esta região. Por último, a thread encerra.
 
-É importante notar que o estado _ThreadStarts_ neste caso não era necessário, mas em outros exemplos, como no [ReaderWriter](../ReaderWriter/README.md) ele se mostra essencial. A documentação desse exemplo explica o porquê.
+É importante notar que o estado _ThreadStarts_ neste caso não era necessário, mas em outros exemplos, como no [ReaderWriter](../ReaderWriter/README.md) ele se mostra essencial. [Nesta seção](../ReaderWriter/README.md#sobre-pares-de-estados) do exemplo é explicado o porquê.
 
 ## Testes
 
