@@ -1,0 +1,10 @@
+WriterWantsToStart
+WriterStarts
+WriterWantsToStart
+
+
+
+DeadLock detected!!
+Expected event 4 called WriterStarts
+
+

@@ -1,0 +1,12 @@
+WriterWantsToStart *
+WriterStarts *
+WriterWrites *
+WriterEnds *
+ReaderWantsToStart 1
+ReaderStarts 1
+ReaderReads 1
+ReaderEnds 1
+ReaderWantsToStart !1
+ReaderStarts !1
+ReaderReads !1
+ReaderEnds !1

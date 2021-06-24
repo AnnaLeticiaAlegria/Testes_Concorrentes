@@ -40,11 +40,11 @@ Cada thread deste arquivo executa a mesma função: a _threadFunction_. Nela, a 
 
 ## Testes
 
-Nesta pasta, há _scripts_ de teste deste exemplo, assim como os arquivos de configuração utilizados por eles. Para executar estes scripts, basta que o usuário modifique o caminho para as bibliotecas de Lua em C de seu computador. No script, elas estão na variável LUA_CDIR. Na minha máquina (MacOS Mojave), pela forma como instalei Lua, estes arquivos estão na pasta: Users/annaleticiaalegria/lua-5.3.5/src
+Nesta pasta, há _scripts_ de teste deste exemplo, assim como os arquivos de configuração utilizados por eles. Para executar estes _scripts_, basta que o usuário modifique o caminho para as bibliotecas de Lua em C de seu computador. No script, elas estão na variável de ambiente LUA_CDIR. Na minha máquina (MacOS Mojave), pela forma como instalei Lua, estes arquivos estão na pasta: Users/annaleticiaalegria/lua-5.3.5/src
 
-O _script_ _runMain.sh_ executa dois testes com o arquivo _main.c_, que não utiliza semáforos. Ambos os testes são feitos com 2 threads mas cada um recebe um arquivo de configuração. O primeiro recebe o arquivo _statesFile\_1.txt_ e o segundo recebe _statesFile\_2.txt_ .
+O _script_ _runMain.sh_ executa dois testes com o arquivo _main.c_, que não utiliza semáforos. Ambos os testes são feitos com 2 threads mas cada um recebe um arquivo de configuração. O primeiro recebe o arquivo _statesFile\_1.txt_ e o segundo recebe _statesFile\_2.txt_ . Os resultados dos testes são impressos no terminal e em um arquivo _.log_.
 
-Já o _script_ _runMain\_with\_semaphore.sh_ executa os mesmos testes que o arquivo anterior mas com o arquivo _main\_with\_semaphores.c_ .
+Já o _script_ _runMain\_with\_semaphore.sh_ executa os mesmos testes que o arquivo anterior mas com o arquivo _main\_with\_semaphores.c_ . Os resultados dos testes são impressos no terminal e em um arquivo _.log_.
 
 A ordem dos eventos do arquivo de configuração _statesFile\_1.txt_ é:
 

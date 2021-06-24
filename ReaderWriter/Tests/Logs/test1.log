@@ -1,0 +1,15 @@
+WriterWantsToStart
+WriterStarts
+WriterWrites
+----Writer 0 writes 97
+WriterEnds
+ReaderWantsToStart
+ReaderStarts
+ReaderReads
+----Reader 1 reads 97
+ReaderEnds
+ReaderWantsToStart
+ReaderStarts
+ReaderReads
+----Reader 0 reads 0
+ReaderEnds

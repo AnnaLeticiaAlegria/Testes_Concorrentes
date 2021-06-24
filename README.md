@@ -101,9 +101,9 @@ Agora, o usuário está pronto para compilar, executar e interpretar os resultad
 
 É necessário compilar o código do _StateManager_ em conjunto com o código do usuário. Caso a disposição das pastas esteja de acordo com o que é mostrado em [Projeto do programa](#projeto-do-programa), para compilar o código, basta escrever o seguinte comando no terminal bash:
 
-> gcc -Wall -o programa main.c ../StateManager/stateManager.c -I/caminho/para/bibliotecas/Lua -llua5.3
+> gcc -Wall -o programa main.c ../StateManager/stateManager.c -I/$LUA_CDIR -llua5.3
 
-O caminho para as bibliotecas em Lua deve ser o local no qual os arquivos lua.h, lauxlib.h e lualib.h se encontram.
+A variável de ambiente LUA_CDIR deve ser o local no qual os arquivos lua.h, lauxlib.h e lualib.h se encontram.
 
 Após compilado o programa, basta executar, passando os argumentos pedidos pelo programa do usuário via linha de comando.
 
