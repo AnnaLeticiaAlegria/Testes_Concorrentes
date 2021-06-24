@@ -234,9 +234,9 @@ void * threadFunction (void * id) {
   aux = count;
   checkState("UpdateCount");
   count = aux + 1;
-  sem_post(semaphoreE); // V(semaphoreE)
-
   printf("---Thread %d wrote %d\n", myId, count);
+  
+  sem_post(semaphoreE); // V(semaphoreE)
 
   pthread_exit(NULL);
 }
