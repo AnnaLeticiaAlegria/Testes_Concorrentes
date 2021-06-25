@@ -2,7 +2,7 @@
 
 ## Descrição
 
-Este exemplo demonstra o funcionamento do módulo _StateManager_ em um caso mais complexo. 
+Este exemplo demonstra o funcionamento do módulo _StateManager_ em um caso mais complexo. A solução deste problema foi elaborada pela professora Noemi Rodriguez.
 
 Neste problema, há produtores e consumidores. Os produtores produzem itens para um _buffer_ circular e os consumidores consomem itens desse _buffer_. Entretanto, diferentemente do caso [ReaderWriter](../ReaderWriter/README.md), um produtor só pode sobrescrever uma posição do _buffer_ caso todos os consumidores tenham consumido o item daquela posição.
 
@@ -83,6 +83,21 @@ O produtor realiza o bloco de estados que o faz produzir um item: _ProduzerWants
 Depois de consumir, este consumidor encerra com _ConsumerEnds_. Agora, o outro consumidor também consome o item do produtor, executando o bloco de estados: _ConsumerWantsToStart_, _ConsumerStarts_, _ConsumerConsumes_ e _ConsumerEnds_.
 
 ### Teste 2
+
+Arquivo de configuração deste teste:
+
+> ConsumerWantsToStart 1<br/>ConsumerStarts 1<br/>ConsumerWaits 1<br/>ProducerWantsToStart *<br/>ProducerStarts *<br/>ProducerProduces *<br/>ProducerEnds *<br/>ConsumerWantsToStart !1<br/>ConsumerStarts !1<br/>ConsumerConsumes !1<br/>ConsumerConsumes 1<br/>ConsumerEnds 1<br/>ConsumerEnds !1<br/>
+
+Este teste é executado com um _buffer_ de tamanho 1, 1 produtor, 2 consumidores e 1 item a ser produzido.
+
+Assim como no teste anterior, o primeiro consumidor tenta consumir, pela sequência de estados _ConsumerWantsToStart_ e _ConsumerStarts_ mas não há itens a serem produzidos, então ele se coloca em espera, no estado _ConsumerWaits_.
+
+O produtor realiza o bloco de estados que o faz produzir um item: _ProduzerWantsToStart_, _ProducerStarts_ e _ProducerProduces_. Como só foi pedido para 1 item ser produzido, este produtor finaliza, caracterizado pelo estado _ProducerEnds_. Porém, antes de finalizar, ele detecta que um consumidor está esperando e passa o bastão para ele.
+
+Entretanto, o arquivo de configuração pede que o próximo estado a ser executado seja o segundo consumidor com _ConsumerWantsToStart_. Quando ele tenta executar o estado _ConsumerStarts_, ele não consegue pois não adquire o semáforo _e_, que está já em uso pelo produtor que passou o bastão para o primeiro consumidor. Assim, o programa entra em _deadlock_, mostrando que a passagem de bastão está correta.
+
+
+### Teste 3
 
 Arquivo de configuração deste teste:
 

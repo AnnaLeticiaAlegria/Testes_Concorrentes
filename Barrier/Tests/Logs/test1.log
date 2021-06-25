@@ -1,0 +1,37 @@
+Thread 0: step=0
+Thread 2: step=0
+Thread 1: step=0
+Thread 3: step=0
+ThreadWantsToStart
+Thread 4: step=0
+ThreadStarts
+ThreadWaits
+ThreadWantsToStart
+ThreadStarts
+ThreadWaits
+ThreadWantsToStart
+ThreadStarts
+ThreadWaits
+ThreadWantsToStart
+ThreadStarts
+ThreadWaits
+ThreadWantsToStart
+ThreadStarts
+ReleaseAThread
+ThreadPassedTheBarrier
+Thread 4: step=1
+ThreadPassedTheBarrier
+Thread 0: step=1
+ReleaseAThread
+ThreadPassedTheBarrier
+ReleaseAThread
+Thread 2: step=1
+ThreadPassedTheBarrier
+Thread 3: step=1
+
+
+
+DeadLock detected!!
+Expected event 22 called LastThreadPosts
+
+

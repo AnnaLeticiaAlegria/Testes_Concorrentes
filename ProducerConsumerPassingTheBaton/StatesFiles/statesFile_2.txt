@@ -1,0 +1,13 @@
+ConsumerWantsToStart 1
+ConsumerStarts 1
+ConsumerWaits 1
+ProducerWantsToStart *
+ProducerStarts *
+ProducerProduces *
+ProducerEnds *
+ConsumerWantsToStart !1
+ConsumerStarts !1
+ConsumerConsumes !1
+ConsumerConsumes 1
+ConsumerEnds 1
+ConsumerEnds !1

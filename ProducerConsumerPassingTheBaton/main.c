@@ -470,8 +470,6 @@ void deposits (int item, int id) {
       sem_post(semCons[c]); //V(semCons)
       if (flagEnds) {
         printf("---producer %d ending\n", id);
-        sem_post(e); //V(e)
-        sem_post(semProd); 
         checkState("ProducerEnds");
         pthread_exit(NULL);
       }
@@ -561,7 +559,6 @@ void consumes (int myId) {
       if (flagEnds) {
         checkState("ConsumerEnds");
         printf("---consumer %d ending\n", myId);
-        sem_post(e);
         pthread_exit(NULL);
       }
       sem_post(semCons[c]); //V(semCons)
