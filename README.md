@@ -119,9 +119,34 @@ Caso o programa aceite alguma sequência que o usuário sabe estar errada, é ga
 
 ## Exemplos de uso
 
+Este módulo foi implementado em quatro problemas para exemplificar seu modo de uso e a possibilidade de eventos a serem criados. Cada exemplo está nesse repositório separado em uma pasta que contém seu código fonte, arquivos de configuração utilizados nos testes, resultados dos testes, script para rodar os testes e um arquivo README contendo a documentação e explicação do exemplo.
+
+A seguir, é apresentado um resumo de cada exemplo, na ordem sugerida para o usuário conferir cada um:
+
+* [FirstExample](./FirstExample/README.md#exemplo-firstexample): Exemplo mais básico apresentado. Nele, um número de threads modificam a mesma variável global. É apresentada uma versão utilizando semáforos para realizar este controle e uma que não utiliza e verificado o valor desta variável _global_ ao final das execuções.
+
+* [ReaderWriter](./ReaderWriter/README.md#exemplo-readerwriter): Exemplo que utiliza o problema de leitores e escritores. Nesta versão, mais de um leitor pode ler o _buffer_ ao mesmo tempo. Entretanto, não é feito o controle completo na sincronização de leitores e escritores, sendo o módulo _StateManager_ perfeito para exemplificar os problemas que podem ocorrer. Além disso, em sua seção [Sobre pares de estados](./ReaderWriter/README.md#sobre-pares-de-estados) são apresentados os pares de estados.
+
+* [Barrier](./Barrier/README.md#exemplo-barrier): Exemplo que utiliza o problema de sincronização utilizando barreiras. O programa apresenta três funções de barreira, das quais duas são incorretas.
+
+* [ProducerConsumerPassingTheBaton](./ProducerConsumerPassingTheBaton/README.md#exemplo-producerconsumerpassingthebaton): Este exemplo é o exemplo apresentado mais complexo. Nele, produtores e consumidores escrevem em um _buffer_ circular utilizando a técnica de passagem de bastão. Graças a este exemplo, as regras de execução de uma thread foram vistas necessárias e implementadas.
+
+
 ## Testes
 
+Os testes foram realizados em cada exemplo de uso. Foram analisados os resultados de testes com arquivos de ordens de estados que são conhecidamente corretos pra cada exemplo. Também foram utilizados arquivos com ordens de estados consideradas incorretas para verificar se cada exemplo as aceitava.
+
+* [Testes do exemplo FirstExample](./FirstExample/README.md#testes): Foram realizados 2 testes para cada uma das duas versões presentes neste exemplo. Os resultados deles foram comparados entre si.
+
+* [Testes do exemplo ReaderWriter](./ReaderWriter/README.md#testes): Foram realizados 6 testes deste exemplo, a fim de explorar as falhas do programa ao máximo. Estas falhas são derivadas da falta de sincronização entre o que um escritor escreve e o leitor lê.
+
+* [Testes do exemplo Barrier](./Barrier/README.md#testes): Foram realizados 4 testes com este exemplo. Um teste que mostra que a primeira função de barreira está incorreta, outro que mostra problemas na segunda função e os outros dois testes que comprovam que a terceira função está correta.
+
+* [Testes do exemplo ProducerConsumerPassingTheBaton](./ProducerConsumerPassingTheBaton/README.md#testes): Foram realizados 3 testes neste problema. Eles visam a verificação do funcionamento da técnica de passagem de bastão.
+
 ## Passos futuros
+
+Como visto nos exemplos de uso, o módulo já consegue englobar uma boa quantidade de testes. Porém, ainda existem muitos testes interessantes a serem realizados.
 
 Os passos futuros envolvem melhorias no arquivo de configuração. O objetivo é que ele consiga expressar mais casos de testes.
 
