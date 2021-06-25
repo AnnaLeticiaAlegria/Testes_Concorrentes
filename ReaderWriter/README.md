@@ -126,7 +126,7 @@ Isso indica que o arquivo de configuração não contém uma ordem de estados v�
 
 Arquivo de configuração deste teste:
 
-> ReaderWantsToStart *<br/><br/>ReaderStarts *<br/>ReaderReads *<br/>ReaderEnds *<br/>WriterWantsToStart *<br/>WriterStarts *<br/>WriterWrites *<br/>WriterEnds *<br/>
+> ReaderWantsToStart *<br/>ReaderStarts *<br/>ReaderReads *<br/>ReaderEnds *<br/>WriterWantsToStart *<br/>WriterStarts *<br/>WriterWrites *<br/>WriterEnds *<br/>
 
 Este teste executa com 1 leitor e 1 escritor.
 
@@ -138,7 +138,7 @@ Este teste mostra que o caso de um leitor não poder ler um _buffer_ vazio foi t
 
 Arquivo de configuração deste teste:
 
-> WriterWantsToStart *<br/>WriterStarts *<br/>WriterWrites *<br/>WriterEnds *<br/>WriterWantsToStart *<br/>WriterStarts *<br/>WriterWrites *<br/>WriterEnds *<br/>WriterWantsToStart *<br/>WriterStarts *<br/>WriterWrites *<br/>WriterEnds *<br/>WriterWantsToStart *<br/>WriterStarts *<br/>WriterWrites *<br/>WriterEnds *<br/>WriterWantsToStart *<br/>WriterStarts *<br/>WriterWrites *<br/>WriterEnds *<br/>WriterWantsToStart *<br/>WriterStarts *<br/>WriterWrites *<br/>WriterEnds *<br/>ReaderWantsToStart *<br/><br/>ReaderStarts *<br/>ReaderReads *<br/>ReaderEnds *<br/>
+> WriterWantsToStart *<br/>WriterStarts *<br/>WriterWrites *<br/>WriterEnds *<br/>WriterWantsToStart *<br/>WriterStarts *<br/>WriterWrites *<br/>WriterEnds *<br/>WriterWantsToStart *<br/>WriterStarts *<br/>WriterWrites *<br/>WriterEnds *<br/>WriterWantsToStart *<br/>WriterStarts *<br/>WriterWrites *<br/>WriterEnds *<br/>WriterWantsToStart *<br/>WriterStarts *<br/>WriterWrites *<br/>WriterEnds *<br/>WriterWantsToStart *<br/>WriterStarts *<br/>WriterWrites *<br/>WriterEnds *<br/>ReaderWantsToStart *<br/>ReaderStarts *<br/>ReaderReads *<br/>ReaderEnds *<br/>
 
 Este teste executa com 1 leitor e 1 escritor. É importante notar que o _buffer_ está definido como tendo tamanho 5.
 
