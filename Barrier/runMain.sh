@@ -2,11 +2,11 @@
 
 gcc -Wall -o barrier main.c ../StateManager/stateManager.c -I/$LUA_CDIR -llua5.3
 
-printf "\nTest 1 --> Running Barrier v1 with 5 threads, 2 steps and statesFile_1.txt....\n\n"
+printf "\nTest 1 --> Running Barrier v1 with 3 threads, 2 steps and statesFile_1.txt....\n\n"
 
 sleep 2
 
-./barrier 1 5 2 ../Barrier/StatesFiles/statesFile_1.txt >&1 | tee ./Tests/Logs/test1.log
+./barrier 1 3 2 ../Barrier/StatesFiles/statesFile_1.txt >&1 | tee ./Tests/Logs/test1.log
 
 sleep 2
 

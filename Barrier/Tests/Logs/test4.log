@@ -10,6 +10,6 @@ ThreadWaits
 
 
 DeadLock detected!!
-Expected event 4 called ThreadPassedTheBarrier
+Expected event 4 called ThreadPassed
 
 

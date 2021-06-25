@@ -274,6 +274,9 @@ Description: This function is the first version of a barrier. It is incorrect.
 The thread gets the lock of semaphore 'mutex' to access the variable 'arrived'. If it isn't the last one to arrive,
 it releases the semaphore 'mutex' and waits on semaphore 'cond'. If it is the last one to arrive, it releases every
 thread that is waiting on 'cond', sets 'arrived' to 0 and releases the semaphore 'mutex'
+This version is wrong because the last thread to arrive stacks sem_post's calls and then, releases the semaphore 
+'mutex'. If this threads executes the next step before the other threads consume the sem_post on semaphore 'cond', it 
+can acquire the semaphore 'mutex' and will not wait on the barrier, since the sem_wait on 'cond' won't work.
 ----------------------------------------------------------------------------------------------------------------------
 */
 void barrier_v1(int numThreads) {
@@ -288,11 +291,12 @@ void barrier_v1(int numThreads) {
     checkState("ThreadWaits");
     sem_wait(cond);
 
-    checkState("ThreadPassedTheBarrier");
+    checkState("ThreadPassed");
   } 
   else {
     for(int i=1; i<numThreads; i++)
-    { 
+    {
+      checkState("WantsToRelease");
       sem_post(cond); 
       checkState("ReleaseAThread");
     }
@@ -332,7 +336,7 @@ void barrier_v2(int numThreads) {
     checkState("ThreadWaits");
     sem_wait(cond);
 
-    checkState("ThreadPassedTheBarrier");
+    checkState("ThreadPassed");
     arrived--;
     if (arrived==0) {
       checkState("LastThreadPosts");
@@ -375,7 +379,7 @@ void barrier_v3(int id, int numThreads) {
     checkState("ThreadWaits");
     sem_wait(cond);
 
-    checkState("ThreadPassedTheBarrier");
+    checkState("ThreadPassed");
     arrived--;
     if (arrived==0) {
       checkState("LastThreadPosts");

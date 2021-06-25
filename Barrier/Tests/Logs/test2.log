@@ -1,9 +1,9 @@
 Thread 0: step=0
 Thread 2: step=0
-Thread 1: step=0
-ThreadWantsToStart
-Thread 3: step=0
 Thread 4: step=0
+ThreadWantsToStart
+Thread 1: step=0
+Thread 3: step=0
 ThreadStarts
 ThreadWaits
 ThreadWantsToStart
@@ -17,10 +17,10 @@ ThreadStarts
 ThreadWaits
 ThreadWantsToStart
 ThreadStarts
-ThreadPassedTheBarrier
-ThreadPassedTheBarrier
-ThreadPassedTheBarrier
-ThreadPassedTheBarrier
+ThreadPassed
+ThreadPassed
+ThreadPassed
+ThreadPassed
 
 
 

@@ -12,9 +12,9 @@ ThreadStarts *
 ThreadWaits *
 ThreadWantsToStart *
 ThreadStarts *
-ThreadPassedTheBarrier *
-ThreadPassedTheBarrier *
-ThreadPassedTheBarrier *
-ThreadPassedTheBarrier *
+ThreadPassed *
+ThreadPassed *
+ThreadPassed *
+ThreadPassed *
 LastThreadPosts *
 EveryThreadArrived *

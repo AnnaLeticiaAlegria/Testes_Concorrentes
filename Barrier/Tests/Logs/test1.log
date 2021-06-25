@@ -1,37 +1,29 @@
 Thread 0: step=0
 Thread 1: step=0
-Thread 3: step=0
-ThreadWantsToStart
 Thread 2: step=0
-Thread 4: step=0
-ThreadStarts
-ThreadWaits
 ThreadWantsToStart
 ThreadStarts
-ThreadWaits
 ThreadWantsToStart
 ThreadStarts
-ThreadWaits
 ThreadWantsToStart
 ThreadStarts
-ThreadWaits
-ThreadWantsToStart
-ThreadStarts
+WantsToRelease
 ReleaseAThread
-ThreadPassedTheBarrier
-Thread 0: step=1
-ThreadPassedTheBarrier
+WantsToRelease
 ReleaseAThread
-Thread 1: step=1
-ThreadPassedTheBarrier
-Thread 4: step=1
-ReleaseAThread
-ThreadPassedTheBarrier
 Thread 2: step=1
+ThreadWantsToStart
+ThreadStarts
+ThreadWaits
+ThreadPassed
+ThreadWaits
+ThreadPassed
+Thread 1: step=1
+ThreadWaits
 
 
 
 DeadLock detected!!
-Expected event 22 called LastThreadPosts
+Expected event 18 called ThreadPassed
 
 
