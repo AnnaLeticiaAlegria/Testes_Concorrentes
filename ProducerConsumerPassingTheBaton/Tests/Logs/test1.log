@@ -4,16 +4,16 @@ ConsumerWaits
 ProducerWantsToStart
 ProducerStarts
 ProducerProduces
----producer 0 wrote 109
+---producer 0 wrote 64
 ---producer 0 ending
 ProducerEnds
 ConsumerConsumes
----consumer 1 consumes 109
+---consumer 0 consumes 64
 ConsumerEnds
----consumer 1 finalizando
+---consumer 0 finalizando
 ConsumerWantsToStart
 ConsumerStarts
 ConsumerConsumes
----consumer 0 consumes 109
+---consumer 1 consumes 64
 ConsumerEnds
----consumer 0 finalizando
+---consumer 1 finalizando

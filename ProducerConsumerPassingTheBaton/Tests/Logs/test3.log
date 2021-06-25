@@ -1,32 +1,32 @@
 ProducerWantsToStart
 ProducerStarts
 ProducerProduces
----producer 0 wrote 122
+---producer 0 wrote 7
 ProducerWantsToStart
 ProducerStarts
 ProducerWaits
 ConsumerWantsToStart
 ConsumerStarts
 ConsumerConsumes
----consumer 0 consumes 122
+---consumer 0 consumes 7
 ConsumerWantsToStart
 ConsumerStarts
 ConsumerConsumes
----consumer 1 consumes 122
+---consumer 1 consumes 7
 ProducerProduces
----producer 1 wrote 16
+---producer 1 wrote 7
 ProducerEnds
 ---producer 1 ending
 ConsumerWantsToStart
 ConsumerStarts
 ConsumerConsumes
----consumer 0 consumes 16
+---consumer 0 consumes 7
 ConsumerEnds
 ---consumer 0 finalizando
 ConsumerWantsToStart
 ConsumerStarts
 ConsumerConsumes
----consumer 1 consumes 16
+---consumer 1 consumes 7
 ConsumerEnds
 ---consumer 1 finalizando
 ProducerWantsToStart

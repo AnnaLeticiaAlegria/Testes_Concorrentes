@@ -6,10 +6,10 @@ WriterEnds
 ReaderWantsToStart
 ReaderStarts
 ReaderReads
-----Reader 1 reads 103
+----Reader 0 reads 103
 ReaderEnds
 ReaderWantsToStart
 ReaderStarts
 ReaderReads
-----Reader 0 reads 0
+----Reader 1 reads 0
 ReaderEnds

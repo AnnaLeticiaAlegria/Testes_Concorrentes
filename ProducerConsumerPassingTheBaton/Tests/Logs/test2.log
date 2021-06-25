@@ -4,7 +4,7 @@ ConsumerWaits
 ProducerWantsToStart
 ProducerStarts
 ProducerProduces
----producer 0 wrote 74
+---producer 0 wrote 133
 ---producer 0 ending
 ProducerEnds
 ConsumerWantsToStart

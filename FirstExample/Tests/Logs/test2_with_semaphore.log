@@ -1,6 +1,6 @@
 ---Thread 0 started
-ThreadStarts
 ---Thread 1 started
+ThreadStarts
 ReadCount
 UpdateCount
 ---Thread 0 wrote 1

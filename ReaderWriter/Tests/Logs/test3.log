@@ -1,12 +1,12 @@
 WriterWantsToStart
 WriterStarts
 WriterWrites
-----Writer 0 writes 103
+----Writer 1 writes 103
 WriterEnds
 WriterWantsToStart
 WriterStarts
 WriterWrites
-----Writer 1 writes 169
+----Writer 0 writes 169
 WriterEnds
 ReaderWantsToStart
 ReaderWantsToStart
@@ -15,6 +15,6 @@ ReaderStarts
 ReaderReads
 ----Reader 0 reads 103
 ReaderReads
-----Reader 1 reads 103
 ReaderEnds
+----Reader 1 reads 103
 ReaderEnds
