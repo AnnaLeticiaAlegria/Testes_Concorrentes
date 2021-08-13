@@ -47,6 +47,8 @@ const char ** statesArray; // Array with the names of each event of the sequence
 int * statesIdArray;       // Array with the ids of each event of the sequence. It's length is equal to totalStates 
 pthread_t * threadIdArray; // Array with the thread's id of the user's program. It's length is equal to the number of threads
 
+lua_State *LState;
+
 
 /*
 ----------------------------------------------------------------------------------------------------------------------
@@ -78,8 +80,6 @@ Lastly, it sets an alarm with time 'deadLockDetectTime' (which is, by default, 5
 ----------------------------------------------------------------------------------------------------------------------
 */
 void initializeManager (char * fileName, int nThreads) {
-  lua_State *LState;
-
   /* Set SIGALRM handler */
   signal(SIGALRM,signalHandler);
 
@@ -111,9 +111,6 @@ void initializeManager (char * fileName, int nThreads) {
 
   /* Pop the results from calling Lua function */
   getLuaResults (LState);
-
-  /* Close Lua State */
-  lua_close(LState);
 
   /* Allocate threadIdArray */
   threadIdArray = (pthread_t*) malloc (nThreads * sizeof(pthread_t));
@@ -196,6 +193,9 @@ void finalizeManager (void) {
   free(statesArray);
   free(statesIdArray);
   alarm(0);
+
+  /* Close Lua State */
+  lua_close(LState);
 }
 
 /*
@@ -302,39 +302,22 @@ can execute this state. Works on changing that are being done.
 ----------------------------------------------------------------------------------------------------------------------
 */
 int compareStates (const char * state, int currentState) {
+  int isEventNext;
 
-  /* First, check the state's name */
-  if (!strcmp(state, statesArray[currentState])) {
+   /* Put the function's name and its parameters in the stack */
+  lua_getglobal(LState, "checkEvent");
+  lua_pushlstring(LState, state, strlen(state));  
 
-    /* Second, check if it cannot be any threadId */
-    if (statesIdArray[currentState] != 0) {
-      pthread_t currentThreadId = pthread_self(); // Get the thread id
-      pthread_t targetThreadId = threadIdArray[abs(statesIdArray[currentState]) - 1]; // Get the currentState's thread id
-
-      /* Then, check the state's id */
-      if (statesIdArray[currentState] > 0) { // it means that it must be the state with this id
-
-        /* If there was no thread assigned to this id yet, it assignes itself*/
-        if (targetThreadId == 0) {
-          threadIdArray[abs(statesIdArray[currentState]) - 1] = currentThreadId;
-          return 1;
-        }
-        return pthread_equal(currentThreadId, targetThreadId);
-      }
-
-      /* If reached this point, it means that it cannot be the state with this id (statesIdArray[currentState] < 0) */
-      if (!pthread_equal(currentThreadId, targetThreadId)) {
-        return 1;
-      }
-    }
-    else {
-      /* If it can be any id, it returns 1 since it passed already by the name's condition */
-      return 1;
-    }
+  /* Call the function on the stack, giving 1 parameter and expecting 3 values to be returned */
+  if (lua_pcall(LState, 1, 1, 0)) {
+    printf("Error during checkEvent call\n");
+    exit(0);
   }
 
-  /* In case it didn't passed any of the conditions, returns 0 */
-  return 0;
+  isEventNext = lua_tonumber(LState, -1);
+  lua_pop(LState,1);
+
+  return isEventNext;
 }
 
 /*

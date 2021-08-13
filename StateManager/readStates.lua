@@ -14,6 +14,9 @@
 local lpeg = require 'lpeg'
 local match = lpeg.match
 
+local graph = {}
+local currentEvent = 0
+
 ----------------------------------------------------------------------------------------------------------------------
 -- Function: readStates
 -- Parameters: 
@@ -76,5 +79,33 @@ function readStates(path)
     table.insert (stateIdArray, stateId)
   end
   file:close()
+
+  createGraph ()
   return stateIdArray, stateNameArray, #stateNameArray
+end
+
+function createGraph ()
+  graph = {{"ThreadStarts", {2}, 1}, {"ReadCount", {3}, 1}, {"ThreadStarts", {4}, -1}, {"ReadCount", {5}, -1}, {"UpdateCount", {6}, 1}, {"UpdateCount", {}, -1}}
+  -- for a, b in ipairs(graph) do
+  --   for c, d in ipairs(b) do
+  --     print(d)
+  --   end
+  -- end
+end
+
+function checkEvent (eventName)
+  -- check if eventName exists in graph[currentEvent][2]
+  if (currentEvent == 0) then
+    currentEvent = 1
+    if (graph[1][1] == eventName) then return 1 else return 0 end
+  end
+
+  for index, value in ipairs(graph[currentEvent][2]) do
+    if (eventName == graph[value][1]) then
+      currentEvent = value
+      return 1
+    end
+  end
+
+  return 0
 end
