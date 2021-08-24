@@ -306,10 +306,11 @@ int compareStates (const char * state, int currentState) {
 
    /* Put the function's name and its parameters in the stack */
   lua_getglobal(LState, "checkEvent");
-  lua_pushlstring(LState, state, strlen(state));  
+  lua_pushlstring(LState, state, strlen(state));
+  lua_pushinteger(LState, (int) pthread_self());
 
   /* Call the function on the stack, giving 1 parameter and expecting 3 values to be returned */
-  if (lua_pcall(LState, 1, 1, 0)) {
+  if (lua_pcall(LState, 2, 1, 0)) {
     printf("Error during checkEvent call\n");
     exit(0);
   }

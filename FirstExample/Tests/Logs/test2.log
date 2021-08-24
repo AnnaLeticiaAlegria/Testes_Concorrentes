@@ -1,11 +1,7 @@
 ---Thread 0 started
 ---Thread 1 started
+Processando evento ThreadStarts
+threadId nova t1 nil
 ThreadStarts
-ReadCount
-UpdateCount
----Thread 0 wrote 1
-ThreadStarts
-ReadCount
-UpdateCount
----Thread 1 wrote 2
----Final value of count: 2
+Processando evento ThreadStarts
+Error during checkEvent call

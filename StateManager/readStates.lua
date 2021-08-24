@@ -15,7 +15,8 @@ local lpeg = require 'lpeg'
 local match = lpeg.match
 
 local graph = {}
-local currentEvent = 0
+local currentEvent = {}
+local threadIdTable = {}
 
 ----------------------------------------------------------------------------------------------------------------------
 -- Function: readStates
@@ -85,27 +86,59 @@ function readStates(path)
 end
 
 function createGraph ()
-  graph = {{"ThreadStarts", {2}, 1}, {"ReadCount", {3}, 1}, {"ThreadStarts", {4}, -1}, {"ReadCount", {5}, -1}, {"UpdateCount", {6}, 1}, {"UpdateCount", {}, -1}}
-  -- for a, b in ipairs(graph) do
-  --   for c, d in ipairs(b) do
-  --     print(d)
-  --   end
-  -- end
-end
-
-function checkEvent (eventName)
-  -- check if eventName exists in graph[currentEvent][2]
-  if (currentEvent == 0) then
-    currentEvent = 1
-    if (graph[1][1] == eventName) then return 1 else return 0 end
+  graph = {}
+  for i = 1,6 do
+    graph[i] = {}
   end
 
-  for index, value in ipairs(graph[currentEvent][2]) do
-    if (eventName == graph[value][1]) then
-      currentEvent = value
-      return 1
+  graph[1]["ThreadStarts"] = {{2} , "t1"}
+  graph[2]["ReadCount"] = {{3}, "t1"}
+  graph[3]["ThreadStarts"] = {{4}, "t2"}
+  graph[4]["ReadCount"] = {{5}, "t2"}
+  graph[5]["UpdateCount"] = {{6}, "t1"}
+  graph[6]["UpdateCount"] = {{}, "t2"}
+
+  table.insert(currentEvent, 1)
+end
+
+function checkThreadId (threadVariable, threadId)
+  if (threadIdTable[threadVariable]) then
+    print("threadId existe " .. tostring(threadVariable) .. " " .. tostring(threadIdTable[threadVariable]))
+    if (threadId == threadIdTable[threadVariable]) then return 1 else return 0 end
+  else
+    print("threadId nova " .. tostring(threadVariable) .. " " .. tostring(threadIdTable[threadVariable]))
+    threadIdTable[threadVariable] = threadId
+    return 1
+  end
+end
+
+function checkEvent (eventName, threadId)
+  print("Processando evento " .. eventName)
+
+  local nextNodeTable = {}
+
+  for eventIndex, eventValue in ipairs(currentEvent) do
+    local currentNodeTable = graph[eventValue][eventName]
+    if (currentNodeTable and checkThreadId(currentNodeTable[2], threadId)) then
+      for _, value in ipairs(currentNodeTable[1]) do 
+        table.insert(nextNodeTable, value)
+      end
     end
   end
 
-  return 0
+  if (next(nextNodeTable)) then
+    currentEvent = nextNodeTable
+    return 1
+  else
+    return 0
+  end
 end
+
+createGraph()
+print("Chamada 1 -> "..tostring(checkEvent("ThreadStarts", 123)))
+print("Chamada 2 -> "..tostring(checkEvent("ThreadStarts", 456)))
+print("Chamada 3 -> "..tostring(checkEvent("ReadCount", 123)))
+print("Chamada 4 -> "..tostring(checkEvent("ThreadStarts", 456)))
+print("Chamada 5 -> "..tostring(checkEvent("ReadCount", 456)))
+print("Chamada 6 -> "..tostring(checkEvent("UpdateCount", 123)))
+print("Chamada 7 -> "..tostring(checkEvent("UpdateCount", 456)))
