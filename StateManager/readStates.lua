@@ -87,26 +87,26 @@ end
 
 function createGraph ()
   graph = {}
-  for i = 1,6 do
+  for i = 1,7 do
     graph[i] = {}
   end
 
-  graph[1]["ThreadStarts"] = {{2} , "t1"}
-  graph[2]["ReadCount"] = {{3}, "t1"}
-  graph[3]["ThreadStarts"] = {{4}, "t2"}
-  graph[4]["ReadCount"] = {{5}, "t2"}
-  graph[5]["UpdateCount"] = {{6}, "t1"}
-  graph[6]["UpdateCount"] = {{}, "t2"}
+  graph[1]["WriterWantsToStart"] = {{2} , "t1"}
+  graph[1]["ReaderWantsToStart"] = {{5}, "t2"}
+  graph[2]["WriterStarts"] = {{3,4}, "t1"}
+  graph[3]["WriterWrites"] = {{4}, "t1"}
+  graph[4]["WriterEnds"] = {{1}, "t1"}
+  graph[5]["ReaderStarts"] = {{6,7}, "t2"}
+  graph[6]["ReaderReads"] = {{7}, "t2"}
+  graph[7]["ReaderEnds"] = {{1}, "t2"}
 
   table.insert(currentEvent, 1)
 end
 
 function checkThreadId (threadVariable, threadId)
   if (threadIdTable[threadVariable]) then
-    print("threadId existe " .. tostring(threadVariable) .. " " .. tostring(threadIdTable[threadVariable]))
     if (threadId == threadIdTable[threadVariable]) then return 1 else return 0 end
   else
-    print("threadId nova " .. tostring(threadVariable) .. " " .. tostring(threadIdTable[threadVariable]))
     threadIdTable[threadVariable] = threadId
     return 1
   end
@@ -127,6 +127,7 @@ function checkEvent (eventName, threadId)
   end
 
   if (next(nextNodeTable)) then
+    print("Evento realizado: " .. eventName)
     currentEvent = nextNodeTable
     return 1
   else
@@ -135,10 +136,26 @@ function checkEvent (eventName, threadId)
 end
 
 createGraph()
-print("Chamada 1 -> "..tostring(checkEvent("ThreadStarts", 123)))
-print("Chamada 2 -> "..tostring(checkEvent("ThreadStarts", 456)))
-print("Chamada 3 -> "..tostring(checkEvent("ReadCount", 123)))
-print("Chamada 4 -> "..tostring(checkEvent("ThreadStarts", 456)))
-print("Chamada 5 -> "..tostring(checkEvent("ReadCount", 456)))
-print("Chamada 6 -> "..tostring(checkEvent("UpdateCount", 123)))
-print("Chamada 7 -> "..tostring(checkEvent("UpdateCount", 456)))
+print("Chamada 1 -> "..tostring(checkEvent("WriterWantsToStart", 123)))
+print("Chamada 2 -> "..tostring(checkEvent("WriterStarts", 123)))
+print("Chamada 3 -> "..tostring(checkEvent("WriterWrites", 123)))
+print("Chamada 4 -> "..tostring(checkEvent("WriterEnds", 123)))
+print("Chamada 5 -> "..tostring(checkEvent("ReaderWantsToStart", 456)))
+print("Chamada 6 -> "..tostring(checkEvent("ReaderStarts", 456)))
+print("Chamada 7 -> "..tostring(checkEvent("ReaderReads", 456)))
+print("Chamada 8 -> "..tostring(checkEvent("ReaderEnds", 456)))
+print("Testando loops")
+
+for i = 1, 4 do
+  print("Chamada 1 loop i=" ..tostring(i).." -> "..tostring(checkEvent("WriterWantsToStart", 123)))
+  print("Chamada 2 loop i=" ..tostring(i).." -> "..tostring(checkEvent("WriterStarts", 123)))
+  print("Chamada 3 loop i=" ..tostring(i).." -> "..tostring(checkEvent("WriterWrites", 123)))
+  print("Chamada 4 loop i=" ..tostring(i).." -> "..tostring(checkEvent("WriterEnds", 123)))
+  print("Chamada 3 -> "..tostring(checkEvent("WriterWrites", 123)))
+end
+for i = 1, 4 do
+  print("Chamada 1 loop i=" ..tostring(i).." -> "..tostring(checkEvent("ReaderWantsToStart", 456)))
+  print("Chamada 2 loop i=" ..tostring(i).." -> "..tostring(checkEvent("ReaderStarts", 456)))
+  print("Chamada 3 loop i=" ..tostring(i).." -> "..tostring(checkEvent("ReaderReads", 456)))
+  print("Chamada 4 loop i=" ..tostring(i).." -> "..tostring(checkEvent("ReaderEnds", 456)))
+end

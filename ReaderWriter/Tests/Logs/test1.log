@@ -1,15 +1,44 @@
+Processando evento ReaderWantsToStart
+Processando evento ReaderWantsToStart
+Processando evento WriterWantsToStart
 WriterWantsToStart
+Processando evento ReaderWantsToStart
+Processando evento WriterStarts
 WriterStarts
+Processando evento WriterWrites
 WriterWrites
 ----Writer 0 writes 103
+Processando evento ReaderWantsToStart
+Processando evento ReaderWantsToStart
+Processando evento WriterEnds
 WriterEnds
+Processando evento WriterWantsToStart
+Processando evento ReaderWantsToStart
 ReaderWantsToStart
+Processando evento ReaderStarts
 ReaderStarts
+Processando evento ReaderReads
 ReaderReads
-----Reader 0 reads 103
+----Reader 1 reads 103
+Processando evento WriterWantsToStart
+Processando evento ReaderEnds
 ReaderEnds
+Processando evento ReaderWantsToStart
 ReaderWantsToStart
+Processando evento ReaderStarts
 ReaderStarts
+Processando evento WriterWantsToStart
+Processando evento ReaderWantsToStart
+Processando evento ReaderReads
 ReaderReads
+Processando evento ReaderWantsToStart
 ----Reader 1 reads 0
-ReaderEnds
+Processando evento ReaderEnds
+Processando evento WriterWantsToStart
+
+
+
+DeadLock detected!!
+Expected event 12 called ReaderEnds
+
+
