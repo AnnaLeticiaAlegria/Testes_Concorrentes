@@ -14,7 +14,10 @@ x produtores e y consumidores
     (ConsumerWantsToStart [>> threadC]);
     (ConsumerStarts [threadC]);
     (
-      (ConsumerWaits [threadC]) |
+      (
+        (ConsumerWaits [threadC]);
+        (ConsumerConsumes [threadC]);
+      ) |
       (ConsumerConsumes [threadC])
     )
     (ConsumerEnds [threadC]);

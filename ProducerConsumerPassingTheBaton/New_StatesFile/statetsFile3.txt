@@ -3,12 +3,12 @@ x produtores e y consumidores
 (
   (
     (
-      (ProducerWantsToStart [>>+ threadP]);
-      (ProducerStarts [threadP]);
+      (ProducerWantsToStart [>> threadP]);
+      (ProducerStarts [threadP >>+ groupP]);
     )*
     (
       (
-        (ProducerWaits [threadP]) *
+        (ProducerWaits [(groupP - auxP) >> auxP]) *
         (
           (ConsumerWantsToStart [>>+ threadC]);
           (ConsumerStarts [threadC]);
