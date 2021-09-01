@@ -1,0 +1,22 @@
+x produtores e y consumidores
+
+(
+  (
+    (ProducerWantsToStart [>> threadP]);
+    (ProducerStarts [threadP]);
+    (
+      (ProducerWaits [threadP]) |
+      (ProducerProduces [threadP])
+    )
+    (ProducerEnds [threadP]);
+  ) * |
+  (
+    (ConsumerWantsToStart [>> threadC]);
+    (ConsumerStarts [threadC]);
+    (
+      (ConsumerWaits [threadC]) |
+      (ConsumerConsumes [threadC])
+    )
+    (ConsumerEnds [threadC]);
+  )*
+)*
