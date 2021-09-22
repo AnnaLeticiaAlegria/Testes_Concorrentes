@@ -1,0 +1,11 @@
+(ReaderWantsToStart [>> thread1]);
+(ReaderStarts [thread1]);
+(ReaderEnds [thread1]);
+(WriterWantsToStart [>> thread2]);
+(WriterStarts [thread2]);
+(WriterWrites [thread2]);
+(WriterEnds [thread2]);
+(ReaderWantsToStart [thread1]);
+(ReaderStarts [thread1]);
+(ReaderReads [thread1]);
+(ReaderEnds [thread1]);

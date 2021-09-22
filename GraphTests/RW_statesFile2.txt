@@ -1,0 +1,28 @@
+(
+  (
+    (
+      (WriterWantsToStart [>> thread1]);
+      (
+        (
+          (WriterStarts [thread1]);
+          (WriterWrites [thread1]);
+        ) |
+        (WriterStarts [thread1]);
+      );
+      (WriterEnds [thread1]);
+    )
+  ) |
+  (
+    (
+      (ReaderWantsToStart [>> thread2]);
+      (
+        (
+          (ReaderStarts [thread2]);
+          (ReaderReads [thread2]);
+        ) |
+        (ReaderStarts [thread2]);
+      );
+      (ReaderEnds [thread2]);
+    )
+  )
+)*

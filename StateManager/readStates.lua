@@ -14,9 +14,12 @@
 local lpeg = require 'lpeg'
 local match = lpeg.match
 
+local grammarParser = require "grammarParser"
+
 local graph = {}
 local currentEvent = {}
 local threadIdTable = {}
+local globalGraphNode = 1
 
 ----------------------------------------------------------------------------------------------------------------------
 -- Function: readStates
@@ -48,57 +51,100 @@ function readStates(path)
     return nil 
   end
 
-  -- Iniatilize stateNameArray and stateIdArray as empty tables
-  local stateNameArray = {}
-  local stateIdArray = {}
+  local fileString = file:read("*all")
 
-  -- For each line of the file do
-  for line in file:lines() do
-    local space = lpeg.P(' ') -- Detects whitespaces
-    local notSpace = (1 - space)^0 -- Detects everything that comes before a whitespace 
-    local beforeSpace = lpeg.C(notSpace) * space -- Captures everything that comes before a whitespace
-    local afterSpace = notSpace * space * lpeg.C(notSpace) -- Captures everything that comes after a whitespace
+  tree = grammarParser.grammarParser(fileString)
 
-    local stateName = beforeSpace:match(line) -- Aplies beforeSpace on the string line
-    table.insert (stateNameArray, stateName) -- Insert all characters before whitespace at the next position of stateNameArray
-
-    local stateIdAux = afterSpace:match(line) -- Aplies afterSpace on the string line
-    local stateId
-    local anyId = lpeg.P("*") -- Detects the character '*'
-    local notId = lpeg.P("!") -- Detects the character '!'
-
-    if anyId:match(stateIdAux) then -- If stateIdAux contains a '*'
-      stateId = 0 -- It means it can be any thread id
-    else
-      if notId:match(stateIdAux) then -- If stateIdAux contains a '!'
-        local pattern = notId * lpeg.C((1 - notId)^0) -- Captures the number that follows the character '!'
-        stateId = tonumber(pattern:match(stateIdAux)) * (-1) -- Convert this number to a negative integer
-      else
-        stateId = tonumber(stateIdAux) -- Convert stateIdAux to a positive integer (Since it contains only number)
-      end
-    end
-    table.insert (stateIdArray, stateId)
-  end
   file:close()
 
-  createGraph ()
-  return stateIdArray, stateNameArray, #stateNameArray
-end
-
-function createGraph ()
-  graph = {}
-  for i = 1,7 do
-    graph[i] = {}
+  if not tree then
+    return 0
   end
 
-  graph[1]["WriterWantsToStart"] = {{2} , "t1"}
-  graph[1]["ReaderWantsToStart"] = {{5}, "t2"}
-  graph[2]["WriterStarts"] = {{3,4}, "t1"}
-  graph[3]["WriterWrites"] = {{4}, "t1"}
-  graph[4]["WriterEnds"] = {{1}, "t1"}
-  graph[5]["ReaderStarts"] = {{6,7}, "t2"}
-  graph[6]["ReaderReads"] = {{7}, "t2"}
-  graph[7]["ReaderEnds"] = {{1}, "t2"}
+  createGraph(tree)
+  return 1
+end
+
+local function insertEdge (entryNode, eventName, exitNode, eventRule)
+  if (not graph[entryNode]) then
+    graph[entryNode] = {}
+  end
+  if (not graph[entryNode][eventName]) then
+    graph[entryNode][eventName] = {{exitNode}, eventRule}
+  else
+    table.insert(graph[entryNode][eventName][1], exitNode)
+  end
+end
+
+local function processTree (currentGraphNode, grammarTree)
+  local child1, child2
+  if (grammarTree["tag"] == "item") then
+    return {{grammarTree[1], grammarTree[2], currentGraphNode}}
+  else
+    if(grammarTree["tag"] == "or") then
+      local auxTable = {}
+      child1 = processTree (currentGraphNode, grammarTree[1])
+      for _,value in ipairs(child1) do table.insert(auxTable,value) end
+
+      child2 = processTree (currentGraphNode, grammarTree[2])
+      for _,value in ipairs(child2) do table.insert(auxTable,value) end
+
+      return auxTable
+    else
+      if(grammarTree["tag"] == "star") then
+        child1 = processTree (currentGraphNode, grammarTree[1])
+        for _, value in ipairs(child1) do
+          insertEdge (value[3], value[1], currentGraphNode, value[2])
+        end
+      else
+        if(grammarTree["tag"] == "seq") then
+          child1 = processTree (currentGraphNode, grammarTree[1])
+          globalGraphNode = globalGraphNode + 1
+          for _,value in ipairs(child1) do 
+            insertEdge (value[3], value[1], globalGraphNode, value[2])
+          end
+
+          child2 = processTree (globalGraphNode, grammarTree[2])
+          return child2
+        else
+          print("Error creating graph --> Inexistent tag")
+        end
+      end
+    end
+  end
+end
+
+function createGraph (grammarTree)
+
+  local lastChild = processTree(1, grammarTree)
+
+  if (lastChild) then
+    for _,value in ipairs(lastChild) do 
+      insertEdge (value[3], value[1], globalGraphNode, value[2])
+    end
+  end
+
+  for k,value in ipairs(graph) do
+    print("Node "..tostring(k))
+    for k2,value2 in pairs(value) do
+      print("--- "..k2)
+      for _,value3 in pairs(value2) do
+        for _,value4 in ipairs(value3) do
+          print("------ "..tostring(value4))
+        end
+      end
+    end
+  end
+
+
+  -- graph[1]["WriterWantsToStart"] = {{2} , "t1"}
+  -- graph[1]["ReaderWantsToStart"] = {{5}, "t2"}
+  -- graph[2]["WriterStarts"] = {{3,4}, "t1"}
+  -- graph[3]["WriterWrites"] = {{4}, "t1"}
+  -- graph[4]["WriterEnds"] = {{1}, "t1"}
+  -- graph[5]["ReaderStarts"] = {{6,7}, "t2"}
+  -- graph[6]["ReaderReads"] = {{7}, "t2"}
+  -- graph[7]["ReaderEnds"] = {{1}, "t2"}
 
   table.insert(currentEvent, 1)
 end
@@ -135,7 +181,8 @@ function checkEvent (eventName, threadId)
   end
 end
 
-createGraph()
+readStates("../GraphTests/RW_statesFile2.txt")
+
 print("Chamada 1 -> "..tostring(checkEvent("WriterWantsToStart", 123)))
 print("Chamada 2 -> "..tostring(checkEvent("WriterStarts", 123)))
 print("Chamada 3 -> "..tostring(checkEvent("WriterWrites", 123)))
