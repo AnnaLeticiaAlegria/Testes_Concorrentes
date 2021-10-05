@@ -58,6 +58,7 @@ Encapsulated function's declaration
 
 void getLuaResults (lua_State *LState);
 int compareStates (const char * state, int currentState);
+void setLuaPath(lua_State* L, const char* path);
 void signalHandler(int signum);
 
 /*
@@ -80,12 +81,17 @@ Lastly, it sets an alarm with time 'deadLockDetectTime' (which is, by default, 5
 ----------------------------------------------------------------------------------------------------------------------
 */
 void initializeManager (char * fileName, int nThreads) {
+  int existsTree;
+
   /* Set SIGALRM handler */
   signal(SIGALRM,signalHandler);
 
   /* Open Lua State */
   LState = luaL_newstate();
   luaL_openlibs(LState); 
+
+
+  // setLuaPath(LState, "/Users/annaleticiaalegria/Documentos/Paralelo/Testes_Concorrentes/StateManager/grammarParser.lua");
 
   /* Load Lua file */
   if (luaL_loadfile(LState, readStatesFilePath)) {
@@ -95,33 +101,28 @@ void initializeManager (char * fileName, int nThreads) {
 
   /* Priming run */
   if (lua_pcall(LState, 0, 0, 0)) {
-    printf("Error in priming run\n");
+    printf("Error in priming run --> %s\n", lua_tostring(LState, -1));
     exit(0);
   }
 
   /* Put the function's name and its parameters in the stack */
-  lua_getglobal(LState, "readStates");
+  lua_getglobal(LState, "readStatesFile");
   lua_pushlstring(LState, fileName, strlen(fileName));  
 
-  /* Call the function on the stack, giving 1 parameter and expecting 3 values to be returned */
-  if (lua_pcall(LState, 1, 3, 0)) {
-    printf("Error during readStates call\n");
+  /* Call the function on the stack, giving 1 parameter and expecting 1 value to be returned */
+  if (lua_pcall(LState, 1, 1, 0)) {
+    printf("Error during readStatesFile call --> %s\n", lua_tostring(LState, -1));
     exit(0);
   }
 
   /* Pop the results from calling Lua function */
-  getLuaResults (LState);
+  existsTree = lua_tonumber(LState, -1);
+  lua_pop(LState,1);
 
-  /* Allocate threadIdArray */
-  threadIdArray = (pthread_t*) malloc (nThreads * sizeof(pthread_t));
-  if (threadIdArray == NULL) {
-    printf("Error in threadIdArray malloc\n");
+  if(!existsTree) {
+    printf("Error during event's graph creation\n");
+    lua_close(LState);
     exit(0);
-  }
-
-  /* Insert 0 at each position of threadIdArray */
-  for(int i = 0; i<nThreads; i++){
-    threadIdArray[i] = 0;
   }
 
   /* Set alarm of 'deadLockDetectTime' seconds */
@@ -155,10 +156,10 @@ void checkState (const char * state) {
     pthread_mutex_lock(&conditionLock); // P(conditionLock)
 
     /* In case there are no states left */
-    if (currentState == totalStates) {
-      pthread_mutex_unlock(&conditionLock); // V(conditionLock)
-      pthread_exit(NULL); // End thread
-    }
+    // if (currentState == totalStates) {
+    //   pthread_mutex_unlock(&conditionLock); // V(conditionLock)
+    //   pthread_exit(NULL); // End thread
+    // }
 
     /* Check if it's this state's turn */
     if(compareStates(state, currentState)) {
@@ -189,84 +190,10 @@ at the end of the user's program.
 ----------------------------------------------------------------------------------------------------------------------
 */
 void finalizeManager (void) {
-  free(threadIdArray);
-  free(statesArray);
-  free(statesIdArray);
   alarm(0);
 
   /* Close Lua State */
   lua_close(LState);
-}
-
-/*
-----------------------------------------------------------------------------------------------------------------------
-Function: getLuaResults
-Parameters: 
-  -> LState: Lua State opened by initalizeManager
-Returns: nothing
-
-Description: This function is called after the Lua function is called. It gets every return of the Lua function that
-is on the stack. The Lua function readStates returns the value in the following order: stateIdArray, stateNameArray, 
-length of stateNameArray. So, after the function is called, the stack looks like this:
-
-  ----------------------------
-  | lenght of stateNameArray |
-  ----------------------------
-  |      stateNameArray      |
-  ----------------------------
-  |       stateIdArray       |
-  ----------------------------
-
-It means that the results must be popped out of the stack in the following order: length of stateNameArray, 
-stateNameArray, stateIdArray.
-Getting the length of the stateNameArray, the statesNameArray and the statesIdArray can be allocated with this length.
-----------------------------------------------------------------------------------------------------------------------
-*/
-void getLuaResults (lua_State *LState) {
-  int i = 0;
-
-  /* In readStates.lua, the array size is the last value returned, so it is on the top of the stack */
-  totalStates = lua_tonumber(LState, -1);
-  lua_pop(LState,1);
-
-  /* Allocate statesArray */
-  statesArray = (const char **) malloc ((totalStates) * sizeof(const char*));
-  if (statesArray == NULL) {
-    printf("Error in statesArray malloc\n");
-    exit(0);
-  }
-
-  /* Allocate statesIdArray */
-  statesIdArray = (int *) malloc ((totalStates) * sizeof(int));
-  if (statesIdArray == NULL) {
-    printf("Error in statesIdArray malloc\n");
-    exit(0);
-  }
-
-  lua_pushnil(LState); 
-
-  /* Since statesArray is an array, the function has to pop everything at this address until it has nothing (which means
-  that all the array has been popped) */
-  while (lua_next(LState, -2) != 0) {
-    /* Since is a Lua table, it has key and value. But in this case, the key is a sequential number in range of 
-    (1, #statesArray). This function uses 'key' (at index -2) and 'value' (at index -1). The function needs only the
-    value, therefore, it only needs what is at index -1 */
-    statesArray[i] = lua_tostring(LState, -1);
-    lua_pop(LState, 1);
-    i++;
-  }
-
-  lua_pushnil(LState);
-  i = 0;
-
-  /* Since statesIdArray is an array, the function has to pop everything at this address until it has nothing 
-  (which means that all the array has been popped) */
-  while (lua_next(LState, -3) != 0) {
-    /* Same case as above */
-    statesIdArray[i] = lua_tonumber(LState, -1);
-    lua_pop(LState, 1);
-    i++;
-  }
 }
 
 /*
@@ -311,7 +238,7 @@ int compareStates (const char * state, int currentState) {
 
   /* Call the function on the stack, giving 1 parameter and expecting 3 values to be returned */
   if (lua_pcall(LState, 2, 1, 0)) {
-    printf("Error during checkEvent call\n");
+    printf("Error during checkEvent call--> %s\n", lua_tostring(LState, -1));
     exit(0);
   }
 
@@ -319,6 +246,28 @@ int compareStates (const char * state, int currentState) {
   lua_pop(LState,1);
 
   return isEventNext;
+}
+
+void setLuaPath( lua_State* L, const char* path )
+{
+  const char * cur_path;
+  char * str_aux;
+
+  lua_getglobal( L, "package" );
+  lua_getfield( L, -1, "path" ); // get field "path" from table at top of stack (-1)
+  cur_path = lua_tostring( L, -1 ); // grab path string from top of stack
+
+  str_aux = (char*) malloc ((strlen(cur_path) + strlen(path) + 2) * sizeof(char)); // ; + \0
+  strcpy(str_aux, cur_path);
+  strcat(str_aux, ";");
+  strcat(str_aux, path);
+
+  lua_pop( L, 1 ); // get rid of the string on the stack we just pushed on line 5
+  lua_pushstring( L, cur_path ); // push the new one
+  lua_setfield( L, -2, "path" ); // set the field "path" in table at -2 with value at top of stack
+  lua_pop( L, 1 ); // get rid of package table from top of stack
+
+  free(str_aux);
 }
 
 /*
@@ -333,8 +282,49 @@ alarm is done, the time will reset (only one alarm can be active at the same tim
 ----------------------------------------------------------------------------------------------------------------------
 */
 void signalHandler(int signum){
+  const char ** nextEventTable;
+  int n_nextEvent, i=0;
+
   printf("\n\n\nDeadLock detected!!\n");
-  printf("Expected event %d called %s\n\n\n", currentState + 1, statesArray[currentState]);
+
+  lua_getglobal(LState, "expectedEvent");
+  if (lua_pcall(LState, 0, 2, 0)) {
+    printf("Error during expectedEvent call--> %s\n", lua_tostring(LState, -1));
+    exit(0);
+  }
+
+  n_nextEvent = lua_tonumber(LState, -1);
+  lua_pop(LState,1);
+
+  /* Allocate nextEventTable */
+  nextEventTable = (const char **) malloc ((n_nextEvent) * sizeof(const char*));
+  if (nextEventTable == NULL) {
+    printf("Error in nextEventTable malloc\n");
+    exit(0);
+  }
+
+  lua_pushnil(LState); 
+
+  /* Since nextEventTable is an array, the function has to pop everything at this address until it has nothing (which means
+  that all the array has been popped) */
+  while (lua_next(LState, -2) != 0) {
+    /* Since is a Lua table, it has key and value. But in this case, the key is a sequential number in range of 
+    (1, #nextEventTable). This function uses 'key' (at index -2) and 'value' (at index -1). The function needs only the
+    value, therefore, it only needs what is at index -1 */
+    nextEventTable[i] = lua_tostring(LState, -1);
+    lua_pop(LState, 1);
+    i++;
+  }
+
+  lua_pushnil(LState);
+
+  printf("Possible Events Expected:\n");
+  for (i=0; i< n_nextEvent; i++) {
+    printf("\t -> %s\n", nextEventTable[i]);
+  }
+  printf("\n\n\n");
+
+  free(nextEventTable);
   finalizeManager ();
   exit(0);
 }

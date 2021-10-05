@@ -1,5 +1,5 @@
 --
--- Module: readStates.lua
+-- Module: eventManager.lua
 -- Author: Anna Leticia Alegria
 -- Last Modified at: 17/06/2021
 
@@ -14,12 +14,115 @@
 local lpeg = require 'lpeg'
 local match = lpeg.match
 
-local grammarParser = require "grammarParser"
+-- local grammarParser = require ("grammarParser")
 
 local graph = {}
 local currentEvent = {}
 local threadIdTable = {}
 local globalGraphNode = 1
+
+
+
+
+
+
+
+--[[
+Item <- Id ('[' TheadExp ']' )? | '(' Exp ')'
+
+Iterate <- Item ('*' ?)
+
+Seq <- Iterate (';' Iterate)* ';'?
+
+Exp <- Seq ('|' Seq)*
+]]
+
+
+local m = require "lpeg"
+
+
+local function syntaxerror (s, i)
+  local eols = string.gsub(string.sub(s, 1, i), "[^\n]", "")
+  io.stdout:write("syntax error line ", #eols + 1, ": ",
+   string.sub(s, i - 30, i - 1), "❌", string.sub(s, i, i + 30), "\n")
+  os.exit(false)
+end
+
+
+local function packbin (tag)
+  return function (a, b)
+           return b and {tag = tag, a, b} or a
+         end
+end
+
+
+local function packstar (a, b)
+  return b and {tag = "star", a} or a
+end
+
+
+local inlimit = 0
+
+-- Tokens
+local S = m.V"S"
+
+local OS = '[' * S
+local CS = ']' * S
+
+local OP = '(' * S
+local CP = ')' * S
+
+local OrOp = '|' * S
+local Star = '*' * S
+local Sc = ';' * S
+
+local ID = m.C(m.R("az", "AZ") * m.R("az", "AZ", "09")^0) * S --Captura o nome do ID
+
+local G = m.P{"Prog";
+
+  Prog = S * m.V"Exp" * -m.P(1),
+
+  Exp = (m.V"Seq" * Sc^-1 * (OrOp * m.V"Exp")^-1) / packbin("or"),
+
+  Seq = (m.V"Iterate" * (Sc * m.V"Seq")^-1) / packbin("seq"),
+
+  Iterate = (m.V"Item" * m.C(Star)^-1) / packstar,
+
+  Item = (ID * m.C((OS * m.V"ThreadExp" * CS)^-1)) / packbin("item")
+       + OP * m.V"Exp" * CP,
+
+  ThreadExp = (1 - m.P"]")^0, -- Tudo antes do "]"
+
+  S = m.S(" \t\n")^0 *
+        m.P(function (_, i)
+             -- track input limit
+             inlimit = math.max(inlimit, i)
+             return i
+           end),
+
+}
+
+
+local function grammarParser (input)
+  local p = m.match(G, input)
+  if not p then
+    syntaxerror(input, inlimit)
+  end
+  return p
+end
+
+
+-- print(pt.pt(parser(io.read("a"))))
+
+
+
+
+
+
+
+
+
+
 
 ----------------------------------------------------------------------------------------------------------------------
 -- Function: readStates
@@ -45,15 +148,16 @@ local globalGraphNode = 1
 -- #stateNameArray
 ----------------------------------------------------------------------------------------------------------------------
 
-function readStates(path)
+function readStatesFile(path)
   local file = io.open(path, "r")
   if not file then 
-    return nil 
+    return 0 
   end
 
   local fileString = file:read("*all")
 
-  tree = grammarParser.grammarParser(fileString)
+  -- tree = grammarParser.grammarParser(fileString)
+  tree = grammarParser(fileString)
 
   file:close()
 
@@ -128,15 +232,7 @@ local function processTree (currentGraphNode, grammarTree)
   end
 end
 
-function createGraph (grammarTree)
-
-  local lastChild = processTree(1, grammarTree)
-
-  if (lastChild) then
-    for _,value in ipairs(lastChild) do 
-      insertEdge (value[3], value[1], -1, value[2])
-    end
-  end
+local function printGraph(graph)
 
   for k,value in ipairs(graph) do
     print("Node "..tostring(k))
@@ -149,16 +245,17 @@ function createGraph (grammarTree)
       end
     end
   end
+end
 
+function createGraph (grammarTree)
 
-  -- graph[1]["WriterWantsToStart"] = {{2} , "t1"}
-  -- graph[1]["ReaderWantsToStart"] = {{5}, "t2"}
-  -- graph[2]["WriterStarts"] = {{3,4}, "t1"}
-  -- graph[3]["WriterWrites"] = {{4}, "t1"}
-  -- graph[4]["WriterEnds"] = {{1}, "t1"}
-  -- graph[5]["ReaderStarts"] = {{6,7}, "t2"}
-  -- graph[6]["ReaderReads"] = {{7}, "t2"}
-  -- graph[7]["ReaderEnds"] = {{1}, "t2"}
+  local lastChild = processTree(1, grammarTree)
+
+  if (lastChild) then
+    for _,value in ipairs(lastChild) do 
+      insertEdge (value[3], value[1], -1, value[2])
+    end
+  end
 
   table.insert(currentEvent, 1)
 end
@@ -173,21 +270,22 @@ function checkThreadId (threadVariable, threadId)
 end
 
 function checkEvent (eventName, threadId)
-  print("Processando evento " .. eventName)
 
   local nextNodeTable = {}
 
   for eventIndex, eventValue in ipairs(currentEvent) do
-    local currentNodeTable = graph[eventValue][eventName]
-    if (currentNodeTable and checkThreadId(currentNodeTable[2], threadId)) then
-      for _, value in ipairs(currentNodeTable[1]) do 
-        table.insert(nextNodeTable, value)
+    if (eventValue >= 0) then -- eventValue = -1 when this event can be the last
+      local currentNodeTable = graph[eventValue][eventName]
+      if (currentNodeTable and checkThreadId(currentNodeTable[2], threadId)) then
+        for _, value in pairs(currentNodeTable[1]) do 
+          table.insert(nextNodeTable, value)
+        end
       end
     end
   end
 
   if (next(nextNodeTable)) then
-    print("Evento realizado: " .. eventName)
+    -- print("Evento realizado: " .. eventName)
     currentEvent = nextNodeTable
     return 1
   else
@@ -195,29 +293,19 @@ function checkEvent (eventName, threadId)
   end
 end
 
-readStates("../GraphTests/RW_statesFile2.txt")
+function expectedEvent ()
+  local auxTable = {}
 
+  for _, stateValue in ipairs(currentEvent) do
+    if (stateValue >= 0) then
+      for eventName, _ in pairs(graph[stateValue]) do
+        print(eventName)
+        table.insert(auxTable, eventName)
+      end
+    else
+      table.insert(auxTable, "[This could be the last event]")
+    end
+  end
 
--- print("Chamada 1 -> "..tostring(checkEvent("WriterWantsToStart", 123)))
--- print("Chamada 2 -> "..tostring(checkEvent("WriterStarts", 123)))
--- print("Chamada 3 -> "..tostring(checkEvent("WriterWrites", 123)))
--- print("Chamada 4 -> "..tostring(checkEvent("WriterEnds", 123)))
--- print("Chamada 5 -> "..tostring(checkEvent("ReaderWantsToStart", 456)))
--- print("Chamada 6 -> "..tostring(checkEvent("ReaderStarts", 456)))
--- print("Chamada 7 -> "..tostring(checkEvent("ReaderReads", 456)))
--- print("Chamada 8 -> "..tostring(checkEvent("ReaderEnds", 456)))
--- print("Testando loops")
-
--- for i = 1, 4 do
---   print("Chamada 1 loop i=" ..tostring(i).." -> "..tostring(checkEvent("WriterWantsToStart", 123)))
---   print("Chamada 2 loop i=" ..tostring(i).." -> "..tostring(checkEvent("WriterStarts", 123)))
---   print("Chamada 3 loop i=" ..tostring(i).." -> "..tostring(checkEvent("WriterWrites", 123)))
---   print("Chamada 4 loop i=" ..tostring(i).." -> "..tostring(checkEvent("WriterEnds", 123)))
---   print("Chamada 3 -> "..tostring(checkEvent("WriterWrites", 123)))
--- end
--- for i = 1, 4 do
---   print("Chamada 1 loop i=" ..tostring(i).." -> "..tostring(checkEvent("ReaderWantsToStart", 456)))
---   print("Chamada 2 loop i=" ..tostring(i).." -> "..tostring(checkEvent("ReaderStarts", 456)))
---   print("Chamada 3 loop i=" ..tostring(i).." -> "..tostring(checkEvent("ReaderReads", 456)))
---   print("Chamada 4 loop i=" ..tostring(i).." -> "..tostring(checkEvent("ReaderEnds", 456)))
--- end
+  return auxTable, #auxTable
+end

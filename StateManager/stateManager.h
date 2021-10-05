@@ -45,11 +45,11 @@ Global variable's declaration
 | |---StateManager
 | | |---stateManager.c
 | | |---stateManager.h
-| | |---readStates.lua
+| | |---eventManager.lua
 
 Change the readStatesFilePath accordingly if it is not the case
 */
-static char * readStatesFilePath = "../StateManager/readStates.lua";
+static char * readStatesFilePath = "../StateManager/readStatesFile.lua";
 
 /* Time that the program can wait a thread until it considers as a deadlock. Default is 5 seconds */
 static int deadLockDetectTime = 5;
