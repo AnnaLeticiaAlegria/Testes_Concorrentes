@@ -26,3 +26,6 @@ sleep 2
 ./producerConsumer 1 2 2 2 ../ProducerConsumerPassingTheBaton/StatesFiles/statesFile_3.txt >&1 | tee ./Tests/Logs/test3.log
 
 sleep 2
+
+
+# 1 -> 1 produtor e 2 consumidores

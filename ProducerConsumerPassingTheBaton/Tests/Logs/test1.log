@@ -1,19 +1,2 @@
-ConsumerWantsToStart
-ConsumerStarts
-ConsumerWaits
-ProducerWantsToStart
-ProducerStarts
-ProducerProduces
----producer 0 wrote 64
----producer 0 ending
-ProducerEnds
-ConsumerConsumes
----consumer 0 consumes 64
-ConsumerEnds
----consumer 0 finalizando
-ConsumerWantsToStart
-ConsumerStarts
-ConsumerConsumes
----consumer 1 consumes 64
-ConsumerEnds
----consumer 1 finalizando
+syntax error line 2: ❌ConsumerStarts *
+ConsumerWaits 

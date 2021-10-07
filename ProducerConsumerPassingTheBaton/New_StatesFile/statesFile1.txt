@@ -1,5 +1,3 @@
-1 produtor e 2 consumidores
-
 (ConsumerWantsToStart [>>thread1]);
 (ProducerWantsToStart [>>thread2]);
 (ConsumerWantsToStart [~thread1 >> thread3]);
@@ -11,8 +9,8 @@
 (ProducerProduces [thread2]);
 (ProducerEnds [thread2]);
 
+(ConsumerConsumes [thread1]);
 (ConsumerStarts [thread3]);
 (ConsumerConsumes [thread3]);
-(ConsumerConsumes [thread1]);
 (ConsumerEnds [thread1]);
 (ConsumerEnds [thread3]);

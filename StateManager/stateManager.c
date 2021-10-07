@@ -283,17 +283,20 @@ alarm is done, the time will reset (only one alarm can be active at the same tim
 */
 void signalHandler(int signum){
   const char ** nextEventTable;
-  int n_nextEvent, i=0;
-
-  printf("\n\n\nDeadLock detected!!\n");
+  int n_nextEvent, i=0, code;
 
   lua_getglobal(LState, "expectedEvent");
-  if (lua_pcall(LState, 0, 2, 0)) {
+  if (lua_pcall(LState, 0, 3, 0)) {
     printf("Error during expectedEvent call--> %s\n", lua_tostring(LState, -1));
     exit(0);
   }
 
-  n_nextEvent = lua_tonumber(LState, -1);
+  code = lua_tonumber(LState, -1);
+  lua_pop(LState,1);
+
+  lua_pushnil(LState); 
+
+  n_nextEvent = lua_tonumber(LState, -2);
   lua_pop(LState,1);
 
   /* Allocate nextEventTable */
@@ -307,7 +310,7 @@ void signalHandler(int signum){
 
   /* Since nextEventTable is an array, the function has to pop everything at this address until it has nothing (which means
   that all the array has been popped) */
-  while (lua_next(LState, -2) != 0) {
+  while (lua_next(LState, -3) != 0) {
     /* Since is a Lua table, it has key and value. But in this case, the key is a sequential number in range of 
     (1, #nextEventTable). This function uses 'key' (at index -2) and 'value' (at index -1). The function needs only the
     value, therefore, it only needs what is at index -1 */
@@ -318,9 +321,16 @@ void signalHandler(int signum){
 
   lua_pushnil(LState);
 
-  printf("Possible Events Expected:\n");
-  for (i=0; i< n_nextEvent; i++) {
-    printf("\t -> %s\n", nextEventTable[i]);
+  if (!code) {
+    printf("\n\n\nDeadLock detected!!\n");
+
+    printf("Possible Events Expected:\n");
+    for (i=0; i< n_nextEvent; i++) {
+      printf("\t -> %s\n", nextEventTable[i]);
+    }
+  }
+  else {
+    printf("\n\n\nFinished executing the script without problems!!\n");
   }
   printf("\n\n\n");
 

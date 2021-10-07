@@ -1,5 +1,3 @@
-x produtores e y consumidores
-
 (
   (
     (ProducerWantsToStart [>> threadP]);
@@ -7,16 +5,16 @@ x produtores e y consumidores
     (
       (ProducerWaits [threadP]) |
       (ProducerProduces [threadP])
-    )
+    );
     (ProducerEnds [threadP]);
-  ) * |
+  ) |
   (
     (ConsumerWantsToStart [>> threadC]);
     (ConsumerStarts [threadC]);
     (
       (ConsumerWaits [threadP]) |
       (ConsumerConsumes [threadP])
-    )
+    );
     (ConsumerEnds [threadC]);
-  )*
+  )
 )*

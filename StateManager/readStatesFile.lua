@@ -295,17 +295,22 @@ end
 
 function expectedEvent ()
   local auxTable = {}
+  local code = 0
 
   for _, stateValue in ipairs(currentEvent) do
     if (stateValue >= 0) then
       for eventName, _ in pairs(graph[stateValue]) do
-        print(eventName)
         table.insert(auxTable, eventName)
       end
     else
       table.insert(auxTable, "[This could be the last event]")
+      code = 1 -- indicates that the current event could be the last in the script
     end
   end
 
-  return auxTable, #auxTable
+  if (code == 1 and #auxTable > 1) then -- the current event could lead to another event, so it wasnt necessarily the last in the script
+    code = 0
+  end 
+
+  return auxTable, #auxTable, code
 end
