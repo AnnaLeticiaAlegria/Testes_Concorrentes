@@ -1,0 +1,11 @@
+ConsumerWantsToStart
+ProducerWantsToStart
+
+
+
+DeadLock detected!!
+Possible Events Expected:
+	 -> ConsumerWantsToStart
+
+
+

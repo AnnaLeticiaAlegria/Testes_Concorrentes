@@ -322,7 +322,7 @@ void signalHandler(int signum){
   lua_pushnil(LState);
 
   if (!code) {
-    printf("\n\n\nDeadLock detected!!\n");
+    printf("\n\n\nDeadLock detected!!\n"); 
 
     printf("Possible Events Expected:\n");
     for (i=0; i< n_nextEvent; i++) {

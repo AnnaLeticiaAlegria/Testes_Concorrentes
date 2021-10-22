@@ -1,0 +1,17 @@
+(
+  (
+    (
+      (ProducerWantsToStart [>> threadP]);
+      (ProducerStarts [threadP >>+ groupP]);
+    )* ;
+    ProducerEnds [threadP];
+  )
+  |
+  (
+    (
+      (ConsumerWantsToStart [>> threadC]);
+      (ConsumerStarts [threadC >>+ groupC]);
+    ) * ;
+    ConsumerEnds [threadP];
+  )
+) *;

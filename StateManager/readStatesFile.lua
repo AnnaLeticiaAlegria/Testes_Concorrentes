@@ -192,35 +192,53 @@ local function insertEdge (entryNode, eventName, exitNode, eventRule)
   end
 end
 
+local function actionTagOr (currentGraphNode, child1, child2)
+  local auxTable = {}
+
+  for _,value in ipairs(child1) do table.insert(auxTable,value) end
+  
+  for _,value in ipairs(child2) do table.insert(auxTable,value) end
+
+  return auxTable
+end
+
+local function actionTagStar (currentGraphNode, child1)
+  for _, value in ipairs(child1) do
+    print("POS REC - PROCESSSA ESTRELA "..tostring(value[3]))
+    insertEdge (value[3], value[1], currentGraphNode, value[2])
+  end
+end
+
+local function actionTagSeq (currentGraphNode, child1)
+  globalGraphNode = globalGraphNode + 1
+  for _,value in ipairs(child1) do 
+    insertEdge (value[3], value[1], globalGraphNode, value[2])
+  end
+end
+  
+
 local function processTree (currentGraphNode, grammarTree)
   local child1, child2
   if (grammarTree["tag"] == "item") then
     return {{grammarTree[1], grammarTree[2], currentGraphNode}}
   else
     if(grammarTree["tag"] == "or") then
-      local auxTable = {}
       child1 = processTree (currentGraphNode, grammarTree[1])
-      for _,value in ipairs(child1) do table.insert(auxTable,value) end
-
       child2 = processTree (currentGraphNode, grammarTree[2])
-      for _,value in ipairs(child2) do table.insert(auxTable,value) end
 
-      return auxTable
+      return actionTagOr (currentGraphNode, child1, child2)
     else
       if(grammarTree["tag"] == "star") then
         child1 = processTree (currentGraphNode, grammarTree[1])
-        for _, value in ipairs(child1) do
-          insertEdge (value[3], value[1], currentGraphNode, value[2])
-        end
+        print("PROCESSSA ESTRELA "..tostring(currentGraphNode))
+        actionTagStar (currentGraphNode, child1)
 
         return child1
       else
         if(grammarTree["tag"] == "seq") then
           child1 = processTree (currentGraphNode, grammarTree[1])
-          globalGraphNode = globalGraphNode + 1
-          for _,value in ipairs(child1) do 
-            insertEdge (value[3], value[1], globalGraphNode, value[2])
-          end
+          
+          actionTagSeq (currentGraphNode, child1)
 
           child2 = processTree (globalGraphNode, grammarTree[2])
           return child2
@@ -314,3 +332,7 @@ function expectedEvent ()
 
   return auxTable, #auxTable, code
 end
+
+readStatesFile("../ProducerConsumerPassingTheBaton/New_StatesFile/test.txt")
+
+printGraph(graph)

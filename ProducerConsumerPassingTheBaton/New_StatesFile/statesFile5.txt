@@ -1,5 +1,6 @@
 (
   (
+    [{} >> groupP];
     (
       (ProducerWantsToStart [>> threadP]);
       (ProducerStarts [threadP >>+ groupP]);
@@ -7,17 +8,13 @@
     (
       (
         (ProducerWaits [(groupP - auxP) >>+ auxP]) * ;
-        (
-          (ConsumerWantsToStart [>> threadC]);
-          (ConsumerStarts [threadC]);
-          (ConsumerConsumes [threadC >>+ groupC]);
-        )* ;
-        (ConsumerEnds [groupC]) * ;
+        (ConsumerWantsToStart [>> threadC]);
+        (ConsumerStarts [threadC]);
+        (ConsumerConsumes [threadC]);
         (ProducerProduces [groupP]) * ;
       ) |
       (ProducerProduces [groupP]) * ;
     );
-    (ProducerEnds [groupP]) * ;
   )  |
   (
     (
@@ -27,16 +24,20 @@
     (
       (
         (ConsumerWaits [(groupC - auxC) >>+ auxC]) * ;
-        (
-          (ProducerWantsToStart [>> threadP]);
-          (ProducerStarts [threadP]);
-          (ProducerProduces [threadP >>+ groupP]);
-        )* ;
-        (ProducerEnds [groupP]) * ;
+        (ProducerWantsToStart [>> threadP]);
+        (ProducerStarts [threadP]);
+        (ProducerProduces [threadP]);
         (ConsumerConsumes [groupC]) * ;
       ) |
       (ConsumerConsumes [groupC]) * ;
     );
-    (ConsumerEnds [groupC]) * ;
   )
-)*
+) * ;
+(
+  (
+    (ProducerEnds [groupP >>- groupP])
+    |
+    (ConsumerEnds [groupC]);
+  ) * ;
+  [(groupP && groupC) >> {}];
+) *

@@ -12,12 +12,10 @@
           (ConsumerStarts [threadC]);
           (ConsumerConsumes [threadC >>+ groupC]);
         )* ;
-        (ConsumerEnds [groupC]) * ;
         (ProducerProduces [groupP]) * ;
       ) |
       (ProducerProduces [groupP]) * ;
     );
-    (ProducerEnds [groupP]) * ;
   )  |
   (
     (
@@ -32,11 +30,14 @@
           (ProducerStarts [threadP]);
           (ProducerProduces [threadP >>+ groupP]);
         )* ;
-        (ProducerEnds [groupP]) * ;
         (ConsumerConsumes [groupC]) * ;
       ) |
       (ConsumerConsumes [groupC]) * ;
     );
-    (ConsumerEnds [groupC]) * ;
   )
-)*
+) * ;
+(
+  (ProducerEnds [groupP])
+  |
+  (ConsumerEnds [groupC]);
+) *
