@@ -16,10 +16,10 @@ local match = lpeg.match
 
 -- local grammarParser = require ("grammarParser")
 
-local graph = {}
-local currentEvent = {}
-local threadIdTable = {}
-local globalGraphNode = 1
+local graph
+local currentEvent
+local threadIdTable
+local globalGraphNode
 
 
 
@@ -117,12 +117,33 @@ end
 
 
 
+local function pt (x, id)
+  id = id or ""
+  if type(x) == "string" then return "'" .. tostring(x) .. "'"
+  elseif type(x) ~= "table" then return tostring(x)
+  else
+    local s = id .. "{\n"
+    for k,v in pairs(x) do
+      s = s .. id .. tostring(k) .. " = " .. pt(v, id .. "  ") .. ";\n"
+    end
+    s = s .. id .. "}"
+    return s
+  end
+end
 
 
 
 
 
 
+
+
+function initializeGlobalVariables ()
+  graph = {}
+  currentEvent = {}
+  threadIdTable = {}
+  globalGraphNode = 1
+end
 
 ----------------------------------------------------------------------------------------------------------------------
 -- Function: readStates
@@ -149,6 +170,8 @@ end
 ----------------------------------------------------------------------------------------------------------------------
 
 function readStatesFile(path)
+  initializeGlobalVariables()
+
   local file = io.open(path, "r")
   if not file then 
     return 0 
@@ -202,46 +225,93 @@ local function actionTagOr (currentGraphNode, child1, child2)
   return auxTable
 end
 
-local function actionTagStar (currentGraphNode, child1)
-  for _, value in ipairs(child1) do
-    print("POS REC - PROCESSSA ESTRELA "..tostring(value[3]))
-    insertEdge (value[3], value[1], currentGraphNode, value[2])
-  end
-end
-
 local function actionTagSeq (currentGraphNode, child1)
   globalGraphNode = globalGraphNode + 1
   for _,value in ipairs(child1) do 
     insertEdge (value[3], value[1], globalGraphNode, value[2])
   end
 end
-  
 
-local function processTree (currentGraphNode, grammarTree)
+function deepcopy(orig)
+  local orig_type = type(orig)
+  local copy
+  if orig_type == 'table' then
+    copy = {}
+    for orig_key, orig_value in next, orig, nil do
+      copy[deepcopy(orig_key)] = deepcopy(orig_value)
+    end
+    setmetatable(copy, deepcopy(getmetatable(orig)))
+  else -- number, string, boolean, etc
+    copy = orig
+  end
+  return copy
+end
+
+local function actionTagStar (currentGraphNode, child1, starCaseChild, hasFatherOr)
+
+  if(hasFatherOr) then
+
+    globalGraphNode = globalGraphNode + 1
+
+    for _, value in ipairs(child1) do
+      insertEdge (value[3], value[1], globalGraphNode, value[2])
+    end
+
+    if (not starCaseChild) then
+      local auxChild = deepcopy(child1)
+
+      for _, starValue in ipairs(child1) do
+        for _, childValue2 in ipairs(child1) do
+          insertEdge (globalGraphNode, starValue[1], globalGraphNode, starValue[2])
+          childValue2[3] = globalGraphNode
+        end
+      end
+      for _, value in ipairs(auxChild) do
+        table.insert(child1, value)
+      end
+      -- for _, value in ipairs
+    else
+      for _, starValue in ipairs(starCaseChild) do
+        for _, childValue2 in ipairs(child1) do
+          insertEdge (globalGraphNode, starValue[1], childValue2[3], starValue[2])
+        end
+      end
+    end
+  else
+    for _, value in ipairs(child1) do
+      insertEdge (value[3], value[1], currentGraphNode, value[2])
+    end
+  end
+
+  return child1
+end
+  
+local function processTree (currentGraphNode, grammarTree, hasFatherOr)
   local child1, child2
   if (grammarTree["tag"] == "item") then
     return {{grammarTree[1], grammarTree[2], currentGraphNode}}
   else
     if(grammarTree["tag"] == "or") then
-      child1 = processTree (currentGraphNode, grammarTree[1])
-      child2 = processTree (currentGraphNode, grammarTree[2])
+      child1, _ = processTree (currentGraphNode, grammarTree[1], 1)
+      child2, _ = processTree (currentGraphNode, grammarTree[2], 1)
 
-      return actionTagOr (currentGraphNode, child1, child2)
+      return actionTagOr (currentGraphNode, child1, child2), child1
     else
       if(grammarTree["tag"] == "star") then
-        child1 = processTree (currentGraphNode, grammarTree[1])
-        print("PROCESSSA ESTRELA "..tostring(currentGraphNode))
-        actionTagStar (currentGraphNode, child1)
+        local starCaseChild
+        child1, starCaseChild = processTree (currentGraphNode, grammarTree[1], hasFatherOr)
+        actionTagStar (currentGraphNode, child1, starCaseChild, hasFatherOr)
 
         return child1
       else
         if(grammarTree["tag"] == "seq") then
-          child1 = processTree (currentGraphNode, grammarTree[1])
-          
+          child1, _ = processTree (currentGraphNode, grammarTree[1], hasFatherOr)
+
           actionTagSeq (currentGraphNode, child1)
 
-          child2 = processTree (globalGraphNode, grammarTree[2])
-          return child2
+          child2, _ = processTree (globalGraphNode, grammarTree[2], hasFatherOr)
+
+          return child2, child1
         else
           print("Error creating graph --> Inexistent tag")
         end
@@ -267,7 +337,7 @@ end
 
 function createGraph (grammarTree)
 
-  local lastChild = processTree(1, grammarTree)
+  local lastChild, _ = processTree(1, grammarTree, nil)
 
   if (lastChild) then
     for _,value in ipairs(lastChild) do 
@@ -315,6 +385,8 @@ function expectedEvent ()
   local auxTable = {}
   local code = 0
 
+  printGraph(graph)
+
   for _, stateValue in ipairs(currentEvent) do
     if (stateValue >= 0) then
       for eventName, _ in pairs(graph[stateValue]) do
@@ -333,6 +405,13 @@ function expectedEvent ()
   return auxTable, #auxTable, code
 end
 
-readStatesFile("../ProducerConsumerPassingTheBaton/New_StatesFile/test.txt")
+print("\n\n\n\n\nTeste1\n\n\n")
+readStatesFile("../ProducerConsumerPassingTheBaton/Tests/test.txt")
+
+printGraph(graph)
+
+print("\n\n\n\n\nTeste2\n\n\n")
+
+readStatesFile("../ProducerConsumerPassingTheBaton/Tests/test2.txt")
 
 printGraph(graph)

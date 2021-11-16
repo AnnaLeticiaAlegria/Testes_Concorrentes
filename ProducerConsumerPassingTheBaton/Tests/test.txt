@@ -4,7 +4,7 @@
       (ProducerWantsToStart [>> threadP]);
       (ProducerStarts [threadP >>+ groupP]);
     )* ;
-    ProducerEnds [threadP];
+    (ProducerEnds [groupP >>- groupP]) *;
   )
   |
   (
@@ -12,6 +12,6 @@
       (ConsumerWantsToStart [>> threadC]);
       (ConsumerStarts [threadC >>+ groupC]);
     ) * ;
-    ConsumerEnds [threadP];
+    (ConsumerEnds [groupC >>- groupC]) *;
   )
 ) *;

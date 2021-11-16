@@ -76,7 +76,7 @@ local G = m.P{"Prog";
 }
 
 
-local function grammarParser (input)
+function grammarParser (input)
   local p = m.match(G, input)
   if not p then
     syntaxerror(input, inlimit)

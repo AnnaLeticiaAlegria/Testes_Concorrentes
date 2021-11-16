@@ -37,7 +37,7 @@
   (
     (ProducerEnds [groupP >>- groupP])
     |
-    (ConsumerEnds [groupC]);
+    (ConsumerEnds [groupC >>- groupC]);
   ) * ;
   [(groupP && groupC) >> {}];
 ) *
