@@ -1,3 +1,17 @@
+--
+-- Module: grammarParser.lua
+-- Author: Roberto Ierusalimschy
+-- Last Modified at: 24/11/2021 by Anna Leticia Alegria
+
+----------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------
+-- Description: This module contains the Lua function grammarParser. It is a function called by module luaMain.lua that
+-- reads the eventsFile and uses LPeg library to convert the script to a grammar and then to a tree that is returned
+-- by this module.
+----------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------
+--
+
 --[[
 Item <- Id ('[' TheadExp ']' )? | '(' Exp ')'
 
@@ -17,7 +31,7 @@ local m = require "lpeg"
 local function syntaxerror (s, i)
   local eols = string.gsub(string.sub(s, 1, i), "[^\n]", "")
   io.stdout:write("syntax error line ", #eols + 1, ": ",
-   string.sub(s, i - 30, i - 1), "❌", string.sub(s, i, i + 30), "\n")
+   string.sub(s, i - 30, i - 1), "❌", string.sub(s, i, i + 30), "\n") -- prints the characters before and after the error
   os.exit(false)
 end
 
@@ -49,7 +63,7 @@ local OrOp = '|' * S
 local Star = '*' * S
 local Sc = ';' * S
 
-local ID = m.C(m.R("az", "AZ") * m.R("az", "AZ", "09")^0) * S --Captura o nome do ID
+local ID = m.C(m.R("az", "AZ") * m.R("az", "AZ", "09")^0) * S
 
 local G = m.P{"Prog";
 
@@ -64,7 +78,7 @@ local G = m.P{"Prog";
   Item = (ID * m.C((OS * m.V"ThreadExp" * CS)^-1)) / packbin("item")
        + OP * m.V"Exp" * CP,
 
-  ThreadExp = (1 - m.P"]")^0, -- Tudo antes do "]"
+  ThreadExp = (1 - m.P"]")^0, -- everything before "]"
 
   S = m.S(" \t\n")^0 *
         m.P(function (_, i)

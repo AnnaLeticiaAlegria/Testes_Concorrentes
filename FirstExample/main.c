@@ -21,7 +21,7 @@ should write sequential values.
 #include <stdlib.h>
 #include <pthread.h>
 
-#include "../StateManager/stateManager.h"
+#include "../EventManager/eventManager.h"
 
 /* Global variable's declaration */
 

@@ -1,21 +1,20 @@
 /*
-Module: stateManager.c
+Module: eventManager.c
 Author: Anna Leticia Alegria
 Last Modified at: 17/06/2021
 
 ----------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------
-Description: This module contains the State Manager functions. 
+Description: This module contains the Event Manager functions. 
 The Manager works reading the passed file that contains the desired order of the events. It calls the module 
-readStates.lua to read this file and return an array of the desired events (statesArray) and an array of the states id
-(statesIdArray), in which each entry corresponds to the state on the same position in statesArray. This is done in
-the initalizeManager function.
+luaMain.lua to read this file and create an graph that contains the possible paths an event can lead to. This graph
+is operated by the lua functions. This C module calls this functions whenever an event needs to be checked.
 
-The documentation explains how the state's file should be done.
+The documentation explains how the event's file should be done.
 
-After the statesArray and the statesIdArray are ready, the user can call the function checkState, passing the desired
-state/event. This state must exist in the state's file. The program checks if the desired event is the next on the
-statesArray and if it's id corresponds to the next state's id.
+After the event's graph is ready, the user can call the function checkCurrentEvent, passing the desired event. 
+This event must exist in the event's file. The program checks if the desired event can be the next on the graph if 
+it fullfills the thread's id's conditions.
 This way, the program can control the event's order and make sure that the threads follow this order.
 
 At the end of the user's program, the finalizeManager function should be called to free all the memory allocated
@@ -24,7 +23,7 @@ by this module.
 ----------------------------------------------------------------------------------------------------------------------
 */
 
-#include "stateManager.h"
+#include "eventManager.h"
 #include <lua.h>
 #include <lauxlib.h>
 #include <lualib.h>
@@ -40,13 +39,6 @@ Global variable's declaration
 pthread_cond_t condition = PTHREAD_COND_INITIALIZER;
 pthread_mutex_t conditionLock = PTHREAD_MUTEX_INITIALIZER;
 
-int currentState = 0; // Position of the current state in the statesArray and in the statesIdArray
-int totalStates = 0;  // Total state's sequence length
-
-const char ** statesArray; // Array with the names of each event of the sequence. It's length is equal to totalStates 
-int * statesIdArray;       // Array with the ids of each event of the sequence. It's length is equal to totalStates 
-pthread_t * threadIdArray; // Array with the thread's id of the user's program. It's length is equal to the number of threads
-
 lua_State *LState;
 
 
@@ -56,8 +48,7 @@ Encapsulated function's declaration
 ----------------------------------------------------------------------------------------------------------------------
 */
 
-void getLuaResults (lua_State *LState);
-int compareStates (const char * state, int currentState);
+int compareEvents (const char * event);
 void setLuaPath(lua_State* L, const char* path);
 void signalHandler(int signum);
 
@@ -65,18 +56,15 @@ void signalHandler(int signum);
 ----------------------------------------------------------------------------------------------------------------------
 Function: initializeManager
 Parameters: 
-  -> fileName: the name of the file with the states' order
+  -> fileName: the name of the file with the events' order
   -> nThreads: user's program's total number of threads
 Returns: nothing
 
-Description: This function loads the Lua file called readStates.lua, located at readStatesFilePath. It exits in case
-this file doesn't exist. Next, the function prepares the stack to call the Lua functions in readStates.lua.
+Description: This function loads the Lua file called luaMain.lua, located at luaMainFilePath. It exits in case
+this file doesn't exist. Next, the function prepares the stack to call the Lua functions in luaMain.lua.
 Since the function readStates requires a string with the path of the file, the program puts this variable in the stack,
 after putting the function's name. After that, it call lua_pcall to call the Lua function.
-Then, call this module's function getLuaResults. This function obtains the returns of the Lua function and places at
-the global variables of this module.
-After closing the LuaState, this function allocates the threadIdArray with length of nThreads and inserts 0 at each
-position.
+After that, it closes the LuaState.
 Lastly, it sets an alarm with time 'deadLockDetectTime' (which is, by default, 5 seconds)
 ----------------------------------------------------------------------------------------------------------------------
 */
@@ -134,19 +122,19 @@ void initializeManager (char * fileName, int nThreads) {
 ----------------------------------------------------------------------------------------------------------------------
 Function: checkCurrentEvent
 Parameters: 
-  -> state: name of the state that wants to go next
+  -> event: name of the event that wants to go next
 Returns: nothing
 
-Description: This functions checks if the given state is the next state in the statesArray order and if it fullfills 
-the id's condition. For more details about the id's condition, check the function compareStates.
-If so, it prints the state, updates the current state and calls the pthread function that sends a message in broadcast
-to all the waiting threads so they can stop waiting and check if its their turn now.
-If it isn't this state's turn, the thread keeps waiting until another thread sinalize that it can stop waiting.
+Description: This functions checks if the given event can be the next event in the event's graph order and if it 
+fullfills the id's condition. For more details about the id's condition, check the function compareEvents.
+If so, it prints the event and calls the pthread function that sends a message in broadcast to all the waiting 
+threads so they can stop waiting and check if its their turn now.
+If it isn't this events's turn, the thread keeps waiting until another thread sinalize that it can stop waiting.
 
-There is an alarm with time of 'deadLockDetectTime' seconds declared everytime a state begins it's turn. If this time 
-runs out, it means no other state started a turn for the last 'deadLockDetectTime' seconds. This means that every 
-thread is waiting for the turn of their state and none of them has been accepted. This indicate that the sequence
-in the state File is not a valid sequence for the user's program. So, the handler of the SIGALRM ends the manager
+There is an alarm with time of 'deadLockDetectTime' seconds declared everytime an event begins it's turn. If this time 
+runs out, it means no other event started a turn for the last 'deadLockDetectTime' seconds. This means that every 
+thread is waiting for the turn of their event and none of them has been accepted. This indicate that the sequence
+in the event File is not a valid sequence for the user's program. So, the handler of the SIGALRM ends the manager
 and the user's program.
 ----------------------------------------------------------------------------------------------------------------------
 */
@@ -155,16 +143,15 @@ void checkCurrentEvent (const char * event) {
   while (1) {
     pthread_mutex_lock(&conditionLock); // P(conditionLock)
 
-    /* In case there are no states left */
+    /* In case there are no events left */
     // if (currentState == totalStates) {
     //   pthread_mutex_unlock(&conditionLock); // V(conditionLock)
     //   pthread_exit(NULL); // End thread
     // }
 
     /* Check if it's this state's turn */
-    if(compareStates(event, currentState)) {
+    if(compareEvents(event)) {
       printf("%s\n", event);
-      currentState ++;
       pthread_cond_broadcast(&condition); // Tell to the awaiting threads that they can go on
       pthread_mutex_unlock(&conditionLock); // V(conditionLock)
       alarm(deadLockDetectTime);
@@ -198,42 +185,41 @@ void finalizeManager (void) {
 
 /*
 ----------------------------------------------------------------------------------------------------------------------
-Function: compareStates
+Function: compareEvents
 Parameters: 
-  -> state: name of the state that wants to go next
-  -> currentState: position of the currentState in statesArray
+  -> event: name of the event that wants to go next
 Returns:
-  -> 1: if the given state is the next state
-  -> 0: if the given state is not the next state. Therefore, it needs to wait its turn
+  -> 1: if the given event can be the next event
+  -> 0: if the given event cannot be the next event. Therefore, it needs to wait its turn
 
-Description: This function first compares the given state name with the current state's name to see if it can be the 
-next state to go on. If not, returns 0. If so, continue to check the states id.
+Description: This function calls the Lua function that compares the given event name with all the possible next 
+event's name of the current node of the graph to see if it can be the next event to go on. This Lua function also
+checks if this thread's id fullfills the thread's id's condition.
 
-The state id is defined by the user on the state's file order. If this state can be performed by any thread, it's id
-is equal to 0. If it must be performed by a specific thread, this id contains an integer greater than 0.(*Note 1) 
-If it can be performed by any thread but cannot be performed by a specific thread, this id contains an integer lower 
-than 0.(*Note 2)
+The accepted thread's by every event are defined by the user using it's name within brackets. The user must follow
+this form:
 
-If the thread is the first one passing the name and the positive id's condition, it assignes it's id to the 
-threadIdArray at the (id - 1) position.
-If the thread passes the name's and the id's condition, the function returns 1.
+[term1 assignSignal term2]
 
-*Note 1: The user must assign a positive number to this state that is lower or equal to the number of threads. This
-number (called id) does not guarantee that this thread is the (id)th thread to be executed, it means that this thread
-will be considered the (id)th when it reachs this function. This id is useful when the user wants to guarantee that
-differents states/events will be executed by the same thread.
-
-*Note 2: To use this resource, the user must be assigned a thread with the specified id. (For example, if it assigns -1
-to a state, it must be any state before assigned to the id 1). Is important to notice that any thread but the specified
-can execute this state. Works on changing that are being done.
+In which:
+  -> term1: It can be empty. It defines the group of threads in which the thread that is trying to execute this event
+  must be part of. (Note: the user must have assigned a thread to this group so this can work, since the group starts
+  empty).
+  -> assignSignal: It determines what will happen to the thread that executed this event:
+    --> If assignSignal = '>>', then the group described in term2 will be overwrited by the thread that executed this
+    event.
+    --> If assignSignal = '>>+', then the thread that executed this event will be added to the group of threads
+    described in term2.
+    --> If assignSignal = '>>-', then the thread that executed this event will be subtracted of the group of threads
+    described in term2.
 ----------------------------------------------------------------------------------------------------------------------
 */
-int compareStates (const char * state, int currentState) {
+int compareEvents (const char * event) {
   int isEventNext;
 
    /* Put the function's name and its parameters in the stack */
   lua_getglobal(LState, "checkEvent");
-  lua_pushlstring(LState, state, strlen(state));
+  lua_pushlstring(LState, event, strlen(event));
   lua_pushinteger(LState, (int) pthread_self());
 
   /* Call the function on the stack, giving 1 parameter and expecting 3 values to be returned */
@@ -247,6 +233,8 @@ int compareStates (const char * state, int currentState) {
 
   return isEventNext;
 }
+
+///////////////////////////////////////
 
 void setLuaPath( lua_State* L, const char* path )
 {
@@ -279,6 +267,9 @@ Returns: nothing
 
 Description: This handler is called whenever the SIGALRM reaches the time that it was specified. If another call of
 alarm is done, the time will reset (only one alarm can be active at the same time)
+This function calls the Lua function "expectedEvent", that returns a table with all the events that could be the next
+event after the last event executed. This function then prints the array returned by the Lua function. If there were
+no possible next events, this functions prints a message telling everything worked without any problems.
 ----------------------------------------------------------------------------------------------------------------------
 */
 void signalHandler(int signum){

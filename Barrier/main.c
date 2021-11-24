@@ -20,7 +20,7 @@ There are 3 barrier's implementations on this module. Two of them are wrong and 
 #include <string.h>
 #include <semaphore.h>
 
-#include "../StateManager/stateManager.h"
+#include "../EventManager/eventManager.h"
 
 /* Global variable's declaration */
 

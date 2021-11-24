@@ -1,20 +1,20 @@
 /*
-Module: stateManager.h
+Module: eventManager.h
 Author: Anna Leticia Alegria
 Last Modified at: 19/11/2021
 
 ----------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------
-Description: This module contains the State Manager header functions. 
+Description: This module contains the Event Manager header functions. 
 The Manager works reading the passed file that contains the desired order of the events. It calls the module 
 luaMain.lua to read this file and return if it was possible to read the file or not. The Lua module contains functions
 to create the graph of events and to manipulate it, so that the C module only gets the results of the operations.
 
 The documentation explains how the event's file should be done.
 
-After calling the initializeManager function, the user can call the function checkState, passing the desired
+After calling the initializeManager function, the user can call the function checkCurrentEvent, passing the desired
 event. This event must exist in the event's file. The program calls the Lua function that checks if the desired event 
-is possibly the next event, checking the graph's edges from the current state. Besides that, the function checks the
+is possibly the next event, checking the graph's edges from the current event. Besides that, the function checks the
 if the thread's id corresponds to the allowed thread's id.
 This way, the program can control the event's order and make sure that the threads follow this order.
 
@@ -35,20 +35,20 @@ by this module.
 |---external directory
 | |---user's program folder
 | | |---main.c
-| | |---statesFile.txt
-| |---StateManager
+| | |---eventsFile.txt
+| |---EventManager
 | | |---grammarParser.lua
 | | |---graphManager.lua
 | | |---luaMain.lua
-| | |---stateManager.c
-| | |---stateManager.h
+| | |---eventManager.c
+| | |---eventManager.h
 | | |---threadIdManager.lua
 
 
 Change the readStatesFilePath accordingly if it is not the case
 */
 // static char * readStatesFilePath = "../StateManager/readStatesFile.lua";
-static char * luaMainFilePath = "../StateManager/luaMain.lua";
+static char * luaMainFilePath = "../EventManager/luaMain.lua";
 
 /* Time that the program can wait a thread until it considers as a deadlock. Default is 5 seconds */
 static int deadLockDetectTime = 5;
@@ -57,7 +57,7 @@ static int deadLockDetectTime = 5;
 ----------------------------------------------------------------------------------------------------------------------
 Function: initializeManager
 Parameters: 
-  -> fileName: the name of the file with the states' order
+  -> fileName: the name of the file with the events' order
   -> nThreads: user's program's total number of threads
 Returns: nothing
 
@@ -72,7 +72,8 @@ Input assertions:
 Output assertions:
   -> In case the fileName is incorrect, the program will warn and exit with code 0
   -> In case the program fails to create the graph, it will warn the user and exit with code 0
-  -> In case of success, the graph will be created and filled correctly. The user can call the checkState function now
+  -> In case of success, the graph will be created and filled correctly. The user can call the checkCurrentEvent 
+function now
 ----------------------------------------------------------------------------------------------------------------------
 */
 void initializeManager (char * fileName, int nThreads);
@@ -85,14 +86,14 @@ Parameters:
   -> event: name of the event that wants to go next
 Returns: nothing
 
-Description: This functions checks if the given event is a possible next event in the order described by the stateFile
+Description: This functions checks if the given event is a possible next event in the order described by the eventFile
 passed and if it fullfills the thread's id's condition. For more details about the id's condition, check the 
 documentation.
 
 Input assertions: 
   -> The user must have called the function initializeManager before this function (Therefore, it must fullfill all
 this functions' input assertions as well)
-  -> The given event name must exist in the stateFile passed
+  -> The given event name must exist in the eventFile passed
 
 Output assertions:
   -> In case it is this event's turn, the function returns so the user program's can continue

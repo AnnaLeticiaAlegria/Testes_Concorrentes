@@ -27,7 +27,7 @@ threads.
 #include <string.h>
 #include <time.h>
 
-#include "../StateManager/stateManager.h"
+#include "../EventManager/eventManager.h"
 
 /* Global variable's declaration */
 

@@ -27,7 +27,7 @@ This variable is accessed only on reader's code.
 #include <unistd.h>
 #include <semaphore.h>
 
-#include "../StateManager/stateManager.h"
+#include "../EventManager/eventManager.h"
 
 #define BUFFER_SIZE 5
 
@@ -261,7 +261,7 @@ Parameters:
 Returns: nothing
 
 Description: This function is called by every thread that is a writer.  The writer goes into the forever while and is
-ended by stateManager module, when there is no state left to be executed. The writer waits on semaphore 'rw' for their
+ended by eventManager module, when there is no state left to be executed. The writer waits on semaphore 'rw' for their
 turn no access the buffer, waiting if there is any reader reading the buffer or another writer writing on it. When the
 semaphore tells the writer to go on, it can write a random element on the next position of the buffer.
 ----------------------------------------------------------------------------------------------------------------------
@@ -305,7 +305,7 @@ Parameters:
 Returns: nothing
 
 Description: This function is called by every thread that is a reader. The reader goes into the forever while and is
-ended by stateManager module, when there is no state left to be executed. Readers can read the buffer at the same
+ended by eventManager module, when there is no state left to be executed. Readers can read the buffer at the same
 time, but they can't read the buffer if a writer is accessing it. So, the reader waits the semaphore on variable
 'mutexR' to access the variable 'activeReaders' without any problem. If is the first reader to reach this part, it
 gets the lock of the database. If it isn't, another reader has already gotten the lock. Then, the readers can read the

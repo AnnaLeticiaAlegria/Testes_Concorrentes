@@ -21,7 +21,7 @@ thread can be interrupted and another thread could read the same value of 'count
 #include <string.h>
 #include <semaphore.h>
 
-#include "../StateManager/stateManager.h"
+#include "../EventManager/eventManager.h"
 
 /* Global variable's declaration */
 

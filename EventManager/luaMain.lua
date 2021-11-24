@@ -114,27 +114,27 @@ function expectedEvent ()
   return auxTable, #auxTable, code
 end
 
-print("\n\n\n\n\nTeste1\n\n\n")
-readStatesFile("../ProducerConsumerPassingTheBaton/Tests/test.txt")
-
-graphManager.printGraph(graph)
-
--- print("\n\n\n\n\nTeste2\n\n\n")
-
--- readStatesFile("../ProducerConsumerPassingTheBaton/Tests/test2.txt")
+-- print("\n\n\n\n\nTeste1\n\n\n")
+-- readStatesFile("../ProducerConsumerPassingTheBaton/Tests/test.txt")
 
 -- graphManager.printGraph(graph)
 
-print(checkEvent ("ProducerWantsToStart", 1))
-print(checkEvent ("ProducerWantsToStart", 2))
-print(checkEvent ("ProducerStarts", 2))
-print(checkEvent ("ProducerStarts", 1))
-print(checkEvent ("ProducerWantsToStart", 2))
-print(checkEvent ("ProducerStarts", 2))
-print(checkEvent ("ConsumerWantsToStart", 4))
-print(checkEvent ("ProducerWantsToStart", 3))
-print(checkEvent ("ProducerStarts", 3))
-print(checkEvent ("ProducerEnds", 3))
-print(checkEvent ("ProducerEnds", 2))
-print(checkEvent ("ProducerEnds", 1))
-print(checkEvent ("ProducerEnds", 3))
+-- -- print("\n\n\n\n\nTeste2\n\n\n")
+
+-- -- readStatesFile("../ProducerConsumerPassingTheBaton/Tests/test2.txt")
+
+-- -- graphManager.printGraph(graph)
+
+-- print(checkEvent ("ProducerWantsToStart", 1))
+-- print(checkEvent ("ProducerWantsToStart", 2))
+-- print(checkEvent ("ProducerStarts", 2))
+-- print(checkEvent ("ProducerStarts", 1))
+-- print(checkEvent ("ProducerWantsToStart", 2))
+-- print(checkEvent ("ProducerStarts", 2))
+-- print(checkEvent ("ConsumerWantsToStart", 4))
+-- print(checkEvent ("ProducerWantsToStart", 3))
+-- print(checkEvent ("ProducerStarts", 3))
+-- print(checkEvent ("ProducerEnds", 3))
+-- print(checkEvent ("ProducerEnds", 2))
+-- print(checkEvent ("ProducerEnds", 1))
+-- print(checkEvent ("ProducerEnds", 3))
