@@ -94,7 +94,7 @@ void initializeManager (char * fileName, int nThreads) {
   // setLuaPath(LState, "/Users/annaleticiaalegria/Documentos/Paralelo/Testes_Concorrentes/StateManager/grammarParser.lua");
 
   /* Load Lua file */
-  if (luaL_loadfile(LState, readStatesFilePath)) {
+  if (luaL_loadfile(LState, luaMainFilePath)) {
     printf("Error opening lua file\n");
     exit(0);
   }
@@ -132,7 +132,7 @@ void initializeManager (char * fileName, int nThreads) {
 
 /*
 ----------------------------------------------------------------------------------------------------------------------
-Function: checkState
+Function: checkCurrentEvent
 Parameters: 
   -> state: name of the state that wants to go next
 Returns: nothing
@@ -150,7 +150,7 @@ in the state File is not a valid sequence for the user's program. So, the handle
 and the user's program.
 ----------------------------------------------------------------------------------------------------------------------
 */
-void checkState (const char * state) {
+void checkCurrentEvent (const char * event) {
 
   while (1) {
     pthread_mutex_lock(&conditionLock); // P(conditionLock)
@@ -162,8 +162,8 @@ void checkState (const char * state) {
     // }
 
     /* Check if it's this state's turn */
-    if(compareStates(state, currentState)) {
-      printf("%s\n", state);
+    if(compareStates(event, currentState)) {
+      printf("%s\n", event);
       currentState ++;
       pthread_cond_broadcast(&condition); // Tell to the awaiting threads that they can go on
       pthread_mutex_unlock(&conditionLock); // V(conditionLock)

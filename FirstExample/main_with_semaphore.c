@@ -228,11 +228,11 @@ void * threadFunction (void * id) {
   int aux;
   printf("---Thread %d started\n", myId);
 
-  checkState("ThreadStarts");
+  checkCurrentEvent("ThreadStarts");
   sem_wait(semaphoreE); // P(semaphoreE)
-  checkState("ReadCount");
+  checkCurrentEvent("ReadCount");
   aux = count;
-  checkState("UpdateCount");
+  checkCurrentEvent("UpdateCount");
   count = aux + 1;
   printf("---Thread %d wrote %d\n", myId, count);
   

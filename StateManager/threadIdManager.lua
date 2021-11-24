@@ -45,6 +45,10 @@ local function solveOperators(threadTerm1, threadId)
   local returnedTable = {}
 
   -------- funções do lpeg para separar os conjuntos
+  if (lpeg.match(lpeg.P("~"), threadTerm1)) then
+    threadTerm1 = threadTerm1:gsub("~", "")
+  end
+
   resultedTable = threadIdTable[threadTerm1] -- mudar para o resultado dos conjuntos
 
   if (resultedTable) then
@@ -77,9 +81,12 @@ local function assignCase (threadTerm1, threadTerm2, threadTerm3, threadId)
     resultedTable = solveOperators(threadTerm1, threadId)
   end
 
-  -- Step 2: check if threadId exists in first set
-
-  if (existsInTable(resultedTable, threadId) < 0) then return 0 end
+  -- Step 2: check if threadId exists in first set or if doesn't exist
+  if (lpeg.match(lpeg.P("~"), threadTerm1)) then
+    if (existsInTable(resultedTable, threadId) >= 0) then return 0 end
+  else
+    if (existsInTable(resultedTable, threadId) < 0) then return 0 end
+  end
   
   -- Step 3: if threadId exists in first set, adds it on second set
 

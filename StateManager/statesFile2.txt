@@ -1,0 +1,20 @@
+(
+  (
+    (ProducerWantsToStart [>> threadP]);
+    (ProducerStarts [threadP]);
+    (
+      (ProducerWaits [threadP]) |
+      (ProducerProduces [threadP])
+    );
+    (ProducerEnds [threadP]);
+  ) |
+  (
+    (ConsumerWantsToStart [>> threadC]);
+    (ConsumerStarts [threadC]);
+    (
+      (ConsumerWaits [threadP]) |
+      (ConsumerConsumes [threadP])
+    );
+    (ConsumerEnds [threadC]);
+  )
+)*

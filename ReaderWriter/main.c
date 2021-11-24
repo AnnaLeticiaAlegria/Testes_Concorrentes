@@ -273,23 +273,23 @@ void* writeTask (void * num)
 
 	while(1)
 	{
-    checkState("WriterWantsToStart");
+    checkCurrentEvent("WriterWantsToStart");
 
     sem_wait(rw); //P(rw)
 
-    checkState("WriterStarts");
+    checkCurrentEvent("WriterStarts");
     
     /* write the database */
 		if (n < BUFFER_SIZE)
 		{
-      checkState("WriterWrites");
+      checkCurrentEvent("WriterWrites");
 			element = rand()%200;
 			buffer[n] = element;
 			n = (n+1)%BUFFER_SIZE;
       printf("----Writer %d writes %d\n", id, element);
 		}
 
-    checkState("WriterEnds");
+    checkCurrentEvent("WriterEnds");
 
     sem_post(rw); //V(rw)
 	}
@@ -320,7 +320,7 @@ void* readTask (void * num)
 
 	while(1)
 	{
-    checkState("ReaderWantsToStart");
+    checkCurrentEvent("ReaderWantsToStart");
 
     sem_wait(mutexR); //P(mutexR)
 
@@ -330,12 +330,12 @@ void* readTask (void * num)
     }
     sem_post(mutexR); //V(mutexR)
 
-    checkState("ReaderStarts");
+    checkCurrentEvent("ReaderStarts");
 
     /* read the database */
 		if (n > 0)
 		{
-      checkState("ReaderReads");
+      checkCurrentEvent("ReaderReads");
 			element = buffer[m];
       printf("----Reader %d reads %d\n", id, element);
 		}
@@ -346,7 +346,7 @@ void* readTask (void * num)
       sem_post(rw); //V(rw)
     }
 
-    checkState("ReaderEnds");
+    checkCurrentEvent("ReaderEnds");
     
     sem_post(mutexR); //V(mutexR)
 	}

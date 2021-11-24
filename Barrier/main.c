@@ -280,25 +280,25 @@ can acquire the semaphore 'mutex' and will not wait on the barrier, since the se
 ----------------------------------------------------------------------------------------------------------------------
 */
 void barrier_v1(int numThreads) {
-  checkState("ThreadWantsToStart");
+  checkCurrentEvent("ThreadWantsToStart");
   sem_wait(mutex);
-  checkState("ThreadStarts");
+  checkCurrentEvent("ThreadStarts");
 
   arrived++;
   if (arrived < numThreads) {
     sem_post(mutex);
 
-    checkState("ThreadWaits");
+    checkCurrentEvent("ThreadWaits");
     sem_wait(cond);
 
-    checkState("ThreadPassed");
+    checkCurrentEvent("ThreadPassed");
   } 
   else {
     for(int i=1; i<numThreads; i++)
     {
-      checkState("WantsToRelease");
+      checkCurrentEvent("WantsToRelease");
       sem_post(cond); 
-      checkState("ReleaseAThread");
+      checkCurrentEvent("ReleaseAThread");
     }
     arrived = 0;
     sem_post(mutex);
@@ -325,21 +325,21 @@ arrived == 0 condition, not releasing the semaphore 'mutex'. There will be a dea
 ----------------------------------------------------------------------------------------------------------------------
 */
 void barrier_v2(int numThreads) {
-  checkState("ThreadWantsToStart");
+  checkCurrentEvent("ThreadWantsToStart");
   sem_wait(mutex);
-  checkState("ThreadStarts");
+  checkCurrentEvent("ThreadStarts");
 
   arrived++;
   if (arrived < numThreads) {
     sem_post(mutex);
 
-    checkState("ThreadWaits");
+    checkCurrentEvent("ThreadWaits");
     sem_wait(cond);
 
-    checkState("ThreadPassed");
+    checkCurrentEvent("ThreadPassed");
     arrived--;
     if (arrived==0) {
-      checkState("LastThreadPosts");
+      checkCurrentEvent("LastThreadPosts");
       sem_post(mutex);
     }
     else {
@@ -347,7 +347,7 @@ void barrier_v2(int numThreads) {
     }
   } else {
     sem_post(cond); 
-    checkState("EveryThreadArrived");
+    checkCurrentEvent("EveryThreadArrived");
     arrived--; //it should have been called before previous line
   }
 }
@@ -368,21 +368,21 @@ the semaphore 'mutex'.
 ----------------------------------------------------------------------------------------------------------------------
 */
 void barrier_v3(int id, int numThreads) {
-  checkState("ThreadWantsToStart");
+  checkCurrentEvent("ThreadWantsToStart");
   sem_wait(mutex);
-  checkState("ThreadStarts");
+  checkCurrentEvent("ThreadStarts");
 
   arrived++;
   if (arrived < numThreads) {
     sem_post(mutex);
 
-    checkState("ThreadWaits");
+    checkCurrentEvent("ThreadWaits");
     sem_wait(cond);
 
-    checkState("ThreadPassed");
+    checkCurrentEvent("ThreadPassed");
     arrived--;
     if (arrived==0) {
-      checkState("LastThreadPosts");
+      checkCurrentEvent("LastThreadPosts");
       sem_post(mutex);
     }
     else {
@@ -391,6 +391,6 @@ void barrier_v3(int id, int numThreads) {
   } else {
     arrived--;
     sem_post(cond);
-    checkState("EveryThreadArrived");
+    checkCurrentEvent("EveryThreadArrived");
   }
 }
