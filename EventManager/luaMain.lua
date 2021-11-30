@@ -1,16 +1,17 @@
 --
--- Module: eventManager.lua
+-- Module: luaMain.lua
 -- Author: Anna Leticia Alegria
--- Last Modified at: 17/06/2021
+-- Last Modified at: 24/11/2021
 
 ----------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------
--- Description: This module contains the Lua function readStates. It is a function called by module stateManager.c that
+-- Description: This module contains the Lua functions. It is a function called by module eventManager.c that
 -- reads the statesFile and uses LPeg library to treat each condition. It returns the allocated and filled array
 -- stateNameArray, stateIdArray and their length (which are equal).
 ----------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------
 --
+package.path = package.path .. ';../EventManager/?.lua;'
 
 local grammarParser = require ("grammarParser")
 local graphManager = require ("graphManager")
@@ -20,7 +21,7 @@ local graph
 local currentEvent
 
 ----------------------------------------------------------------------------------------------------------------------
--- Function: readStates
+-- Function: readStatesFile
 -- Parameters: 
 --   -> path: the path of the statesFile.txt file as a string
 -- Returns: 

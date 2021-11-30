@@ -1,3 +1,5 @@
+package.path = package.path .. ';../ProducerConsumerPassingTheBaton/Tests/?.lua;'
+
 local fooFile = require("file1") 
 
 function boo ()

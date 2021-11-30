@@ -1,7 +1,7 @@
 /*
 Module: eventManager.h
 Author: Anna Leticia Alegria
-Last Modified at: 19/11/2021
+Last Modified at: 23/11/2021
 
 ----------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------
@@ -45,9 +45,8 @@ by this module.
 | | |---threadIdManager.lua
 
 
-Change the readStatesFilePath accordingly if it is not the case
+Change the luaMainFilePath accordingly and the package.path variable in luaMain.lua module if it is not the case
 */
-// static char * readStatesFilePath = "../StateManager/readStatesFile.lua";
 static char * luaMainFilePath = "../EventManager/luaMain.lua";
 
 /* Time that the program can wait a thread until it considers as a deadlock. Default is 5 seconds */

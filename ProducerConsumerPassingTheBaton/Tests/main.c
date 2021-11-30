@@ -9,8 +9,8 @@ int main (void) {
   lua_State* LState = luaL_newstate();
   luaL_openlibs(LState);
 
-  if (luaL_loadfile(LState, "../Tests/mainFile.lua")) {
-    printf("Error opening lua file\n");
+  if (luaL_loadfile(LState, "../ProducerConsumerPassingTheBaton/Tests/mainFile.lua")) {
+    printf("Error opening lua file --> %s\n", lua_tostring(LState, -1));
     exit(0);
   }
 

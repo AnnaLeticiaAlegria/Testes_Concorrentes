@@ -1,7 +1,0 @@
----Thread 0 started
----Thread 1 started
-Processando evento ThreadStarts
-threadId nova t1 nil
-ThreadStarts
-Processando evento ReadCount
-Error during checkEvent call
