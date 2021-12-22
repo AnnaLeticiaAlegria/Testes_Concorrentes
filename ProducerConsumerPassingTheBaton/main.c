@@ -85,14 +85,14 @@ int main (int argc, char** argv) {
   srand(time(NULL));
 
   if (argc != 6) {
-    printf("Program needs 5 parameters: nPositions, nProducers, nConsumers, nItens and statesFileName\n");
+    printf("Program needs 5 parameters: nPositions, nProducers, nConsumers, nItens and eventsFileName\n");
     return 0;
   }
   N = strtol(argv[1], NULL, 10);
   P = strtol(argv[2], NULL, 10);
   C = strtol(argv[3], NULL, 10);
   I = strtol(argv[4], NULL, 10);
-  initializeManager (argv[5], P + C);
+  initializeManager (argv[5], "../ProducerConsumerPassingTheBaton/EventsFiles/configFile.txt");
 
   numPos = N;
   numProd = P;

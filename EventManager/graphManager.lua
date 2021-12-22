@@ -3,6 +3,7 @@ local graphManager = {}
 local graph
 local currentEvent
 local globalGraphNode
+local eventsNamesTable
 
 
 local function deepcopy(orig)
@@ -28,6 +29,17 @@ local function existsInTable (searchedTable, element)
   end
 
   return 0
+end
+
+local function eventInEventNameList (event)
+  if (eventsNamesTable) then
+    if (existsInTable (eventsNamesTable, event) == 0) then
+      print("Error: event " .. event .. " doesnt exist in configuration file")
+      return 0
+    end
+  end
+  
+  return 1
 end
 
 local function insertEdge (entryNode, eventName, exitNode, eventRule)
@@ -82,7 +94,6 @@ local function actionTagStar (currentGraphNode, child1, starCaseChild, hasFather
       for _, value in ipairs(auxChild) do
         table.insert(child1, value)
       end
-      -- for _, value in ipairs
     else
       for _, starValue in ipairs(starCaseChild) do
         for _, childValue2 in ipairs(child1) do
@@ -102,6 +113,9 @@ end
 local function processTree (currentGraphNode, grammarTree, hasFatherOr)
   local child1, child2
   if (grammarTree["tag"] == "item") then
+    if (eventInEventNameList (grammarTree[1]) == 0) then
+      os.exit()
+    end
     return {{grammarTree[1], grammarTree[2], currentGraphNode}}
   else
     if(grammarTree["tag"] == "or") then
@@ -148,11 +162,12 @@ function graphManager.printGraph(graph)
   end
 end
 
-function graphManager.createGraph (grammarTree)
+function graphManager.createGraph (grammarTree, namesTable)
   graph = {}
   currentEvent = {}
   globalGraphNode = 1
-  
+  eventsNamesTable = namesTable
+
   local lastChild, _ = processTree(1, grammarTree, nil)
 
   if (lastChild) then

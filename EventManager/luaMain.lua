@@ -19,6 +19,10 @@ local threadIdManager = require("threadIdManager")
 
 local graph
 local currentEvent
+local eventsNamesTable
+local ignoredEventsNames
+
+local configurationOn = 0
 
 ----------------------------------------------------------------------------------------------------------------------
 -- Function: readStatesFile
@@ -44,7 +48,30 @@ local currentEvent
 -- #stateNameArray
 ----------------------------------------------------------------------------------------------------------------------
 
-function readStatesFile(path)
+function readConfigFile (configFilePath)
+  ignoredEventsNames = {}
+  eventsNamesTable = {}
+
+  configurationOn = 1
+
+  local file = io.open(configFilePath, "r")
+  if not file then 
+    return 0
+  end
+
+  for line in file:lines() do
+    if (string.find(line, "//")) then
+      local aux = string.gsub(line, "//","")
+      table.insert(ignoredEventsNames, aux)
+    else
+      table.insert(eventsNamesTable, line)
+    end
+  end
+
+  return 1
+end
+
+function readEventsFile(path)
 
   local file = io.open(path, "r")
   if not file then 
@@ -62,28 +89,54 @@ function readStatesFile(path)
     return 0
   end
 
-  graph, currentEvent = graphManager.createGraph(tree)
+  graph, currentEvent = graphManager.createGraph(tree, eventsNamesTable)
+
   return 1
 end
 
+function existsInTable (searchedTable, eventName)
+  if (configurationOn == 0) then
+    return 1
+  end
+
+  for _, value in ipairs(searchedTable) do
+    if (eventName == value) then
+      return 1
+    end
+  end
+
+  return 0
+end
+
+
 function checkEvent (eventName, threadId)
 
-  print(eventName, threadId)
+  -- print(eventName, threadId)
   local nextNodeTable = {}
+
+  if (configurationOn == 1 and existsInTable(ignoredEventsNames, eventName) == 1) then
+    print(eventName .. " --> Ignored")
+    return 1
+  end
 
   for eventIndex, eventValue in ipairs(currentEvent) do
     if (eventValue >= 0) then -- eventValue = -1 when this event can be the last
       local currentNodeTable = graph[eventValue][eventName]
-      if (currentNodeTable and threadIdManager.checkThreadId(currentNodeTable[2], threadId) == 1) then
-        for _, value in pairs(currentNodeTable[1]) do 
-          table.insert(nextNodeTable, value)
+      if (existsInTable(eventsNamesTable, eventName) == 1) then
+        if (currentNodeTable and threadIdManager.checkThreadId(currentNodeTable[2], threadId) == 1) then
+          for _, value in pairs(currentNodeTable[1]) do 
+            table.insert(nextNodeTable, value)
+          end
         end
+      else
+        print("Error during execution of event " .. eventName .. " --> Doesn't exist")
+        os.exit()
       end
     end
   end
 
   if (next(nextNodeTable)) then
-    -- print("Evento realizado: " .. eventName)
+    print(eventName .. " --> Executed")
     currentEvent = nextNodeTable
     return 1
   else
@@ -95,7 +148,7 @@ function expectedEvent ()
   local auxTable = {}
   local code = 0
 
-  graphManager.printGraph(graph)
+  -- graphManager.printGraph(graph)
 
   for _, stateValue in ipairs(currentEvent) do
     if (stateValue >= 0) then
@@ -116,13 +169,15 @@ function expectedEvent ()
 end
 
 -- print("\n\n\n\n\nTeste1\n\n\n")
--- readStatesFile("../ProducerConsumerPassingTheBaton/Tests/test.txt")
+
+-- readConfigFile("../ProducerConsumerPassingTheBaton/EventsFiles/configFile.txt")
+-- readEventsFile("../ProducerConsumerPassingTheBaton/EventsFiles/eventOrderFile_1.txt")
 
 -- graphManager.printGraph(graph)
 
 -- -- print("\n\n\n\n\nTeste2\n\n\n")
 
--- -- readStatesFile("../ProducerConsumerPassingTheBaton/Tests/test2.txt")
+-- -- readEventsFile("../ProducerConsumerPassingTheBaton/Tests/test2.txt")
 
 -- -- graphManager.printGraph(graph)
 

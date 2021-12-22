@@ -29,14 +29,11 @@ This variable is accessed only on reader's code.
 
 #include "../EventManager/eventManager.h"
 
-#define BUFFER_SIZE 5
-
 
 /* Global variable's declaration */
 
-int buffer [BUFFER_SIZE];
+int buffer;
 int nReaders, nWriters;
-int n = 0, m = 0;
 int activeReaders = 0;
 
 pthread_t * readersThreads;
@@ -77,13 +74,13 @@ At last, the main function frees the memory spaces allocated and finalizes the m
 
 int main(int argc, char** argv) 
 { 
-	if (argc != 4) {
-    printf("Program needs 3 parameters: nReaders, nWriters and statesFileName \n");
+	if (argc != 5) {
+    printf("Program needs 4 parameters: nReaders, nWriters, eventFileName and configFileName \n");
     return 0;
   }
   nReaders = strtol(argv[1], NULL, 10);
   nWriters = strtol(argv[2], NULL, 10);
-  initializeManager (argv[3], nReaders + nWriters);
+  initializeManager (argv[3], argv[4]);
 
   initializeSemaphore ();
   initializeThreads ();
@@ -280,20 +277,15 @@ void* writeTask (void * num)
     checkCurrentEvent("WriterStarts");
     
     /* write the database */
-		if (n < BUFFER_SIZE)
-		{
-      checkCurrentEvent("WriterWrites");
-			element = rand()%200;
-			buffer[n] = element;
-			n = (n+1)%BUFFER_SIZE;
-      printf("----Writer %d writes %d\n", id, element);
-		}
+    checkCurrentEvent("WriterWrites");
+    element = rand()%200;
+    buffer = element;
+    printf("----Writer %d writes %d\n", id, element);
 
     checkCurrentEvent("WriterEnds");
 
     sem_post(rw); //V(rw)
 	}
-
 	pthread_exit(NULL); 
 }
 
@@ -326,6 +318,7 @@ void* readTask (void * num)
 
     activeReaders ++;
     if (activeReaders == 1) { //if first, get lock
+      checkCurrentEvent("FirstReader");
       sem_wait(rw); //P(rw)
     }
     sem_post(mutexR); //V(mutexR)
@@ -333,16 +326,14 @@ void* readTask (void * num)
     checkCurrentEvent("ReaderStarts");
 
     /* read the database */
-		if (n > 0)
-		{
-      checkCurrentEvent("ReaderReads");
-			element = buffer[m];
-      printf("----Reader %d reads %d\n", id, element);
-		}
+    checkCurrentEvent("ReaderReads");
+    element = buffer;
+    printf("----Reader %d reads %d\n", id, element);
+
     sem_wait(mutexR);
     activeReaders --;
     if (activeReaders == 0) { //if last, release lock
-			m = (m+1)%BUFFER_SIZE;
+      checkCurrentEvent("LastReader");
       sem_post(rw); //V(rw)
     }
 

@@ -75,7 +75,7 @@ Output assertions:
 function now
 ----------------------------------------------------------------------------------------------------------------------
 */
-void initializeManager (char * fileName, int nThreads);
+void initializeManager (char * scriptFileName, char * configFileName);
 
 
 /*

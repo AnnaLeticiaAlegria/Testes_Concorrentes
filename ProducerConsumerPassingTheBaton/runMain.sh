@@ -30,3 +30,5 @@ sleep 2
 
 # 1 -> 1 produtor e 2 consumidores
 # ./producerConsumer 2 1 1 4 ../ProducerConsumerPassingTheBaton/New_StatesFile/statesFile4.txt
+
+./producerConsumer 1 1 2 1 ../ProducerConsumerPassingTheBaton/Tests/test.txt

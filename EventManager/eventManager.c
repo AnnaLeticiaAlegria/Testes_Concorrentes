@@ -41,13 +41,14 @@ pthread_mutex_t conditionLock = PTHREAD_MUTEX_INITIALIZER;
 
 lua_State *LState;
 
-
 /*
 ----------------------------------------------------------------------------------------------------------------------
 Encapsulated function's declaration
 ----------------------------------------------------------------------------------------------------------------------
 */
 
+void callConfigFunction (char * configFileName);
+void callReadEventsFunction (char * eventsFileName);
 int compareEvents (const char * event);
 void setLuaPath(lua_State* L, const char* path);
 void signalHandler(int signum);
@@ -68,8 +69,7 @@ After that, it closes the LuaState.
 Lastly, it sets an alarm with time 'deadLockDetectTime' (which is, by default, 5 seconds)
 ----------------------------------------------------------------------------------------------------------------------
 */
-void initializeManager (char * fileName, int nThreads) {
-  int existsTree;
+void initializeManager (char * scriptFileName, char * configFileName) {
 
   /* Set SIGALRM handler */
   signal(SIGALRM,signalHandler);
@@ -93,25 +93,9 @@ void initializeManager (char * fileName, int nThreads) {
     exit(0);
   }
 
-  /* Put the function's name and its parameters in the stack */
-  lua_getglobal(LState, "readStatesFile");
-  lua_pushlstring(LState, fileName, strlen(fileName));  
+  callConfigFunction (configFileName);
 
-  /* Call the function on the stack, giving 1 parameter and expecting 1 value to be returned */
-  if (lua_pcall(LState, 1, 1, 0)) {
-    printf("Error during readStatesFile call --> %s\n", lua_tostring(LState, -1));
-    exit(0);
-  }
-
-  /* Pop the results from calling Lua function */
-  existsTree = lua_tonumber(LState, -1);
-  lua_pop(LState,1);
-
-  if(!existsTree) {
-    printf("Error during event's graph creation\n");
-    lua_close(LState);
-    exit(0);
-  }
+  callReadEventsFunction (scriptFileName);
 
   /* Set alarm of 'deadLockDetectTime' seconds */
   alarm(deadLockDetectTime);
@@ -151,7 +135,8 @@ void checkCurrentEvent (const char * event) {
 
     /* Check if it's this state's turn */
     if(compareEvents(event)) {
-      printf("%s\n", event);
+      // printf("%s\n", event);
+      fflush (stdout);
       pthread_cond_broadcast(&condition); // Tell to the awaiting threads that they can go on
       pthread_mutex_unlock(&conditionLock); // V(conditionLock)
       alarm(deadLockDetectTime);
@@ -234,30 +219,6 @@ int compareEvents (const char * event) {
   return isEventNext;
 }
 
-///////////////////////////////////////
-
-void setLuaPath( lua_State* L, const char* path )
-{
-  const char * cur_path;
-  char * str_aux;
-
-  lua_getglobal( L, "package" );
-  lua_getfield( L, -1, "path" ); // get field "path" from table at top of stack (-1)
-  cur_path = lua_tostring( L, -1 ); // grab path string from top of stack
-
-  str_aux = (char*) malloc ((strlen(cur_path) + strlen(path) + 2) * sizeof(char)); // ; + \0
-  strcpy(str_aux, cur_path);
-  strcat(str_aux, ";");
-  strcat(str_aux, path);
-
-  lua_pop( L, 1 ); // get rid of the string on the stack we just pushed on line 5
-  lua_pushstring( L, cur_path ); // push the new one
-  lua_setfield( L, -2, "path" ); // set the field "path" in table at -2 with value at top of stack
-  lua_pop( L, 1 ); // get rid of package table from top of stack
-
-  free(str_aux);
-}
-
 /*
 ----------------------------------------------------------------------------------------------------------------------
 Function: signalHandler
@@ -312,8 +273,11 @@ void signalHandler(int signum){
 
   lua_pushnil(LState);
 
+  printf("\n\n\nEND");
   if (!code) {
-    printf("\n\n\nDeadLock detected!!\n"); 
+    printf("\n\n\nDeadLock detected!!\n\nThe input event order wasn't accepted by your program. Please note that:\n"); 
+    printf("-- If the input order was supposed to be invalid, this mean that your program might be ok.\n");
+    printf("-- If the input order was supposed to be valid, this means that your program might have some issues.\n\n");
 
     printf("Possible Events Expected:\n");
     for (i=0; i< n_nextEvent; i++) {
@@ -321,11 +285,62 @@ void signalHandler(int signum){
     }
   }
   else {
-    printf("\n\n\nFinished executing the script without problems!!\n");
+    printf("\n\n\nFinished executing the script!!\n\nThe input event order was accepted by your program. Please note that:\n");
+    printf("-- If the input order was supposed to be invalid, this mean that your program might have some issues.\n");
+    printf("-- If the input order was supposed to be valid, this means that your program might be ok.\n\n");
   }
   printf("\n\n\n");
 
   free(nextEventTable);
   finalizeManager ();
   exit(0);
+}
+
+void callConfigFunction (char * configFileName) {
+  int isConfig;
+
+  if (configFileName) {
+    /* Put the function's name and its parameters in the stack */
+    lua_getglobal(LState, "readConfigFile");
+    lua_pushlstring(LState, configFileName, strlen(configFileName));  
+
+    /* Call the function on the stack, giving 1 parameter and expecting 1 value to be returned */
+    if (lua_pcall(LState, 1, 1, 0)) {
+      printf("Error during readConfigFile call --> %s\n", lua_tostring(LState, -1));
+      exit(0);
+    }
+
+    /* If the configuration file could be read */
+    isConfig = lua_tonumber(LState, -1);
+    lua_pop(LState,1);
+
+    if (!isConfig) {
+      printf("Error in configuration file --> %s\n", lua_tostring(LState, -1));
+      exit(0);
+    }
+  }
+}
+
+void callReadEventsFunction (char * eventsFileName) {
+  int existsTree;
+
+  /* Put the function's name and its parameters in the stack */
+  lua_getglobal(LState, "readEventsFile");
+  lua_pushlstring(LState, eventsFileName, strlen(eventsFileName));  
+
+  /* Call the function on the stack, giving 1 parameter and expecting 1 value to be returned */
+  if (lua_pcall(LState, 1, 1, 0)) {
+    printf("Error during readEventsFile call --> %s\n", lua_tostring(LState, -1));
+    exit(0);
+  }
+
+  /* Pop the results from calling Lua function */
+  existsTree = lua_tonumber(LState, -1);
+  lua_pop(LState,1);
+
+  if(!existsTree) {
+    printf("Error during event's graph creation\n");
+    lua_close(LState);
+    exit(0);
+  }
 }

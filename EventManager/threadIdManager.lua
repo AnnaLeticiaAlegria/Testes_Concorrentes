@@ -1,21 +1,23 @@
 local lpeg = require 'lpeg'
-local match = lpeg.match
 
 local threadIdManager = {}
 local threadIdTable = {}
 
 -- returns [term1] [term2] [term3] ----> threadP >> groupP -----> returns threadP, >>, groupP
 local function splitTerms (threadExpression)
+  -- print(threadExpression)
   local space = lpeg.S(" \t\n")^0
   local assignSignal = space * lpeg.C(lpeg.P(">>+") + lpeg.P(">>-") + lpeg.P(">>")) * space
   local notAssign = (1 - assignSignal)^0
 
-  local expressionParser = (((lpeg.C(notAssign))^-1 * assignSignal)^-1 * lpeg.C(notAssign))
+  local firstTerm = lpeg.C(notAssign)
+  local lastTerm = lpeg.C(lpeg.R("az", "AZ","(-","09")^0) * space * lpeg.P("]")
 
-  threadExpression = threadExpression:gsub("%[", "")
-  threadExpression = threadExpression:gsub("%]", "")
+  local expressionParser = (lpeg.P("[") * space * ((firstTerm)^-1 * assignSignal)^-1 * lastTerm)
 
   local term1, term2, term3 = lpeg.match(expressionParser, threadExpression)
+
+  -- print(term1, term2, term3)
 
   local splitCase = "assign"
   if (not term2) then
@@ -119,7 +121,9 @@ function printTable (table)
 end
 
 function threadIdManager.checkThreadId (threadExpression, threadId)
-  local splitCase, terms = splitTerms (string.sub(threadExpression,2,string.len(threadExpression) - 1)) -- removing brackets
+  -- local splitCase, terms = splitTerms (string.sub(threadExpression,2,string.len(threadExpression) - 1)) -- removing brackets
+  local splitCase, terms = splitTerms (threadExpression) -- removing brackets
+
   local isThreadId
 
   -- print("Thread expression "..threadExpression)
@@ -130,9 +134,9 @@ function threadIdManager.checkThreadId (threadExpression, threadId)
     isThreadId = assignCase (terms[1], terms[2], terms[3], threadId)
   end
 
-  if (isThreadId == 1) then
-    printTable (threadIdTable)
-  end
+  -- if (isThreadId == 1) then
+  --   printTable (threadIdTable)
+  -- end
   return isThreadId
 end
 
@@ -147,7 +151,7 @@ return threadIdManager
 -- print("\n\n[>> groupP] --> 456")
 -- print(threadIdManager.checkThreadId("[>> groupP]",456))
 
--- print("\n\n[threadP >> groupP] --> 123")
+-- print("\n\n[    threadP >> groupP     ] --> 123")
 -- print(threadIdManager.checkThreadId("[threadP >> groupP]", 123))
 
 -- print("\n\n[ >> threadA] --> 789")
@@ -165,3 +169,5 @@ return threadIdManager
 -- _, terms = splitTerms ("[threadP >>+ groupP]")
 
 -- print(terms[1], terms[2], terms[3])
+
+-- print(threadIdManager.checkThreadId("[    (threadA + threadB) >>- groupP]", 789))
