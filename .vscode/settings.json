@@ -1,0 +1,7 @@
+{
+  "files.associations": {
+    "concurrency.h": "c",
+    "stdio.h": "c",
+    "eventmanager.h": "c"
+  }
+}

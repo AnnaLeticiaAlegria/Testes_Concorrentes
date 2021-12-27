@@ -22,18 +22,14 @@ should write sequential values.
 #include <pthread.h>
 
 #include "../EventManager/eventManager.h"
+#include "../ConcurrencyModule/concurrency.h"
 
 /* Global variable's declaration */
-
-pthread_t * threadArray;
-int ** idArray;
 
 int count = 0; // Variable that all threads increment
 
 /* Encapsulated function's declarations */
 
-void initializeThreads (int nThreads);
-void freeThreads (int nThreads);
 void * threadFunction (void * id);
 
 /*
@@ -54,6 +50,8 @@ At last, the main function frees the memory spaces allocated and finalizes the m
 ----------------------------------------------------------------------------------------------------------------------
 */
 int main (int argc, char** argv) {
+  pthread_t * threadArray;
+  int ** idArray;
   int nThreads;
 
   if (argc != 3) {
@@ -63,74 +61,15 @@ int main (int argc, char** argv) {
   nThreads = strtol(argv[1], NULL, 10);
   initializeManager (argv[2], nThreads);
   
-  initializeThreads (nThreads);
+  threadArray = initializeThreads (nThreads, idArray, threadFunction);
+
+  joinThreads(threadArray, nThreads);
 
   printf("---Final value of count: %d\n",count);
 
-  freeThreads (nThreads);
+  freeThreads (threadArray, nThreads, idArray);
   finalizeManager();
   return 0;
-}
-
-
-/*
-----------------------------------------------------------------------------------------------------------------------
-Function: initializeThreads
-Parameters: 
-  -> nThreads: number of threads the user wants to create
-Returns: nothing
-
-Description: This function allocates the memory space to threadArray and to idArray (arrays with length of 'nThreads')
-It calls the thread's functions and make the main thread wait for their conclusion.
-----------------------------------------------------------------------------------------------------------------------
-*/
-void initializeThreads (int nThreads) {
-  int i;
-  int * id;
-
-  threadArray = (pthread_t*) malloc (nThreads * sizeof(pthread_t));
-  if (threadArray == NULL) {
-    printf("Error during threadArray alloc\n");
-  }
-
-  /* This vector is important to every thread have a unique id and to be possible to free the allocated memory space
-  after */
-  idArray = (int**) malloc (nThreads * sizeof(int*));
-  if (idArray == NULL) {
-    printf("Error during idArray alloc\n");
-  }
-
-  for (i = 0; i < nThreads ; i++) {
-    id = (int *) malloc (sizeof(int));
-    if (id == NULL) {
-      printf("Error during id alloc\n");
-    }
-    *id = i;
-    idArray[i] = id;
-    pthread_create(&threadArray[i], NULL, threadFunction, (void*) id);
-  }
-
-  for(i = 0; i < nThreads; i++) {
-    pthread_join(threadArray[i],NULL);
-  }
-}
-
-/*
-----------------------------------------------------------------------------------------------------------------------
-Function: freeThreads
-Parameters: 
-  -> nThreads: number of threads created by the program
-Returns: nothing
-
-Description: This function frees the memory space allocated by this program
-----------------------------------------------------------------------------------------------------------------------
-*/
-void freeThreads (int nThreads) {
-  free(threadArray);
-  for(int i=0;i<nThreads;i++) {
-    free(idArray[i]);
-  }
-  free(idArray);
 }
 
 /*

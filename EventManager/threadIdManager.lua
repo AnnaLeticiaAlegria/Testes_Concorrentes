@@ -5,7 +5,6 @@ local threadIdTable = {}
 
 -- returns [term1] [term2] [term3] ----> threadP >> groupP -----> returns threadP, >>, groupP
 local function splitTerms (threadExpression)
-  -- print(threadExpression)
   local space = lpeg.S(" \t\n")^0
   local assignSignal = space * lpeg.C(lpeg.P(">>+") + lpeg.P(">>-") + lpeg.P(">>")) * space
   local notAssign = (1 - assignSignal)^0

@@ -1,7 +1,7 @@
 /*
 Module: main.c
 Author: Anna Leticia Alegria
-Last Modified at: 24/06/2021
+Last Modified at: 23/12/2021
 
 ----------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------
@@ -28,6 +28,7 @@ This variable is accessed only on reader's code.
 #include <semaphore.h>
 
 #include "../EventManager/eventManager.h"
+#include "../ConcurrencyModule/concurrency.h"
 
 
 /* Global variable's declaration */
@@ -36,21 +37,10 @@ int buffer;
 int nReaders, nWriters;
 int activeReaders = 0;
 
-pthread_t * readersThreads;
-pthread_t * writersThreads;
-
-int ** idArray;
-
 sem_t * rw ;
 sem_t * mutexR;
 
 /* Encapsulated function's declarations */
-
-char * nameRandomize (char * name, int nLetters);
-void initializeSemaphore (void);
-void freeSemaphore (void);
-void initializeThreads (void);
-void freeThreads (void);
 
 void* writeTask (void * num);
 void* readTask (void * num);
@@ -74,6 +64,12 @@ At last, the main function frees the memory spaces allocated and finalizes the m
 
 int main(int argc, char** argv) 
 { 
+  pthread_t * readersThreads;
+  pthread_t * writersThreads;
+
+  int ** readersIdArray = NULL;
+  int ** writersIdArray = NULL;
+
 	if (argc != 5) {
     printf("Program needs 4 parameters: nReaders, nWriters, eventFileName and configFileName \n");
     return 0;
@@ -82,172 +78,24 @@ int main(int argc, char** argv)
   nWriters = strtol(argv[2], NULL, 10);
   initializeManager (argv[3], argv[4]);
 
-  initializeSemaphore ();
-  initializeThreads ();
+  rw = initializeSemaphore("/semRW", 1);
+  mutexR = initializeSemaphore("/semActR", 1);
+
+  readersThreads = initializeThreads (nReaders, readersIdArray, readTask);
+  writersThreads = initializeThreads (nWriters, writersIdArray, writeTask);
 	
+  joinThreads (readersThreads, nReaders);
+  joinThreads (writersThreads, nWriters);
+
 	finalizeManager();
-  freeSemaphore();
-  freeThreads();
+
+  freeSemaphore(rw);
+  freeSemaphore(mutexR);
+
+  freeThreads (readersThreads, nReaders, readersIdArray);
+  freeThreads (writersThreads, nWriters, writersIdArray);
+
 	return 0;
-}
-
-/*
-----------------------------------------------------------------------------------------------------------------------
-Function: nameRandomize
-Parameters: 
-  -> name: string to be modified by adding random letters at it's end
-  -> nLetters: number of random letters to be added at the end of 'name'
-Returns:
-  -> randomName: A string containing the string 'name' + 'nLetters' number of letters after 'name'
-
-Description: This function copies the letters in 'name' and adds 'nLetters' of uppercase letters at it's end. In case
-the alloc of memory space of 'randomName' goes wrong, this function ends the program.
-----------------------------------------------------------------------------------------------------------------------
-*/
-char * nameRandomize (char * name, int nLetters) {
-  int i, nameSize;
-  char * randomName;
-  nameSize = strlen(name);
-  randomName = (char *) malloc ((nameSize + nLetters + 1) * sizeof(char));
-  if (randomName == NULL) {
-    printf("Error during randomName alloc\n");
-    exit(0);
-  }
-
-  strcpy(randomName, name);
-  for(i=0;i<nLetters;i++){
-    randomName[nameSize + i] = 'A' + rand()%26;
-  }
-  randomName[nameSize + i] = '\0'; // Add '\0' at the end so it is considered as a string
-
-  return randomName;
-}
-
-/*
-----------------------------------------------------------------------------------------------------------------------
-Function: initializeSemaphore
-Parameters: none
-Returns: nothing
-
-Description: This function initializes the semaphores used in this program. Since this program can end without closing
-the semaphore (in case of deadlocks), the name of the semaphore is random generated, so it doesn't choose a name that 
-it was previously chosen and not released.
-----------------------------------------------------------------------------------------------------------------------
-*/
-void initializeSemaphore (void) {
-  char * semName;
-
-  semName = nameRandomize ("/semRW", 10);
-  sem_unlink(semName);
-  rw = sem_open(semName, O_CREAT, S_IRUSR | S_IWUSR, 1); 
-  if (rw == SEM_FAILED){
-    printf("Error opening semaphore rw\n");
-    free(semName);
-    exit(0);
-  }
-  free(semName);
-
-  semName = nameRandomize ("/semActR", 10);
-  sem_unlink(semName);
-  mutexR = sem_open(semName, O_CREAT, S_IRUSR | S_IWUSR, 1); 
-  if (mutexR == SEM_FAILED){
-    printf("Error opening semaphore mutexR\n");
-    free(semName);
-    exit(0);
-  }
-  free(semName);
-}
-
-/*
-----------------------------------------------------------------------------------------------------------------------
-Function: freeSemaphore
-Parameters: none
-Returns: nothing
-
-Description: This function calls the function sem_close to free the semaphores used.
-----------------------------------------------------------------------------------------------------------------------
-*/
-void freeSemaphore (void) {
-  sem_close(rw);
-  sem_close(mutexR);
-}
-
-/*
-----------------------------------------------------------------------------------------------------------------------
-Function: initializeThreads
-Parameters: none
-Returns: nothing
-
-Description: This function allocates the memory space to readersThreads, to writersThreads and to idArray 
-(arrays with length of '(nReaders + nWriters)') It calls the threads' functions and makes the main thread wait 
-for their conclusion.
-----------------------------------------------------------------------------------------------------------------------
-*/
-void initializeThreads () {
-  int i;
-  int * id;
-
-  readersThreads = (pthread_t*) malloc (nReaders * sizeof(pthread_t));
-  if (readersThreads == NULL) {
-    printf("Error during readersThreads alloc\n");
-  }
-
-  writersThreads = (pthread_t*) malloc (nWriters * sizeof(pthread_t));
-  if (writersThreads == NULL) {
-    printf("Error during writersThreads alloc\n");
-  }
-
-  idArray = (int**) malloc ((nReaders + nWriters) * sizeof(int*));
-  if (idArray == NULL) {
-    printf("Error during idArray alloc\n");
-  }
-
-  for (i = 0; i < nReaders ; i++) {
-    id = (int *) malloc (sizeof(int));
-    if (id == NULL) {
-      printf("Error during id alloc\n");
-    }
-    *id = i;
-    idArray[i] = id;
-    pthread_create(&readersThreads[i], NULL, readTask, (void*) id);
-  }
-
-  for (; (i - nReaders) < nWriters; i++) {
-    id = (int *) malloc (sizeof(int));
-    if (id == NULL) {
-      printf("Error during id alloc\n");
-    }
-    *id = (i - nReaders);
-    idArray[i] = id;
-    pthread_create(&writersThreads[(i - nReaders)], NULL, writeTask, (void*) id);
-  }
-
-  for(i = 0; i < nReaders; i++) {
-    pthread_join(readersThreads[i],NULL);
-  }
-
-  for(i = 0; i < nWriters; i++) {
-    pthread_join(writersThreads[i],NULL);
-  }
-}
-
-/*
-----------------------------------------------------------------------------------------------------------------------
-Function: freeThreads
-Parameters: none
-Returns: nothing
-
-Description: This function frees the memory space allocated by this program
-----------------------------------------------------------------------------------------------------------------------
-*/
-void freeThreads (void) {
-  free(readersThreads);
-  free(writersThreads);
-
-  for(int i=0;i<(nReaders + nWriters);i++) {
-    free(idArray[i]);
-  }
-  free(idArray);
 }
 
 /*
@@ -291,7 +139,7 @@ void* writeTask (void * num)
 
 /*
 ----------------------------------------------------------------------------------------------------------------------
-Function: writeTask
+Function: readTask
 Parameters: 
   -> num: pointer with thread's number
 Returns: nothing
