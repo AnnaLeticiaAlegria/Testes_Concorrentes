@@ -25,7 +25,7 @@ local ignoredEventsNames
 local configurationOn = 0
 
 ----------------------------------------------------------------------------------------------------------------------
--- Function: readStatesFile
+-- Function: readEventFile
 -- Parameters: 
 --   -> path: the path of the statesFile.txt file as a string
 -- Returns: 
@@ -81,7 +81,6 @@ function readEventsFile(path)
   local fileString = file:read("*all")
 
   tree = grammarParser.grammarParser(fileString)
-  -- tree = grammarParser(fileString)
 
   file:close()
 

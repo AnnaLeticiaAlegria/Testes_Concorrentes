@@ -275,7 +275,7 @@ void signalHandler(int signum){
 
   printf("\n\n\nEND");
   if (!code) {
-    printf("\n\n\nDeadLock detected!!\n\nThe input event order wasn't accepted by your program. Please note that:\n"); 
+    printf("\n\n\nPossible deadLock detected!!\n\nThe input event order wasn't accepted by your program. Please note that:\n"); 
     printf("-- If the input order was supposed to be invalid, this mean that your program might be ok.\n");
     printf("-- If the input order was supposed to be valid, this means that your program might have some issues.\n\n");
 

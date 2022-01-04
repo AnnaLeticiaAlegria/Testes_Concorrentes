@@ -121,7 +121,7 @@ end
 
 function threadIdManager.checkThreadId (threadExpression, threadId)
   -- local splitCase, terms = splitTerms (string.sub(threadExpression,2,string.len(threadExpression) - 1)) -- removing brackets
-  local splitCase, terms = splitTerms (threadExpression) -- removing brackets
+  local splitCase, terms = splitTerms (threadExpression)
 
   local isThreadId
 
@@ -141,8 +141,8 @@ end
 
 return threadIdManager
 
--- print("\n\n[threadP] --> 123")
--- print(threadIdManager.checkThreadId("[threadP]",123))
+-- print("\n\n[>> threadP] --> 123")
+-- print(threadIdManager.checkThreadId("[>>threadP]",123))
 
 -- print("\n\n[threadP] --> 321")
 -- print(threadIdManager.checkThreadId("[threadP]",321))
@@ -161,12 +161,3 @@ return threadIdManager
 
 -- print("\n\n[threadA >>- groupP] --> 789")
 -- print(threadIdManager.checkThreadId("[threadA >>- groupP]", 789))
-
--- local terms
--- _, terms = splitTerms ("[groupP >>- groupP] ")
--- print(terms[1], terms[2], terms[3])
--- _, terms = splitTerms ("[threadP >>+ groupP]")
-
--- print(terms[1], terms[2], terms[3])
-
--- print(threadIdManager.checkThreadId("[    (threadA + threadB) >>- groupP]", 789))
