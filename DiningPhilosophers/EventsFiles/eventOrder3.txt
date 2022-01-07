@@ -1,0 +1,49 @@
+(
+  (
+    (
+      (LeftieWantsFork1 [>>+ philosopherLeftie]);
+      (LeftieGotFork1 [philosopherLeftie]);
+    )
+    |
+    (
+      (RightieWantsFork1 [>>+ philosopherRightie]);
+      (RightieGotFork1 [philosopherRightie]);
+    )
+  )*;
+  (
+    (
+      (LeftieWantsFork2 [philosopherLeftie]);
+      (LeftieGotFork2 [philosopherLeftie]);
+    )
+    |
+    (
+      (RightieWantsFork2 [philosopherRightie]);
+      (RightieGotFork2 [philosopherRightie]);
+    )
+  )*;
+
+  (Eating [>> philosopher])* ;
+
+  (
+    (
+      (LeftieGivesFork1 [philosopherLeftie]);
+      (LeftiePutFork1 [philosopherLeftie]);
+    )
+    |
+    (
+      (RightieGivesFork1 [philosopherRightie]);
+      (RightiePutFork1 [philosopherRightie]);
+    )
+  )* ;
+  (
+    (
+      (LeftieGivesFork2 [philosopherLeftie]);
+      (LeftiePutFork2 [philosopherLeftie]);
+    )
+    |
+    (
+      (RightieGivesFork2 [philosopherRightie]);
+      (RightiePutFork2 [philosopherRightie]);
+    )
+  )* ;
+) *; 

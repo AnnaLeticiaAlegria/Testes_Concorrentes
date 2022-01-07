@@ -1,0 +1,18 @@
+(LeftieWantsFork1 [>> philosopherLeftie]);
+(LeftieGotFork1 [philosopherLeftie]);
+
+(LeftieWantsFork2 [philosopherLeftie]);
+(LeftieGotFork2 [philosopherLeftie]);
+
+(RightieWantsFork1 [>>+ philosopherRightie]);
+(RightieWantsFork1 [>>+ philosopherRightie]);
+(RightieWantsFork1 [>>+ philosopherRightie]);
+(RightieGotFork1 [philosopherRightie]);
+(RightieGotFork1 [philosopherRightie]);
+
+(RightieWantsFork2 [philosopherRightie]);
+(RightieWantsFork2 [philosopherRightie]);
+(RightieGotFork2 [philosopherRightie]);
+
+(Eating [philosopherLeftie]);
+(Eating [philosopherRightie]);
