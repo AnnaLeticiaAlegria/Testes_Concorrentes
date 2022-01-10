@@ -13,16 +13,14 @@
 /* Global variable's declaration */
 
 int nThreads;
-int * forksArray;
 
-sem_t * mutex;
+sem_t ** mutexArray;
 
 /* Encapsulated function's declarations */
 
-void* threadFunction (void * num);
+void initializeMutexArray (void);
 
-void createForks ();
-void deleteForks ();
+void* threadFunction (void * num);
 
 void eat (int philosopher);
 void think (int philosopher);
@@ -43,9 +41,7 @@ int main(int argc, char** argv)
   nThreads = strtol(argv[1], NULL, 10);
   initializeManager (argv[2], argv[3]);
 
-  createForks();
-
-  mutex = initializeSemaphore("/semMutex", 1);
+  initializeMutexArray ();
 
   threadsArray = initializeThreads (nThreads, threadsIdArray, threadFunction);
 	
@@ -53,13 +49,33 @@ int main(int argc, char** argv)
 
 	finalizeManager();
 
-  deleteForks();
+  for (int i=0;i<nThreads;i++) {
+    freeSemaphore(mutexArray[i]);
+  }
 
-  freeSemaphore(mutex);
+  free(mutexArray);
 
   // freeThreads (threadsArray, nThreads, threadsIdArray);
 
 	return 0;
+}
+
+void initializeMutexArray (void) {
+  char stringName [11];
+
+  mutexArray = (sem_t**) malloc (nThreads * sizeof(sem_t*));
+  if (mutexArray == NULL) {
+    printf("Error in mutexArray malloc\n");
+    exit(0);
+  }
+
+  strcpy(stringName, "/semMutex");
+
+  for (int i=0; i<nThreads; i++) {
+    stringName[9] = 'a' + i;
+    stringName[10] = '\0';
+    mutexArray[i] = initializeSemaphore(stringName, 1);
+  }
 }
 
 void* threadFunction (void * num) {
@@ -112,22 +128,6 @@ void* threadFunction (void * num) {
 	pthread_exit(NULL); 
 }
 
-void createForks () {
-  int i;
-  forksArray = (int*) malloc (nThreads * sizeof(int));
-  if (forksArray == NULL) {
-    printf("Error allocating fork vector\n");
-    exit(0);
-  }
-
-  for (i=0;i<nThreads;i++) {
-    forksArray[i] = 1;
-  }
-}
-
-void deleteForks () {
-  free(forksArray);
-}
 
 void eat (int philosopher) {
   printf("--------------Philosopher %d eating--------------\n", philosopher);
@@ -140,24 +140,15 @@ void think (int philosopher) {
 }
 
 void getFork (int philosopher, int fork) {
-  int gotFork = 0;
 
-  while(!gotFork) {
-    sem_wait(mutex);
-    if (forksArray[fork]) {
-      gotFork = 1;
-      forksArray[fork] = 0;
-    }
-    sem_post(mutex);
-  }
+  sem_wait(mutexArray[fork]);
 
   printf("--------------Philosopher %d got fork %d--------------\n", philosopher, fork);
 }
 
 void putFork (int philosopher, int fork) {
-  sem_wait(mutex);
-  forksArray[fork] = 1;
-  sem_post(mutex);
+
+  sem_post(mutexArray[fork]);
 
   printf("--------------Philosopher %d put fork %d--------------\n", philosopher, fork);
 }

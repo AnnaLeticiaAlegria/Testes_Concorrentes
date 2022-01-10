@@ -2,6 +2,7 @@
   "files.associations": {
     "concurrency.h": "c",
     "stdio.h": "c",
-    "eventmanager.h": "c"
+    "eventmanager.h": "c",
+    "__mutex_base": "c"
   }
 }
