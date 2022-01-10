@@ -1,16 +1,18 @@
-(LeftieWantsFork1 [>> philosopherLeftie]);
+(Starting1 [>> philosopher1]);
+(Starting2 [>> philosopher2]);
+(Starting3 [>> philosopher3]);
+(Starting4 [>> philosopher4]);
+(Starting5 [>> philosopher5]);
+
+(LeftieWantsFork1 [philosopher1 >> philosopherLeftie]);
 (LeftieGotFork1 [philosopherLeftie]);
 
 (LeftieWantsFork2 [philosopherLeftie]);
 (LeftieGotFork2 [philosopherLeftie]);
 
-(RightieWantsFork1 [>>+ philosopherRightie]);
-(RightieWantsFork1 [>>+ philosopherRightie]);
-(RightieWantsFork1 [>>+ philosopherRightie]);
-(RightieGotFork1 [philosopherRightie]);
+(RightieWantsFork1 [philosopher3 >> philosopherRightie]);
 (RightieGotFork1 [philosopherRightie]);
 
-(RightieWantsFork2 [philosopherRightie]);
 (RightieWantsFork2 [philosopherRightie]);
 (RightieGotFork2 [philosopherRightie]);
 

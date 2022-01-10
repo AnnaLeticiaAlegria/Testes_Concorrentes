@@ -1,49 +1,17 @@
-(
-  (
-    (
-      (LeftieWantsFork1 [>>+ philosopherLeftie]);
-      (LeftieGotFork1 [philosopherLeftie]);
-    )
-    |
-    (
-      (RightieWantsFork1 [>>+ philosopherRightie]);
-      (RightieGotFork1 [philosopherRightie]);
-    )
-  )*;
-  (
-    (
-      (LeftieWantsFork2 [philosopherLeftie]);
-      (LeftieGotFork2 [philosopherLeftie]);
-    )
-    |
-    (
-      (RightieWantsFork2 [philosopherRightie]);
-      (RightieGotFork2 [philosopherRightie]);
-    )
-  )*;
+(Starting1 [>> philosopher1]);
+(Starting2 [>> philosopher2]);
+(Starting3 [>> philosopher3]);
+(Starting4 [>> philosopher4]);
+(Starting5 [>> philosopher5]);
 
-  (Eating [>> philosopher])* ;
+(RightieWantsFork1 [philosopher2]);
+(RightieGotFork1 [philosopher2]);
 
-  (
-    (
-      (LeftieGivesFork1 [philosopherLeftie]);
-      (LeftiePutFork1 [philosopherLeftie]);
-    )
-    |
-    (
-      (RightieGivesFork1 [philosopherRightie]);
-      (RightiePutFork1 [philosopherRightie]);
-    )
-  )* ;
-  (
-    (
-      (LeftieGivesFork2 [philosopherLeftie]);
-      (LeftiePutFork2 [philosopherLeftie]);
-    )
-    |
-    (
-      (RightieGivesFork2 [philosopherRightie]);
-      (RightiePutFork2 [philosopherRightie]);
-    )
-  )* ;
-) *; 
+(RightieWantsFork1 [philosopher3]);
+(RightieGotFork1 [philosopher3]);
+
+(RightieWantsFork2 [philosopher3]);
+(RightieGotFork2 [philosopher3]);
+
+(Eating [philosopher2]);
+(Eating [philosopher3]);
