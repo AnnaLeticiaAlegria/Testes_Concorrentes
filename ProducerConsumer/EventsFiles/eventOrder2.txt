@@ -1,0 +1,5 @@
+(ProducerWantsToStart [>> producer1]);
+(ProducerStarts [producer1]);
+
+(ConsumerWantsToStart [>> consumer1]);
+(ConsumerStarts [consumer1]);

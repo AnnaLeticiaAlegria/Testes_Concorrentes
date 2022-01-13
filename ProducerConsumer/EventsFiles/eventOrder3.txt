@@ -1,0 +1,7 @@
+(ProducerWantsToStart [>> producer1]);
+(ProducerStarts [producer1]);
+(ProducerEnds [producer1]);
+
+(ProducerWantsToStart [>> producer2]);
+(ProducerStarts [producer2]);
+(ProducerEnds [producer2]);
