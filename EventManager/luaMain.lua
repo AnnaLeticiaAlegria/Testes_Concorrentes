@@ -170,7 +170,7 @@ end
 -- print("\n\n\n\n\nTeste1\n\n\n")
 
 -- readConfigFile("../ProducerConsumerPassingTheBaton/EventsFiles/configFile.txt")
--- readEventsFile("../ProducerConsumerPassingTheBaton/EventsFiles/eventOrderFile_1.txt")
+-- readEventsFile("../Broadcast/EventsFiles/eventOrderFile_1.txt")
 
 -- graphManager.printGraph(graph)
 
@@ -193,3 +193,15 @@ end
 -- print(checkEvent ("ProducerEnds", 2))
 -- print(checkEvent ("ProducerEnds", 1))
 -- print(checkEvent ("ProducerEnds", 3))
+
+readEventsFile("../GraphTests/threadIdTest1.txt")
+
+checkEvent ("Event1", 1)
+checkEvent ("Event2", 1)
+checkEvent ("Event3", 1)
+checkEvent ("Event4", 1)
+checkEvent ("Event4", 1)
+checkEvent ("Event5", 1)
+checkEvent ("Event6", 1)
+checkEvent ("Event7", 1)
+checkEvent ("Event8", 1)

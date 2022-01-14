@@ -1,9 +1,14 @@
+package.path = package.path .. ';../EventManager/?.lua;'
+
+local threadIdParser = require("threadIdParser")
+
 local graphManager = {}
 
 local graph
 local currentEvent
 local globalGraphNode
 local eventsNamesTable
+
 
 
 local function deepcopy(orig)
@@ -116,7 +121,9 @@ local function processTree (currentGraphNode, grammarTree, hasFatherOr)
     if (eventInEventNameList (grammarTree[1]) == 0) then
       os.exit()
     end
-    return {{grammarTree[1], grammarTree[2], currentGraphNode}}
+    local threadIdTree = threadIdParser.threadIdParser(grammarTree[2])
+
+    return {{grammarTree[1], threadIdTree, currentGraphNode}}
   else
     if(grammarTree["tag"] == "or") then
       child1, _ = processTree (currentGraphNode, grammarTree[1], 1)

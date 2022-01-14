@@ -119,18 +119,97 @@ function printTable (table)
   print("\t--------------------")
 end
 
-function threadIdManager.checkThreadId (threadExpression, threadId)
-  -- local splitCase, terms = splitTerms (string.sub(threadExpression,2,string.len(threadExpression) - 1)) -- removing brackets
-  local splitCase, terms = splitTerms (threadExpression)
+function plusCase (term1, term2)
+  if (term2) then -- two terms to sum
+    for _, value in ipairs(term2) do
+      table.insert(term1, value)
+    end
+  else -- case >>+
+    term1["case"] = "plus"
+  end
 
-  local isThreadId
+  return term1
+end
 
-  -- print("Thread expression "..threadExpression)
-  
-  if (splitCase == "check") then
-    isThreadId = checkCase (terms[1], threadId)
+
+function minusCase (term1, term2)
+  local aux = term1
+  if (term2) then -- two terms to subtract
+    for _, value in ipairs(term2) do
+      local index = existsInTable(aux, value)
+      if (index >= 0) then
+        table.remove(aux, index)
+      end
+    end
+  else -- case >>-
+    aux["case"] = "minus"
+  end
+
+  return aux
+end
+
+
+function processThreadTree (threadTree)
+  local term1, term2
+
+  if (threadTree["tag"] == "item") then
+    return {threadTree[1]}
+  end
+
+  term1 = processThreadTree (threadTree[1])
+  if (threadTree[2]) then
+    term2 = processThreadTree (threadTree[2])
+  end
+
+  if (threadTree["tag"] == "assign") then
+    if (term2) then
+      return term1, term2
+    else
+      return nil, term1
+    end
   else
-    isThreadId = assignCase (terms[1], terms[2], terms[3], threadId)
+    if (threadTree["tag"] == "plus") then
+      return plusCase (term1, term2)
+    else
+      if (threadTree["tag"] == "minus") then
+        return minusCase (term1, term2)
+      else
+        if (threadTree["tag"] == "not") then
+          term1["not"] = true
+          return term1
+        else
+          print("Error processing threadId --> Inexistent tag")
+        end
+      end
+    end
+  end
+
+end
+
+
+function threadIdManager.checkThreadId (threadIdTree, threadId)
+  print(threadIdTree)
+
+  local isThreadId = 1
+
+  term1, term2 = processThreadTree(threadIdTree)
+  
+  if(term1) then
+    for key, value in pairs(term1) do
+      print(key)
+      print(value)
+    end
+  else
+    print(term1)
+  end
+
+  if(term2) then
+    for key, value in pairs(term2) do
+      print(key)
+      print(value)
+    end
+  else
+    print(term2)
   end
 
   -- if (isThreadId == 1) then
@@ -140,24 +219,3 @@ function threadIdManager.checkThreadId (threadExpression, threadId)
 end
 
 return threadIdManager
-
--- print("\n\n[>> threadP] --> 123")
--- print(threadIdManager.checkThreadId("[>>threadP]",123))
-
--- print("\n\n[threadP] --> 321")
--- print(threadIdManager.checkThreadId("[threadP]",321))
-
--- print("\n\n[>> groupP] --> 456")
--- print(threadIdManager.checkThreadId("[>> groupP]",456))
-
--- print("\n\n[    threadP >> groupP     ] --> 123")
--- print(threadIdManager.checkThreadId("[threadP >> groupP]", 123))
-
--- print("\n\n[ >> threadA] --> 789")
--- print(threadIdManager.checkThreadId("[ >> threadA]", 789))
-
--- print("\n\n[threadA >>+ groupP] --> 789")
--- print(threadIdManager.checkThreadId("[threadA >>+ groupP]", 789))
-
--- print("\n\n[threadA >>- groupP] --> 789")
--- print(threadIdManager.checkThreadId("[threadA >>- groupP]", 789))
