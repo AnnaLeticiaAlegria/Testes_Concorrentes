@@ -89,6 +89,8 @@ void* producer (void * num) {
 
     sem_wait(empty);
 
+    checkCurrentEvent("ProducerPassedEmpty");
+
     sem_wait(exc);
 
     checkCurrentEvent("ProducerStarts");
@@ -99,6 +101,8 @@ void* producer (void * num) {
 
     checkCurrentEvent("ProducerEnds");
     sem_post(exc);
+
+    checkCurrentEvent("ProducerPostsFull");
 
     sem_post(full);
 
@@ -119,6 +123,8 @@ void* consumer (void * num) {
 
     sem_wait(full);
 
+    checkCurrentEvent("ConsumerPassedFull");
+
     sem_wait(exc);
 
     checkCurrentEvent("ConsumerStarts");
@@ -130,6 +136,8 @@ void* consumer (void * num) {
     checkCurrentEvent("ConsumerEnds");
 
     sem_post(exc);
+
+    checkCurrentEvent("ConsumerPostsEmpty");
 
     sem_post(empty);
 

@@ -77,7 +77,7 @@ function threadIdParser (input)
 end
 
 
--- print(pt.pt(threadIdParser("[ termo2  >> termo3]")))
+-- print(pt.pt(threadIdParser("[termo1]")))
 -- print(pt.pt(threadIdParser("[termo2 + termo3]")))
 
 return {threadIdParser=threadIdParser}

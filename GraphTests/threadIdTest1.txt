@@ -1,0 +1,10 @@
+(Event1 [>> id1]);
+(Event2 [id1]);
+(Event3 [id1 >> group1]);
+(Event4 [ >>+ group1]);
+(Event5 [ >>- group1]);
+
+(Event6 [~id1 >> notid1]);
+(Event7 [id1 + notid1 >> union]);
+(Event8 [>>+ union]);
+(Event9 [(union - id1)]);
