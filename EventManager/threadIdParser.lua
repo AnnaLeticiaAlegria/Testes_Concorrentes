@@ -18,6 +18,38 @@ local function packbin (tag)
   end
 end
 
+local function tablepack ()
+  return function (capturedTable)
+    local term1, op
+    local tree = {}
+    for key, value in pairs(capturedTable) do
+      tree = {}
+      if (value == '+' or value == '-' or value == '~') then
+        op = value
+      else
+        if (not op) then
+          term1 = value
+        else
+          table.insert(tree, term1)
+          table.insert(tree, value)
+          if (op == '+') then
+            tree["tag"] = "plus"
+          else if (op == '-') then
+            tree["tag"] = "minus"
+            else
+              tree["tag"] = "not"
+            end
+          end
+          op = nil
+          term1 = tree
+        end
+      end
+    end
+
+    return term1
+  end
+end
+
 local inlimit = 0
 
 -- Tokens
@@ -29,10 +61,10 @@ local CS = ']' * S
 local OP = '(' * S
 local CP = ')' * S
 
-local PlusOp = '+' * S
-local MinusOp = '-' * S
+local PlusOp = m.C('+') * S
+local MinusOp = m.C('-') * S
 local AssignOp = ">>" * S
-local NotOp = '~' * S
+local NotOp = m.C('~') * S
 
 local ID = m.C(m.R("az", "AZ") * m.R("az", "AZ", "09")^0) * S
 
@@ -43,18 +75,11 @@ local G = m.P{"ThreadExp";
   Exp = ((m.V"Term")^-1 * AssignOp * m.V"Term") / packbin("assign")
       + m.V"Term",
 
-  Term = (OP^-1 * m.V"Plus" * CP^-1) 
-       + (OP^-1 * m.V"Minus" * CP^-1)
-       + (OP^-1 * m.V"Not" * CP^-1)
-       + (OP^-1 * m.V"Item" * CP^-1),
+  Term = m.Ct(m.V"Prefixed" * ((PlusOp + MinusOp) * m.V"Prefixed")^0) / tablepack(),
 
-  Plus = ((m.V"Item")^-1 * PlusOp * m.V"Item") / packbin("plus"),
+  Prefixed = OP^-1 * (PlusOp + MinusOp + NotOp)^-1 * m.V"Item" * CP^-1,
 
-  Minus = ((m.V"Item")^-1 * MinusOp * m.V"Item") / packbin("minus"),
-
-  Not = (NotOp * m.V"Item") / packbin("not"),
-
-  Item = (OP^-1 * ID * CP^-1) / packbin("item"),
+  Item = (OP * ID * CP) + ID/ packbin("item"),
 
 
 
@@ -77,7 +102,10 @@ function threadIdParser (input)
 end
 
 
--- print(pt.pt(threadIdParser("[termo1]")))
--- print(pt.pt(threadIdParser("[termo2 + termo3]")))
+-- print(pt.pt(threadIdParser("[termo1 + termo2]")))
+-- print(pt.pt(threadIdParser("[termo2 + (termo4 + termo3)]")))
+-- print(pt.pt(threadIdParser("[termo2 + termo3 >> grupo1]")))
+-- print(pt.pt(threadIdParser("[ >> grupo2]")))
+-- print(pt.pt(threadIdParser("[ >>+ grupo3]")))
 
 return {threadIdParser=threadIdParser}
