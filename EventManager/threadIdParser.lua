@@ -77,9 +77,9 @@ local G = m.P{"ThreadExp";
 
   Term = m.Ct(m.V"Prefixed" * ((PlusOp + MinusOp) * m.V"Prefixed")^0) / tablepack(),
 
-  Prefixed = OP^-1 * (PlusOp + MinusOp + NotOp)^-1 * m.V"Item" * CP^-1,
+  Prefixed = (PlusOp + MinusOp + NotOp)^-1 * m.V"Item",
 
-  Item = (OP * ID * CP) + ID/ packbin("item"),
+  Item = (OP * m.V"Exp" * CP) + ID/ packbin("item"),
 
 
 
@@ -103,7 +103,7 @@ end
 
 
 -- print(pt.pt(threadIdParser("[termo1 + termo2]")))
--- print(pt.pt(threadIdParser("[termo2 + (termo4 + termo3)]")))
+print(pt.pt(threadIdParser("[termo1 + (termo2 + termo3)]")))
 -- print(pt.pt(threadIdParser("[termo2 + termo3 >> grupo1]")))
 -- print(pt.pt(threadIdParser("[ >> grupo2]")))
 -- print(pt.pt(threadIdParser("[ >>+ grupo3]")))
