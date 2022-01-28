@@ -29,6 +29,7 @@ by this module.
 #include <lualib.h>
 #include <signal.h>
 #include <unistd.h>
+#include <math.h>
 
 /* 
 ----------------------------------------------------------------------------------------------------------------------
@@ -150,6 +151,25 @@ void checkCurrentEvent (const char * event) {
   
 }
 
+void checkCurrentEventWithId (const char * event, int eventId) {
+  char * eventName, idChar[5];
+  int n;
+
+  n = strlen(event);
+  eventName = (char*) malloc ((n + 1 + 6) * sizeof(char));
+  if (eventName == NULL) {
+    printf("Error during eventName alloc\n");
+    exit(0);
+  }
+
+
+  strcpy(eventName, event);
+  sprintf(idChar, "%d", eventId);
+  strcat(eventName, idChar);
+
+  checkCurrentEvent(eventName);
+  free(eventName);
+}
 
 /*
 ----------------------------------------------------------------------------------------------------------------------

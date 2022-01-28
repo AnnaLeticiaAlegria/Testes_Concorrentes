@@ -3,6 +3,9 @@
     "concurrency.h": "c",
     "stdio.h": "c",
     "eventmanager.h": "c",
-    "__mutex_base": "c"
+    "__mutex_base": "c",
+    "lauxlib.h": "c",
+    "__locale": "c",
+    "locale": "c"
   }
 }

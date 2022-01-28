@@ -81,11 +81,7 @@ void initializeMutexArray (void) {
 void* threadFunction (void * num) {
   int id = *((int *) num);
 
-  char eventName[10];
-  strcpy(eventName, "Starting");
-  eventName[8] = '1' + id;
-  eventName[9] = '\0';
-  checkCurrentEvent(eventName);
+  checkCurrentEventWithId ("Starting", id + 1);
 
   
   checkCurrentEvent("Thinking");

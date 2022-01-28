@@ -179,11 +179,11 @@ function threadIdManager.checkThreadId (threadIdTree, threadId)
 
   isThreadId = solveTerms (term1, term2, threadId)
 
-  print("resultado: " .. tostring(isThreadId))
+  -- print("resultado: " .. tostring(isThreadId))
 
-  if (isThreadId == 1) then
-    printTable (threadIdTable)
-  end
+  -- if (isThreadId == 1) then
+  --   printTable (threadIdTable)
+  -- end
   return isThreadId
 end
 

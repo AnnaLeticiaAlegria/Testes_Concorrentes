@@ -102,6 +102,9 @@ Output assertions:
 void checkCurrentEvent (const char * event);
 
 
+void checkCurrentEventWithId (const char * event, int eventId);
+
+
 /*
 ----------------------------------------------------------------------------------------------------------------------
 Function: finalizeManager

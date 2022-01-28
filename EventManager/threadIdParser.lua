@@ -103,7 +103,7 @@ end
 
 
 -- print(pt.pt(threadIdParser("[termo1 + termo2]")))
-print(pt.pt(threadIdParser("[termo1 + (termo2 + termo3)]")))
+-- print(pt.pt(threadIdParser("[termo1 + (termo2 + termo3)]")))
 -- print(pt.pt(threadIdParser("[termo2 + termo3 >> grupo1]")))
 -- print(pt.pt(threadIdParser("[ >> grupo2]")))
 -- print(pt.pt(threadIdParser("[ >>+ grupo3]")))
