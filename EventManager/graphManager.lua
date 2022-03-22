@@ -156,6 +156,7 @@ end
 
 function graphManager.printGraph(graph)
 
+  print(graph)
   for k,value in ipairs(graph) do
     print("Node "..tostring(k))
     for k2,value2 in pairs(value) do

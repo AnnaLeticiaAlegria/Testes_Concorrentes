@@ -206,3 +206,7 @@ end
 -- checkEvent ("Event8", 2)
 -- checkEvent ("Event9", 1)
 -- checkEvent ("Event9", 2)
+
+-- local val = readEventsFile("../EventManager/test.txt")
+
+-- graphManager.printGraph(graph)

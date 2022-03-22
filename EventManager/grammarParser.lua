@@ -75,7 +75,7 @@ local G = m.P{"Prog";
 
   Iterate = (m.V"Item" * m.C(Star)^-1) / packstar,
 
-  Item = (ID * m.C((OS * m.V"ThreadExp" * CS)^-1)) / packbin("item")
+  Item = (ID * m.C((OS * m.V"ThreadExp" * CS))) / packbin("item")
        + OP * m.V"Exp" * CP,
 
   ThreadExp = (1 - m.P"]")^0, -- everything before "]"
@@ -95,6 +95,7 @@ function grammarParser (input)
   if not p then
     syntaxerror(input, inlimit)
   end
+  print(pt.pt(p))
   return p
 end
 

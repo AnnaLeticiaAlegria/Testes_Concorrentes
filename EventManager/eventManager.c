@@ -156,12 +156,11 @@ void checkCurrentEventWithId (const char * event, int eventId) {
   int n;
 
   n = strlen(event);
-  eventName = (char*) malloc ((n + 1 + 6) * sizeof(char));
+  eventName = (char*) malloc ((n + 1 + 10) * sizeof(char));
   if (eventName == NULL) {
     printf("Error during eventName alloc\n");
     exit(0);
   }
-
 
   strcpy(eventName, event);
   sprintf(idChar, "%d", eventId);
