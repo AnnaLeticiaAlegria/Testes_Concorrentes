@@ -95,7 +95,7 @@ function grammarParser (input)
   if not p then
     syntaxerror(input, inlimit)
   end
-  print(pt.pt(p))
+  -- print(pt.pt(p))
   return p
 end
 

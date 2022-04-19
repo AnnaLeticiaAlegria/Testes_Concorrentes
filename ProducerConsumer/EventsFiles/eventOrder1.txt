@@ -1,2 +1,3 @@
 (ConsumerWantsToStart [>> consumer1]);
 (ConsumerStarts [consumer1]);
+(ConsumerEnds [consumer1]);

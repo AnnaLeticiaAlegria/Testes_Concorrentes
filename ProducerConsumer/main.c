@@ -57,9 +57,9 @@ int main(int argc, char** argv)
   producersArray = initializeThreads (nProducers, producersIdArray, producer);
   consumersArray = initializeThreads (nConsumers, consumersIdArray, consumer);
 	
-  empty = initializeSemaphore("/empty", bufferSize);
-  full = initializeSemaphore("/full", 0);
-  exc = initializeSemaphore("/exc", 1);
+  empty = initializeSemaphore("/s_empty", bufferSize);
+  full = initializeSemaphore("/s_full", 0);
+  exc = initializeSemaphore("/s_exc", 1);
 
   joinThreads (producersArray, nProducers);
   joinThreads (consumersArray, nConsumers);
@@ -86,13 +86,9 @@ void* producer (void * num) {
     a = rand() % 100;
 
     checkCurrentEvent("ProducerWantsToStart");
-
     sem_wait(empty);
 
-    checkCurrentEvent("ProducerPassedEmpty");
-
     sem_wait(exc);
-
     checkCurrentEvent("ProducerStarts");
 
     buffer[nxtfree] = a;
@@ -102,14 +98,10 @@ void* producer (void * num) {
     checkCurrentEvent("ProducerEnds");
     sem_post(exc);
 
-    checkCurrentEvent("ProducerPostsFull");
-
     sem_post(full);
 
     printf("--------Producer %d produced item %d--------\n", id, a);
   }
-
-
 	pthread_exit(NULL); 
 }
 
@@ -120,13 +112,10 @@ void* consumer (void * num) {
   while(1) {
 
     checkCurrentEvent("ConsumerWantsToStart");
-
     sem_wait(full);
 
-    checkCurrentEvent("ConsumerPassedFull");
 
     sem_wait(exc);
-
     checkCurrentEvent("ConsumerStarts");
     
     b = buffer[nxtdata];
@@ -134,16 +123,12 @@ void* consumer (void * num) {
     nxtdata = (nxtdata + 1) % bufferSize;
 
     checkCurrentEvent("ConsumerEnds");
-
     sem_post(exc);
-
-    checkCurrentEvent("ConsumerPostsEmpty");
 
     sem_post(empty);
 
     printf("--------Consumer %d consumed item %d--------\n", id, b);
   }
-
 	pthread_exit(NULL); 
 }
 

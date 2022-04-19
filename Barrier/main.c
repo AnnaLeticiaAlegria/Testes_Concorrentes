@@ -60,7 +60,7 @@ At last, the main function frees the memory spaces allocated and finalizes the m
 int main (int argc, char** argv) {
   
   pthread_t * threadArray;
-  int ** idArray;
+  int ** idArray = NULL;
 
   if (argc != 5) {
     printf("Program needs 4 parameters: functionToUse, nThreads, nSteps and statesFileName \n");
@@ -106,7 +106,7 @@ void * threadFunction (void * id) {
 
   for (int i=0; i < nSteps; i++) {
     aux1++;
-    printf("Thread %d: step=%d\n", myId, i);
+    // printf("Thread %d: step=%d\n", myId, i);
 
     /* barreira */
     switch(functionToUse) {
@@ -144,7 +144,6 @@ can acquire the semaphore 'mutex' and will not wait on the barrier, since the se
 ----------------------------------------------------------------------------------------------------------------------
 */
 void barrier_v1(int numThreads) {
-  checkCurrentEvent("ThreadWantsToStart");
   sem_wait(mutex);
   checkCurrentEvent("ThreadStarts");
 
@@ -189,7 +188,6 @@ arrived == 0 condition, not releasing the semaphore 'mutex'. There will be a dea
 ----------------------------------------------------------------------------------------------------------------------
 */
 void barrier_v2(int numThreads) {
-  checkCurrentEvent("ThreadWantsToStart");
   sem_wait(mutex);
   checkCurrentEvent("ThreadStarts");
 
@@ -232,7 +230,6 @@ the semaphore 'mutex'.
 ----------------------------------------------------------------------------------------------------------------------
 */
 void barrier_v3(int id, int numThreads) {
-  checkCurrentEvent("ThreadWantsToStart");
   sem_wait(mutex);
   checkCurrentEvent("ThreadStarts");
 

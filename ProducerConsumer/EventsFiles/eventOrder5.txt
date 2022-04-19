@@ -1,13 +1,17 @@
+(ProducerWantsToStart [>> producers]);
+(ProducerStarts [producers]);
+(ProducerEnds [producers]);
+(ConsumerWantsToStart [>> consumers]);
 (
   (
-    (ProducerWantsToStart [>> producer]);
-    (ProducerStarts [producer]);
-    (ProducerEnds [producer]);
+    (ProducerStarts [producers]);
+    (ProducerEnds [producers]);
+    (ConsumerWantsToStart [>>+ consumers]);
   )
   |
   (
-    (ConsumerWantsToStart [>> consumer]);
-    (ConsumerStarts [consumer]);
-    (ConsumerEnds [consumer]);
+    (ConsumerStarts [consumers]);
+    (ConsumerEnds [consumers]);
+    (ProducerWantsToStart [>>+ producers]);
   )
 )*
