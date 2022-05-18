@@ -56,6 +56,13 @@ function solveTerms (term1, term2, threadId)
       local index = existsInTable(threadIdTable[idName], threadId)
       if (index >= 0) then
         table.remove(threadIdTable[idName], index)
+
+        if (not threadIdTable[-1]) then
+          threadIdTable[-1] = {} -- to insert threadIds that are removed from minus operation (so the not operation can work)
+        end
+        if (existsInTable(threadIdTable[-1], threadId) < 0) then
+          table.insert(threadIdTable[-1], threadId)
+        end
       end
     else
       if (term2["case"] ~= "plus") then
@@ -112,7 +119,9 @@ function notCase (term1)
   for key, value in pairs(threadIdTable) do
     for _, value2 in pairs(value) do
       local index = existsInTable(aux, value2)
+      print("before if")
       if (index < 0) then
+        print("index not found --> "..value2)
         table.insert(aux, value2)
       end
     end
@@ -181,9 +190,9 @@ function threadIdManager.checkThreadId (threadIdTree, threadId)
 
   -- print("resultado: " .. tostring(isThreadId))
 
-  -- if (isThreadId == 1) then
-  --   printTable (threadIdTable)
-  -- end
+  if (isThreadId == 1) then
+    printTable (threadIdTable)
+  end
   return isThreadId
 end
 

@@ -294,9 +294,9 @@ void signalHandler(int signum){
 
   printf("\n\n\nEND");
   if (!code) {
-    printf("\n\n\nPossible blocking detected!!\n\nThe input event order wasn't accepted by your program. Please note that:\n"); 
-    printf("-- If the input order was supposed to be invalid, this mean that your program might be ok.\n");
-    printf("-- If the input order was supposed to be valid, this means that your program might have some issues.\n\n");
+    printf("\n\n\nPossible blocking detected!!\n\nThe input event sequence wasn't accepted by your program. Please note that:\n"); 
+    printf("-- If the input sequence was supposed to be invalid, this means that your program might be ok.\n");
+    printf("-- If the input sequence was supposed to be valid, this means that your program might have some issues.\n\n");
 
     printf("Possible Events Expected:\n");
     for (i=0; i< n_nextEvent; i++) {
@@ -304,9 +304,9 @@ void signalHandler(int signum){
     }
   }
   else {
-    printf("\n\n\nFinished executing the script!!\n\nThe input event order was accepted by your program. Please note that:\n");
-    printf("-- If the input order was supposed to be invalid, this mean that your program might have some issues.\n");
-    printf("-- If the input order was supposed to be valid, this means that your program might be ok.\n\n");
+    printf("\n\n\nFinished executing the script!!\n\nThe input event sequence was accepted by your program. Please note that:\n");
+    printf("-- If the input sequence was supposed to be invalid, this means that your program might have some issues.\n");
+    printf("-- If the input sequence was supposed to be valid, this means that your program might be ok.\n\n");
   }
   printf("\n\n\n");
 

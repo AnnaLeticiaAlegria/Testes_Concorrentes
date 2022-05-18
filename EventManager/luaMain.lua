@@ -169,14 +169,7 @@ end
 
 -- print("\n\n\n\n\nTeste1\n\n\n")
 
--- readConfigFile("../ProducerConsumerPassingTheBaton/EventsFiles/configFile.txt")
 -- readEventsFile("../Broadcast/EventsFiles/eventOrderFile_1.txt")
-
--- graphManager.printGraph(graph)
-
--- -- print("\n\n\n\n\nTeste2\n\n\n")
-
--- -- readEventsFile("../ProducerConsumerPassingTheBaton/Tests/test2.txt")
 
 -- -- graphManager.printGraph(graph)
 
@@ -207,6 +200,10 @@ end
 -- checkEvent ("Event9", 1)
 -- checkEvent ("Event9", 2)
 
--- local val = readEventsFile("../EventManager/test.txt")
+-- readEventsFile("../EventManager/test.txt")
 
 -- graphManager.printGraph(graph)
+
+readEventsFile("../ProducerConsumer/EventsFiles/eventOrder5.txt")
+
+graphManager.printGraph(graph)
