@@ -70,8 +70,8 @@ int main(int argc, char** argv)
   int ** readersIdArray = NULL;
   int ** writersIdArray = NULL;
 
-	if (argc != 5) {
-    printf("Program needs 4 parameters: nReaders, nWriters, eventFileName and configFileName \n");
+	if (argc < 4 || argc > 5) {
+    printf("Program needs 3 or 4 parameters: nReaders, nWriters, eventFileName and configFileName (optional) \n");
     return 0;
   }
   nReaders = strtol(argv[1], NULL, 10);

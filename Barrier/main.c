@@ -26,7 +26,7 @@ There are 3 barrier's implementations on this module. Two of them are wrong and 
 /* Global variable's declaration */
 
 sem_t * mutex;
-sem_t * cond;
+sem_t * allArrived;
 
 int nThreads, nSteps;
 int functionToUse;
@@ -73,7 +73,7 @@ int main (int argc, char** argv) {
   initializeManager (argv[4], NULL);
 
   mutex = initializeSemaphore("/mutex", 1);
-  cond = initializeSemaphore("/cond", 0);
+  allArrived = initializeSemaphore("/allArrived", 0);
 
   threadArray = initializeThreads (nThreads, idArray, threadFunction);
 
@@ -82,7 +82,7 @@ int main (int argc, char** argv) {
   freeThreads (threadArray, nThreads, idArray);
 
   freeSemaphore(mutex);
-  freeSemaphore(cond);
+  freeSemaphore(allArrived);
 
   finalizeManager();
   return 0;
@@ -136,11 +136,11 @@ Returns: nothing
 
 Description: This function is the first version of a barrier. It is incorrect.
 The thread gets the lock of semaphore 'mutex' to access the variable 'arrived'. If it isn't the last one to arrive,
-it releases the semaphore 'mutex' and waits on semaphore 'cond'. If it is the last one to arrive, it releases every
-thread that is waiting on 'cond', sets 'arrived' to 0 and releases the semaphore 'mutex'
+it releases the semaphore 'mutex' and waits on semaphore 'allArrived'. If it is the last one to arrive, it releases every
+thread that is waiting on 'allArrived', sets 'arrived' to 0 and releases the semaphore 'mutex'
 This version is wrong because the last thread to arrive stacks sem_post's calls and then, releases the semaphore 
-'mutex'. If this threads executes the next step before the other threads consume the sem_post on semaphore 'cond', it 
-can acquire the semaphore 'mutex' and will not wait on the barrier, since the sem_wait on 'cond' won't work.
+'mutex'. If this threads executes the next step before the other threads consume the sem_post on semaphore 'allArrived', it 
+can acquire the semaphore 'mutex' and will not wait on the barrier, since the sem_wait on 'allArrived' won't work.
 ----------------------------------------------------------------------------------------------------------------------
 */
 void barrier_v1(int numThreads) {
@@ -152,7 +152,7 @@ void barrier_v1(int numThreads) {
     sem_post(mutex);
 
     checkCurrentEvent("ThreadWaits");
-    sem_wait(cond);
+    sem_wait(allArrived);
 
     checkCurrentEvent("ThreadPassed");
   } 
@@ -160,7 +160,7 @@ void barrier_v1(int numThreads) {
     for(int i=1; i<numThreads; i++)
     {
       checkCurrentEvent("WantsToRelease");
-      sem_post(cond); 
+      sem_post(allArrived); 
       checkCurrentEvent("ReleaseAThread");
     }
     arrived = 0;
@@ -178,8 +178,8 @@ Returns: nothing
 
 Description: This function is the second version of a barrier. It is incorrect.
 The thread gets the lock of semaphore 'mutex' to access the variable 'arrived'. If it isn't the last one to arrive,
-it releases the semaphore 'mutex' and waits on semaphore 'cond'. If it is the last one to arrive, it releases one 
-thread that is waiting on 'cond' and decrements 'arrived'.
+it releases the semaphore 'mutex' and waits on semaphore 'allArrived'. If it is the last one to arrive, it releases one 
+thread that is waiting on 'allArrived' and decrements 'arrived'.
 The thread that was waiting decrements 'arrived' and releases another thread. If it is the last Thread, it releases
 the semaphore 'mutex'.
 This version is wrong because the decrement of 'arrived' by the last thread to arrive is being done after the sem_post.
@@ -196,7 +196,7 @@ void barrier_v2(int numThreads) {
     sem_post(mutex);
 
     checkCurrentEvent("ThreadWaits");
-    sem_wait(cond);
+    sem_wait(allArrived);
 
     checkCurrentEvent("ThreadPassed");
     arrived--;
@@ -205,10 +205,10 @@ void barrier_v2(int numThreads) {
       sem_post(mutex);
     }
     else {
-      sem_post(cond); 
+      sem_post(allArrived); 
     }
   } else {
-    sem_post(cond); 
+    sem_post(allArrived); 
     checkCurrentEvent("EveryThreadArrived");
     arrived--; //it should have been called before previous line
   }
@@ -223,8 +223,8 @@ Returns: nothing
 
 Description: This function is the second version of a barrier. It is correct!!!
 The thread gets the lock of semaphore 'mutex' to access the variable 'arrived'. If it isn't the last one to arrive,
-it releases the semaphore 'mutex' and waits on semaphore 'cond'. If it is the last one to arrive, it decrements 
-'arrived' and releases one thread that is waiting on 'cond'.
+it releases the semaphore 'mutex' and waits on semaphore 'allArrived'. If it is the last one to arrive, it decrements 
+'arrived' and releases one thread that is waiting on 'allArrived'.
 The thread that was waiting decrements 'arrived' and releases another thread. If it is the last Thread, it releases
 the semaphore 'mutex'.
 ----------------------------------------------------------------------------------------------------------------------
@@ -238,7 +238,7 @@ void barrier_v3(int id, int numThreads) {
     sem_post(mutex);
 
     checkCurrentEvent("ThreadWaits");
-    sem_wait(cond);
+    sem_wait(allArrived);
 
     checkCurrentEvent("ThreadPassed");
     arrived--;
@@ -247,11 +247,11 @@ void barrier_v3(int id, int numThreads) {
       sem_post(mutex);
     }
     else {
-      sem_post(cond); 
+      sem_post(allArrived); 
     }
   } else {
     arrived--;
-    sem_post(cond);
+    sem_post(allArrived);
     checkCurrentEvent("EveryThreadArrived");
   }
 }

@@ -1,26 +1,29 @@
-DequeueWantsToStart [>>thread1];
-DequeueStarts [thread1];
-DequeueWaits [thread1];
+EnqueueWantsToStart [>>enqThreads];
+EnqueueStarts [enqThreads];
+EnqueueEnqueues [enqThreads];
+EnqueueBroadcast [enqThreads];
+EnqueueEnds [enqThreads];
 
-EnqueueWantsToStart [>>thread2];
-EnqueueStarts [thread2];
-EnqueueEnqueues [thread2];
-EnqueueBroadcast [thread2];
-EnqueueEnds [thread2];
+EnqueueWantsToStart [>>+ enqThreads];
+EnqueueStarts [enqThreads];
+EnqueueEnqueues [enqThreads];
+EnqueueBroadcast [enqThreads];
+EnqueueEnds [enqThreads];
 
-EnqueueWantsToStart [>>thread3];
-EnqueueStarts [thread3];
-EnqueueEnqueues [thread3];
-EnqueueBroadcast [thread3];
-EnqueueEnds [thread3];
+DequeueWantsToStart [>>deqThreads];
+DequeueStarts [deqThreads];
+DequeueDequeues [deqThreads];
+DequeueBroadcast [deqThreads];
+DequeueEnds [deqThreads];
 
-DequeueContinues [thread1];
-DequeueDequeues [thread1];
-DequeueBroadcast [thread1];
-DequeueEnds [thread1];
+EnqueueWantsToStart [>>+enqThreads];
+EnqueueStarts [enqThreads];
+EnqueueEnqueues [enqThreads];
+EnqueueBroadcast [enqThreads];
+EnqueueEnds [enqThreads];
 
-DequeueWantsToStart [>>thread4];
-DequeueStarts [thread4];
-DequeueDequeues [thread4];
-DequeueBroadcast [thread4];
-DequeueEnds [thread4];
+EnqueueWantsToStart [>>+enqThreads];
+EnqueueStarts [enqThreads];
+EnqueueEnqueues [enqThreads];
+EnqueueBroadcast [enqThreads];
+EnqueueEnds [enqThreads];

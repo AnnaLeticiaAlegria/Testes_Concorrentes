@@ -11,3 +11,5 @@
 (RightieGotFork1 [philosopherRightie]);
 (RightieGotFork1 [philosopherRightie]);
 (RightieGotFork1 [philosopherRightie]);
+
+tirar do conjunto philosopherRightie

@@ -1,0 +1,12 @@
+DequeueWantsToStart [>>thread1];
+DequeueStarts [thread1];
+DequeueWaits [thread1];
+
+EnqueueWantsToStart [>>thread2];
+EnqueueStarts [thread2];
+EnqueueEnqueues [thread2];
+EnqueueEnds [thread2];
+
+DequeueContinues [thread1];
+DequeueDequeues [thread1];
+DequeueEnds [thread1];

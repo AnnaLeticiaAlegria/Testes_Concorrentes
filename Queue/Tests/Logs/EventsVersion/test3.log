@@ -1,0 +1,20 @@
+EnqueueWantsToStart --> Executed
+EnqueueStarts --> Executed
+EnqueueEnqueues --> Executed
+EnqueueBroadcast --> Ignored
+EnqueueEnds --> Executed
+----------Thread 1 enqueued element 7
+EnqueueWantsToStart --> Executed
+EnqueueStarts --> Executed
+EnqueueWaits --> Executed
+DequeueWantsToStart --> Executed
+DequeueStarts --> Executed
+DequeueDequeues --> Executed
+DequeueBroadcast --> Ignored
+DequeueEnds --> Executed
+----------Thread 2 dequeued element 7
+EnqueueContinues --> Executed
+EnqueueEnqueues --> Executed
+EnqueueBroadcast --> Ignored
+EnqueueEnds --> Executed
+----------Thread 0 enqueued element 49

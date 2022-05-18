@@ -86,9 +86,11 @@ void* producer (void * num) {
     a = rand() % 100;
 
     checkCurrentEvent("ProducerWantsToStart");
+
     sem_wait(empty);
 
     sem_wait(exc);
+
     checkCurrentEvent("ProducerStarts");
 
     buffer[nxtfree] = a;
@@ -102,6 +104,8 @@ void* producer (void * num) {
 
     printf("--------Producer %d produced item %d--------\n", id, a);
   }
+
+
 	pthread_exit(NULL); 
 }
 
@@ -112,10 +116,11 @@ void* consumer (void * num) {
   while(1) {
 
     checkCurrentEvent("ConsumerWantsToStart");
+
     sem_wait(full);
 
-
     sem_wait(exc);
+
     checkCurrentEvent("ConsumerStarts");
     
     b = buffer[nxtdata];
@@ -123,12 +128,14 @@ void* consumer (void * num) {
     nxtdata = (nxtdata + 1) % bufferSize;
 
     checkCurrentEvent("ConsumerEnds");
+
     sem_post(exc);
 
     sem_post(empty);
 
     printf("--------Consumer %d consumed item %d--------\n", id, b);
   }
+
 	pthread_exit(NULL); 
 }
 

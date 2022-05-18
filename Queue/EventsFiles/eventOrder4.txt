@@ -1,0 +1,46 @@
+EnqueueWantsToStart [>> enqThreads];
+DequeueWantsToStart [>> deqThreads];
+(
+  EnqueueWantsToStart [>>+ enqThreads];
+  |
+  DequeueWantsToStart [>>+ deqThreads];
+)* ;
+(
+  (EnqueueStarts [enqThreads];
+    (
+      (
+        EnqueueEnqueues [enqThreads];
+        EnqueueBroadcast [enqThreads];
+        EnqueueEnds [enqThreads];
+      )
+      |
+      EnqueueWaits [enqThreads];
+    )
+  )
+  |
+  (DequeueStarts [deqThreads];
+    (
+      (
+        DequeueDequeues [deqThreads];
+        DequeueBroadcast [deqThreads];
+        DequeueEnds [deqThreads];
+      )
+      |
+      DequeueWaits [deqThreads];
+    )
+  )
+  |
+  (
+    EnqueueContinues [enqThreads];
+    EnqueueEnqueues [enqThreads];
+    EnqueueBroadcast [enqThreads];
+    EnqueueEnds [enqThreads];
+  )
+  |
+  (
+    DequeueContinues [deqThreads];
+    DequeueDequeues [deqThreads];
+    DequeueBroadcast [deqThreads];
+    DequeueEnds [deqThreads];
+  )
+) * ;

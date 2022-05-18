@@ -1,0 +1,74 @@
+EnqueueWantsToStart [>> enqThreads];
+DequeueWantsToStart [>> deqThreads];
+DequeueWantsToStart [>>+ deqThreads];
+DequeueWantsToStart [>>+ deqThreads];
+DequeueWantsToStart [>>+ deqThreads];
+EnqueueWantsToStart [>>+ enqThreads];
+DequeueWantsToStart [>>+ deqThreads];
+EnqueueWantsToStart [>>+ enqThreads];
+EnqueueWantsToStart [>>+ enqThreads];
+EnqueueWantsToStart [>>+ enqThreads];
+EnqueueWantsToStart [>>+ enqThreads];
+EnqueueWantsToStart [>>+ enqThreads];
+DequeueWantsToStart [>>+ deqThreads];
+DequeueWantsToStart [>>+ deqThreads];
+DequeueWantsToStart [>>+ deqThreads];
+DequeueWantsToStart [>>+ deqThreads];
+DequeueWantsToStart [>>+ deqThreads];
+
+EnqueueStarts [enqThreads];
+EnqueueEnqueues [enqThreads];
+EnqueueBroadcast [enqThreads];
+EnqueueEnds [enqThreads];
+
+DequeueStarts [deqThreads];
+DequeueDequeues [deqThreads];
+DequeueBroadcast [deqThreads];
+DequeueEnds [deqThreads];
+
+DequeueStarts [deqThreads];
+DequeueWaits [deqThreads];
+DequeueStarts [deqThreads];
+DequeueWaits [deqThreads];
+DequeueStarts [deqThreads];
+DequeueWaits [deqThreads];
+
+EnqueueStarts [enqThreads];
+EnqueueEnqueues [enqThreads];
+EnqueueBroadcast [enqThreads];
+EnqueueEnds [enqThreads];
+
+DequeueStarts [deqThreads];
+DequeueDequeues [deqThreads];
+DequeueBroadcast [deqThreads];
+DequeueEnds [deqThreads];
+
+EnqueueStarts [enqThreads];
+EnqueueEnqueues [enqThreads];
+EnqueueBroadcast [enqThreads];
+EnqueueEnds [enqThreads];
+EnqueueStarts [enqThreads];
+EnqueueEnqueues [enqThreads];
+EnqueueBroadcast [enqThreads];
+EnqueueEnds [enqThreads];
+EnqueueStarts [enqThreads];
+EnqueueEnqueues [enqThreads];
+EnqueueBroadcast [enqThreads];
+EnqueueEnds [enqThreads];
+EnqueueStarts [enqThreads];
+EnqueueEnqueues [enqThreads];
+EnqueueBroadcast [enqThreads];
+EnqueueEnds [enqThreads];
+
+EnqueueStarts [enqThreads];
+EnqueueWaits [enqThreads];
+
+DequeueStarts [deqThreads];
+DequeueDequeues [deqThreads];
+DequeueBroadcast [deqThreads];
+DequeueEnds [deqThreads];
+
+EnqueueContinues [enqThreads];
+EnqueueEnqueues [enqThreads];
+EnqueueBroadcast [enqThreads];
+EnqueueEnds [enqThreads];

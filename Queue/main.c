@@ -20,6 +20,7 @@ typedef struct queue {
 
 Queue * mainQueue;
 int nThreads;
+int nDequeuers, nEnqueuers;
 int bufferSize;
 
 pthread_cond_t waitCondition = PTHREAD_COND_INITIALIZER;
@@ -45,13 +46,15 @@ int main(int argc, char** argv)
 
   int ** threadsIdArray = NULL;
 
-	if (argc < 4 && argc > 5) {
-    printf("Program needs 3 or 4 parameters: bufferSize, nThreads, eventFileName and configFileName(optional) \n");
+	if (argc < 5 && argc > 6) {
+    printf("Program needs 4 or 5 parameters: bufferSize, nEnqueuers, nDequeuers, eventFileName and configFileName(optional) \n");
     return 0;
   }
   bufferSize = strtol(argv[1], NULL, 10);
-  nThreads = strtol(argv[2], NULL, 10);
-  initializeManager (argv[3], argv[4]);
+  nEnqueuers = strtol(argv[2], NULL, 10);
+  nDequeuers = strtol(argv[3], NULL, 10);
+  initializeManager (argv[4], argv[5]);
+  nThreads = nEnqueuers + nDequeuers;
 
   mainQueue = createQueue ();
 
@@ -117,7 +120,7 @@ void* threadFunction (void * num) {
   int id = *((int *) num);
   int element;
 
-	if (id % 2 == 0) {
+	if(id < nEnqueuers) {
     element = rand() % 100;
     enqueue (element);
     printf("----------Thread %d enqueued element %d\n", id, element);
