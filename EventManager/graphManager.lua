@@ -54,7 +54,7 @@ local function insertEdge (entryNode, eventName, exitNode, eventRule)
   if (not graph[entryNode][eventName]) then
     graph[entryNode][eventName] = {{exitNode}, eventRule}
   else
-    if (~existsInTable(graph[entryNode][eventName][1], exitNode)) then
+    if (existsInTable(graph[entryNode][eventName][1], exitNode) == 0) then
       table.insert(graph[entryNode][eventName][1], exitNode)
     end
   end
@@ -102,6 +102,8 @@ local function actionTagPlus (currentGraphNode, child1, plusCaseChild, hasFather
     else
       for _, plusValue in ipairs(plusCaseChild) do
         for _, childValue2 in ipairs(child1) do
+          print("aaaaa")
+          print(globalGraphNode, plusValue[1], childValue2[3], plusValue[3])
           insertEdge (globalGraphNode, plusValue[1], childValue2[3], plusValue[2])
         end
       end

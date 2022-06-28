@@ -20,7 +20,7 @@ sem_t ** mutexArray;
 
 void initializeMutexArray (void);
 
-void* threadFunction (void * num);
+void* philosopherFunction (void * num);
 
 void eat (int philosopher);
 void think (int philosopher);
@@ -43,7 +43,7 @@ int main(int argc, char** argv)
 
   initializeMutexArray ();
 
-  threadsArray = initializeThreads (nThreads, threadsIdArray, threadFunction);
+  threadsArray = initializeThreads (nThreads, threadsIdArray, philosopherFunction);
 	
   joinThreads (threadsArray, nThreads);
 
@@ -78,67 +78,65 @@ void initializeMutexArray (void) {
   }
 }
 
-void* threadFunction (void * num) {
+void* philosopherFunction (void * num) {
   int id = *((int *) num);
 
-  checkCurrentEventWithId ("Starting", id + 1);
+  while(1) {
+    checkCurrentEventWithId ("Starting", id + 1);
+    think(id);
 
-  
-  checkCurrentEvent("Thinking");
-  think(id);
+    if(id == 0) {
+      checkCurrentEvent("LeftieWantsFork1");
+      getFork(id, nThreads - 1);
+      checkCurrentEvent("LeftieGotFork1");
 
-  if(id == 0) {
-    checkCurrentEvent("LeftieWantsFork1");
-    getFork(id, nThreads - 1);
-    checkCurrentEvent("LeftieGotFork1");
+      checkCurrentEvent("LeftieWantsFork2");
+      getFork(id, 0);
+      checkCurrentEvent("LeftieGotFork2");
+    }
+    else {
+      checkCurrentEvent("RightieWantsFork1");
+      getFork(id, id);
+      checkCurrentEvent("RightieGotFork1");
 
-    checkCurrentEvent("LeftieWantsFork2");
-    getFork(id, 0);
-    checkCurrentEvent("LeftieGotFork2");
+      checkCurrentEvent("RightieWantsFork2");
+      getFork(id, id - 1);
+      checkCurrentEvent("RightieGotFork2");
+    }
+
+    checkCurrentEvent("Eating");
+    eat(id);
+
+    if(id == 0) {
+      checkCurrentEvent("LeftieGivesFork1");
+      putFork(id, nThreads - 1);
+      checkCurrentEvent("LeftiePutFork1");
+
+      checkCurrentEvent("LeftieGivesFork2");
+      putFork(id, 0);
+      checkCurrentEvent("LeftiePutFork2");
+    }
+    else {
+      checkCurrentEvent("RightieGivesFork1");
+      putFork(id, id);
+      checkCurrentEvent("RightiePutFork1");
+
+      checkCurrentEvent("RightieGivesFork2");
+      putFork(id, id - 1);
+      checkCurrentEvent("RightiePutFork2");
+    }
   }
-  else {
-    checkCurrentEvent("RightieWantsFork1");
-    getFork(id, id);
-    checkCurrentEvent("RightieGotFork1");
-
-    checkCurrentEvent("RightieWantsFork2");
-    getFork(id, id - 1);
-    checkCurrentEvent("RightieGotFork2");
-  }
-
-  checkCurrentEvent("Eating");
-  eat(id);
-
-  if(id == 0) {
-    checkCurrentEvent("LeftieGivesFork1");
-    putFork(id, nThreads - 1);
-    checkCurrentEvent("LeftiePutFork1");
-
-    checkCurrentEvent("LeftieGivesFork2");
-    putFork(id, 0);
-    checkCurrentEvent("LeftiePutFork2");
-  }
-  else {
-    checkCurrentEvent("RightieGivesFork1");
-    putFork(id, id);
-    checkCurrentEvent("RightiePutFork1");
-
-    checkCurrentEvent("RightieGivesFork2");
-    putFork(id, id - 1);
-    checkCurrentEvent("RightiePutFork2");
-  }
-
 	pthread_exit(NULL); 
 }
 
 
 void eat (int philosopher) {
-  printf("--------------Philosopher %d eating--------------\n", philosopher);
+  printf("--------------Philosopher %d eating--------------\n", philosopher + 1);
   sleep(1);
 }
 
 void think (int philosopher) {
-  printf("--------------Philosopher %d thinking--------------\n", philosopher);
+  printf("--------------Philosopher %d thinking--------------\n", philosopher + 1);
   sleep(1);
 }
 
@@ -146,12 +144,12 @@ void getFork (int philosopher, int fork) {
 
   sem_wait(mutexArray[fork]);
 
-  printf("--------------Philosopher %d got fork %d--------------\n", philosopher, fork);
+  printf("--------------Philosopher %d got fork %d--------------\n", philosopher + 1, fork);
 }
 
 void putFork (int philosopher, int fork) {
 
   sem_post(mutexArray[fork]);
 
-  printf("--------------Philosopher %d put fork %d--------------\n", philosopher, fork);
+  printf("--------------Philosopher %d put fork %d--------------\n", philosopher + 1, fork);
 }

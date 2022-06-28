@@ -1,0 +1,11 @@
+
+(
+  (
+    (Event1[t]);
+    (Event2[t]);
+    (Event3[t]);
+  )+;
+  (Event4[t]);
+)
+|
+(Event5[t]);

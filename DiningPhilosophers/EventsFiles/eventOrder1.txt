@@ -7,9 +7,7 @@
 (RightieWantsFork1 [>>+ philosopherRightie]);
 (RightieWantsFork1 [>>+ philosopherRightie]);
 
-(RightieGotFork1 [philosopherRightie]);
-(RightieGotFork1 [philosopherRightie]);
-(RightieGotFork1 [philosopherRightie]);
-(RightieGotFork1 [philosopherRightie]);
-
-tirar do conjunto philosopherRightie
+(RightieGotFork1 [philosopherRightie >>- philosopherRightie]);
+(RightieGotFork1 [philosopherRightie >>- philosopherRightie]);
+(RightieGotFork1 [philosopherRightie >>- philosopherRightie]);
+(RightieGotFork1 [philosopherRightie >>- philosopherRightie]);

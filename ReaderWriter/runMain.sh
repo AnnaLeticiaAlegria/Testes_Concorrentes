@@ -26,8 +26,10 @@ gcc -Wall -o readerWriter main.c ../EventManager/eventManager.c ../ConcurrencyMo
 
 # sleep 1
 
-printf "\nRunning Test 4 --> ReaderWriter with 3 readers, 3 writers and eventOrderFile_4.txt....\n\n"
+# printf "\nRunning Test 4 --> ReaderWriter with 3 readers, 3 writers and eventOrderFile_4.txt....\n\n"
 
-sleep 1
+# sleep 1
 
-./readerWriter 3 3 ../ReaderWriter/EventsFiles/eventOrderFile_4.txt >&1 | tee ./Tests/Logs/EventsVersion/test4.log
+# ./readerWriter 20 3 ../ReaderWriter/EventsFiles/eventOrderFile_4.txt >&1 | tee ./Tests/Logs/EventsVersion/test4.log
+
+./readerWriter 3 3 ../ReaderWriter/EventsFiles/infinite.txt >&1 | tee ./Tests/Logs/EventsVersion/infinite.log

@@ -1,0 +1,34 @@
+Starting1 --> Executed
+--------------Philosopher 1 thinking--------------
+Starting2 --> Executed
+--------------Philosopher 2 thinking--------------
+Starting3 --> Executed
+--------------Philosopher 3 thinking--------------
+Starting4 --> Executed
+--------------Philosopher 4 thinking--------------
+Starting5 --> Executed
+--------------Philosopher 5 thinking--------------
+RightieWantsFork1 --> Executed
+--------------Philosopher 2 got fork 1--------------
+RightieGotFork1 --> Executed
+RightieWantsFork1 --> Executed
+--------------Philosopher 3 got fork 2--------------
+RightieGotFork1 --> Executed
+RightieWantsFork2 --> Executed
+
+
+
+END
+
+
+Possible blocking detected!!
+
+The input event sequence wasn't accepted by your program. Please note that:
+-- If the input sequence was supposed to be invalid, this means that your program might be ok.
+-- If the input sequence was supposed to be valid, this means that your program might have some issues.
+
+Possible Events Expected:
+	 -> RightieGotFork2
+
+
+

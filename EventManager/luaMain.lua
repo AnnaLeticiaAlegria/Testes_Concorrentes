@@ -148,7 +148,7 @@ function expectedEvent ()
   local auxTable = {}
   local code = 0
 
-  -- graphManager.printGraph(graph)
+  graphManager.printGraph(graph)
 
   for _, stateValue in ipairs(currentEvent) do
     if (stateValue >= 0) then
@@ -217,6 +217,8 @@ end
 -- checkEvent ("WorkerArrives", 1)
 -- checkEvent ("WorkerWaits", 1)
 
-readEventsFile("../EventManager/test_or_plus.txt")
+-- readEventsFile("../EventManager/test_or_plus.txt")
+-- readEventsFile("../ReaderWriter/EventsFiles/infinite.txt")
 
+readEventsFile("../EventManager/test_seq_plus.txt")
 graphManager.printGraph(graph)

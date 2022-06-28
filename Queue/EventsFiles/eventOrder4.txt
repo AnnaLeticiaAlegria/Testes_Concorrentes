@@ -4,7 +4,7 @@ DequeueWantsToStart [>> deqThreads];
   EnqueueWantsToStart [>>+ enqThreads];
   |
   DequeueWantsToStart [>>+ deqThreads];
-)* ;
+)+ ;
 (
   (EnqueueStarts [enqThreads];
     (
@@ -43,4 +43,4 @@ DequeueWantsToStart [>> deqThreads];
     DequeueBroadcast [deqThreads];
     DequeueEnds [deqThreads];
   )
-) * ;
+) + ;
