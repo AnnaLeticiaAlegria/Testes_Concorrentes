@@ -1,2 +1,2 @@
-(Event1 [>> thread1])*;
+(Event1 [>> thread1])+;
 Event2 [thread1];

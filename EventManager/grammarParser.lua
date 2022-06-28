@@ -43,8 +43,8 @@ local function packbin (tag)
 end
 
 
-local function packstar (a, b)
-  return b and {tag = "star", a} or a
+local function packplus (a, b)
+  return b and {tag = "plus", a} or a
 end
 
 
@@ -60,7 +60,7 @@ local OP = '(' * S
 local CP = ')' * S
 
 local OrOp = '|' * S
-local Star = '*' * S
+local Plus = '+' * S
 local Sc = ';' * S
 
 local ID = m.C(m.R("az", "AZ") * m.R("az", "AZ", "09")^0) * S
@@ -73,7 +73,7 @@ local G = m.P{"Prog";
 
   Seq = (m.V"Iterate" * (Sc * m.V"Seq")^-1) / packbin("seq"),
 
-  Iterate = (m.V"Item" * m.C(Star)^-1) / packstar,
+  Iterate = (m.V"Item" * m.C(Plus)^-1) / packplus,
 
   Item = (ID * m.C((OS * m.V"ThreadExp" * CS))) / packbin("item")
        + OP * m.V"Exp" * CP,

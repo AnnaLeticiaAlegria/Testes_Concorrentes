@@ -1,4 +1,5 @@
 local lpeg = require 'lpeg'
+local pt = require ("pt")
 
 local threadIdManager = {}
 local threadIdTable = {}
@@ -44,7 +45,12 @@ end
 
 
 function solveTerms (term1, term2, threadId)
-  if (term1 and term1[1]) then
+  
+  -- print("dentro da solve terms")
+  -- print(term1)
+  if (term1) then
+    -- print("dentro do if")
+    -- print(term1[1])
     if (existsInTable(term1, threadId) < 0) then
       return 0
     end
@@ -65,7 +71,8 @@ function solveTerms (term1, term2, threadId)
         end
       end
     else
-      if (term2["case"] ~= "plus") then
+      -- if (term2["case"] ~= "plus") then
+      if (term2["case"] ~= "plus" or not threadIdTable[idName]) then
         threadIdTable[idName] = {}
       end
       table.insert(threadIdTable[idName], threadId)
@@ -113,18 +120,24 @@ function minusCase (term1, term2)
   return aux
 end
 
-function notCase (term1)
+function notCase (term1, threadId)
   local aux = {}
 
   for key, value in pairs(threadIdTable) do
     for _, value2 in pairs(value) do
       local index = existsInTable(aux, value2)
-      print("before if")
+      -- print("before if")
       if (index < 0) then
-        print("index not found --> "..value2)
+        -- print("index not found --> "..value2)
         table.insert(aux, value2)
       end
     end
+  end
+
+  -- adding threadId, in case it's the first time this id appears
+  local index = existsInTable(aux, threadId)
+  if (index < 0) then
+    table.insert(aux, threadId)
   end
 
   for key, value in pairs(term1) do
@@ -137,7 +150,7 @@ function notCase (term1)
 end
 
 
-function processThreadTree (threadTree, isAssign)
+function processThreadTree (threadTree, isAssign, threadId)
   local term1, term2
 
   if (threadTree["tag"] == "item") then
@@ -149,17 +162,17 @@ function processThreadTree (threadTree, isAssign)
 
   if (threadTree["tag"] == "assign") then
     if (threadTree[2]) then
-      term1 = processThreadTree (threadTree[1], nil)
-      term2 = processThreadTree (threadTree[2], true)
+      term1 = processThreadTree (threadTree[1], nil, threadId)
+      term2 = processThreadTree (threadTree[2], true, threadId)
       return term1, term2
     else
-      term1 = processThreadTree (threadTree[1], true)
+      term1 = processThreadTree (threadTree[1], true, threadId)
       return nil, term1
     end
   else
-    term1 = processThreadTree (threadTree[1], isAssign)
+    term1 = processThreadTree (threadTree[1], isAssign, threadId)
     if (threadTree[2]) then
-      term2 = processThreadTree (threadTree[2], isAssign)
+      term2 = processThreadTree (threadTree[2], isAssign, threadId)
     end
 
     if (threadTree["tag"] == "plus") then
@@ -169,7 +182,7 @@ function processThreadTree (threadTree, isAssign)
         return minusCase (term1, term2)
       else
         if (threadTree["tag"] == "not") then
-          return notCase (term1)
+          return notCase (term1, threadId)
         else
           print("Error processing threadId --> Inexistent tag")
         end
@@ -184,15 +197,16 @@ function threadIdManager.checkThreadId (threadIdTree, threadId)
 
   local isThreadId
 
-  term1, term2 = processThreadTree(threadIdTree, nil)
+  term1, term2 = processThreadTree(threadIdTree, nil, threadId)
 
   isThreadId = solveTerms (term1, term2, threadId)
 
   -- print("resultado: " .. tostring(isThreadId))
+  -- print(pt.pt(threadIdTree))
 
-  if (isThreadId == 1) then
-    printTable (threadIdTable)
-  end
+  -- if (isThreadId == 1) then
+  --   printTable (threadIdTable)
+  -- end
   return isThreadId
 end
 

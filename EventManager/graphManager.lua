@@ -77,7 +77,7 @@ local function actionTagSeq (currentGraphNode, child1)
   end
 end
 
-local function actionTagStar (currentGraphNode, child1, starCaseChild, hasFatherOr)
+local function actionTagPlus (currentGraphNode, child1, plusCaseChild, hasFatherOr)
 
   if(hasFatherOr) then
 
@@ -87,12 +87,12 @@ local function actionTagStar (currentGraphNode, child1, starCaseChild, hasFather
       insertEdge (value[3], value[1], globalGraphNode, value[2])
     end
 
-    if (not starCaseChild) then
+    if (not plusCaseChild) then
       local auxChild = deepcopy(child1)
 
-      for _, starValue in ipairs(child1) do
+      for _, plusValue in ipairs(child1) do
         for _, childValue2 in ipairs(child1) do
-          insertEdge (globalGraphNode, starValue[1], globalGraphNode, starValue[2])
+          insertEdge (globalGraphNode, plusValue[1], globalGraphNode, plusValue[2])
           childValue2[3] = globalGraphNode
         end
       end
@@ -100,9 +100,9 @@ local function actionTagStar (currentGraphNode, child1, starCaseChild, hasFather
         table.insert(child1, value)
       end
     else
-      for _, starValue in ipairs(starCaseChild) do
+      for _, plusValue in ipairs(plusCaseChild) do
         for _, childValue2 in ipairs(child1) do
-          insertEdge (globalGraphNode, starValue[1], childValue2[3], starValue[2])
+          insertEdge (globalGraphNode, plusValue[1], childValue2[3], plusValue[2])
         end
       end
     end
@@ -129,12 +129,13 @@ local function processTree (currentGraphNode, grammarTree, hasFatherOr)
       child1, _ = processTree (currentGraphNode, grammarTree[1], 1)
       child2, _ = processTree (currentGraphNode, grammarTree[2], 1)
 
-      return actionTagOr (currentGraphNode, child1, child2), child1
+      local childs = actionTagOr (currentGraphNode, child1, child2)
+      return childs, childs
     else
-      if(grammarTree["tag"] == "star") then
-        local starCaseChild
-        child1, starCaseChild = processTree (currentGraphNode, grammarTree[1], hasFatherOr)
-        actionTagStar (currentGraphNode, child1, starCaseChild, hasFatherOr)
+      if(grammarTree["tag"] == "plus") then
+        local plusCaseChild
+        child1, plusCaseChild = processTree (currentGraphNode, grammarTree[1], hasFatherOr)
+        actionTagPlus (currentGraphNode, child1, plusCaseChild, hasFatherOr)
 
         return child1
       else

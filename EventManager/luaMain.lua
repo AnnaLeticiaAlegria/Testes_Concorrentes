@@ -122,6 +122,7 @@ function checkEvent (eventName, threadId)
     if (eventValue >= 0) then -- eventValue = -1 when this event can be the last
       local currentNodeTable = graph[eventValue][eventName]
       if (existsInTable(eventsNamesTable, eventName) == 1) then
+        -- print("evento: ".. eventName .. " threadId: ".. threadId)
         if (currentNodeTable and threadIdManager.checkThreadId(currentNodeTable[2], threadId) == 1) then
           for _, value in pairs(currentNodeTable[1]) do 
             table.insert(nextNodeTable, value)
@@ -204,6 +205,18 @@ end
 
 -- graphManager.printGraph(graph)
 
-readEventsFile("../ProducerConsumer/EventsFiles/eventOrder5.txt")
+-- readEventsFile("../ProducerConsumer/EventsFiles/eventOrder5.txt")
+
+-- graphManager.printGraph(graph)
+
+-- readEventsFile("../EventManager/test_threadId.txt")
+
+-- checkEvent ("WorkerArrives", 1)
+-- checkEvent ("CoordinatorPosted", 3)
+-- checkEvent ("WorkerWaits", 1)
+-- checkEvent ("WorkerArrives", 1)
+-- checkEvent ("WorkerWaits", 1)
+
+readEventsFile("../EventManager/test_or_plus.txt")
 
 graphManager.printGraph(graph)
