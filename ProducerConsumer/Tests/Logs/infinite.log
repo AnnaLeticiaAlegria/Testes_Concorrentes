@@ -1,0 +1,168 @@
+ProducerWantsToStart --> Executed
+ProducerStarts --> Executed
+ProducerEnds --> Executed
+ProducerWantsToStart --> Executed
+ProducerStarts --> Executed
+--------Producer 0 produced item 73--------
+ProducerEnds --> Executed
+ProducerWantsToStart --> Executed
+ProducerStarts --> Executed
+--------Producer 1 produced item 7--------
+ProducerEnds --> Executed
+--------Producer 0 produced item 33--------
+ConsumerWantsToStart --> Executed
+ConsumerStarts --> Executed
+ConsumerEnds --> Executed
+--------Consumer 1 consumed item 73--------
+ConsumerWantsToStart --> Executed
+ConsumerStarts --> Executed
+ConsumerEnds --> Executed
+--------Consumer 1 consumed item 7--------
+ProducerWantsToStart --> Executed
+ProducerStarts --> Executed
+ProducerEnds --> Executed
+--------Producer 4 produced item 30--------
+ProducerWantsToStart --> Executed
+ProducerStarts --> Executed
+ProducerEnds --> Executed
+--------Producer 4 produced item 79--------
+ProducerWantsToStart --> Executed
+ProducerStarts --> Executed
+ProducerEnds --> Executed
+--------Producer 4 produced item 21--------
+ConsumerWantsToStart --> Executed
+ConsumerStarts --> Executed
+ConsumerEnds --> Executed
+--------Consumer 2 consumed item 21--------
+ConsumerWantsToStart --> Executed
+ConsumerStarts --> Executed
+ConsumerEnds --> Executed
+--------Consumer 0 consumed item 30--------
+ConsumerWantsToStart --> Executed
+ConsumerStarts --> Executed
+ConsumerEnds --> Executed
+--------Consumer 1 consumed item 79--------
+ConsumerWantsToStart --> Executed
+ConsumerStarts --> Executed
+ConsumerEnds --> Executed
+--------Consumer 4 consumed item 21--------
+ProducerWantsToStart --> Executed
+ProducerStarts --> Executed
+ProducerEnds --> Executed
+--------Producer 1 produced item 79--------
+ProducerWantsToStart --> Executed
+ProducerStarts --> Executed
+ProducerEnds --> Executed
+--------Producer 1 produced item 72--------
+ProducerWantsToStart --> Executed
+ProducerStarts --> Executed
+ProducerEnds --> Executed
+--------Producer 1 produced item 93--------
+ConsumerWantsToStart --> Executed
+ConsumerStarts --> Executed
+ConsumerEnds --> Executed
+--------Consumer 1 consumed item 79--------
+ConsumerWantsToStart --> Executed
+ConsumerStarts --> Executed
+ConsumerEnds --> Executed
+--------Consumer 1 consumed item 72--------
+ProducerWantsToStart --> Executed
+ProducerStarts --> Executed
+ProducerEnds --> Executed
+--------Producer 2 produced item 49--------
+ProducerWantsToStart --> Executed
+ProducerStarts --> Executed
+ProducerEnds --> Executed
+--------Producer 2 produced item 85--------
+ConsumerWantsToStart --> Executed
+ConsumerStarts --> Executed
+ConsumerEnds --> Executed
+--------Consumer 3 consumed item 93--------
+ProducerWantsToStart --> Executed
+ProducerStarts --> Executed
+ProducerEnds --> Executed
+--------Producer 0 produced item 49--------
+ConsumerWantsToStart --> Executed
+ConsumerStarts --> Executed
+ConsumerEnds --> Executed
+--------Consumer 2 consumed item 49--------
+ConsumerWantsToStart --> Executed
+ConsumerStarts --> Executed
+ConsumerEnds --> Executed
+--------Consumer 1 consumed item 85--------
+ConsumerWantsToStart --> Executed
+ConsumerStarts --> Executed
+ConsumerEnds --> Executed
+ProducerWantsToStart --> Executed
+ProducerStarts --> Executed
+--------Consumer 1 consumed item 49--------
+ProducerEnds --> Executed
+--------Producer 4 produced item 67--------
+ProducerWantsToStart --> Executed
+ProducerStarts --> Executed
+ProducerEnds --> Executed
+--------Producer 3 produced item 58--------
+ProducerWantsToStart --> Executed
+ProducerStarts --> Executed
+ProducerEnds --> Executed
+--------Producer 3 produced item 94--------
+ProducerWantsToStart --> Executed
+ProducerStarts --> Executed
+ProducerEnds --> Executed
+--------Producer 3 produced item 57--------
+ProducerWantsToStart --> Executed
+table: 0x7fafe8e0d940
+Node 1
+--- ProducerWantsToStart
+------ 2
+------ table: 0x7fafe8e0db50
+Node 2
+--- ProducerStarts
+------ 3
+------ producers
+Node 3
+--- ProducerEnds
+------ 4
+------ producers
+Node 4
+--- ProducerWantsToStart
+------ 5
+------ table: 0x7fafe8e0e970
+--- ConsumerWantsToStart
+------ 7
+------ table: 0x7fafe8e0f550
+Node 5
+--- ProducerStarts
+------ 6
+------ producers
+Node 6
+--- ProducerEnds
+------ 4
+------ -1
+------ producers
+Node 7
+--- ConsumerStarts
+------ 8
+------ consumers
+Node 8
+--- ConsumerEnds
+------ 4
+------ -1
+------ consumers
+
+
+
+END
+
+
+Possible blocking detected!!
+
+The input event sequence wasn't accepted by your program. Please note that:
+-- If the input sequence was supposed to be invalid, this means that your program might be ok.
+-- If the input sequence was supposed to be valid, this means that your program might have some issues.
+
+Possible Events Expected:
+	 -> ProducerStarts
+
+
+

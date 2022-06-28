@@ -60,95 +60,112 @@ local function insertEdge (entryNode, eventName, exitNode, eventRule)
   end
 end
 
-local function actionTagOr (currentGraphNode, child1, child2)
+local function actionTagOr (currentGraphNode, children)
   local auxTable = {}
+  auxTable["starChildName"] = {}
 
-  for _,value in ipairs(child1) do table.insert(auxTable,value) end
-  
-  for _,value in ipairs(child2) do table.insert(auxTable,value) end
+  -- it doesn't create a new node in the graph, just combine the children into a single table
+  for key,child in pairs(children) do 
+    for _, value in ipairs(child) do
+      table.insert(auxTable,value)
+      table.insert(auxTable["starChildName"],value)
+    end
+  end
+  auxTable["starChildDestiny"] = children["child1"][1]["currentGraphNode"]
 
   return auxTable
 end
 
-local function actionTagSeq (currentGraphNode, child1)
+local function actionTagSeq (currentGraphNode, children)
   globalGraphNode = globalGraphNode + 1
-  for _,value in ipairs(child1) do 
-    insertEdge (value[3], value[1], globalGraphNode, value[2])
+  for _,child in ipairs(children) do 
+    insertEdge (child["currentGraphNode"], child["eventName"], globalGraphNode, child["threadIdTree"])
   end
 end
 
-local function actionTagPlus (currentGraphNode, child1, plusCaseChild, hasFatherOr)
+local function actionTagPlus (currentGraphNode, children, hasFatherOr)
 
   if(hasFatherOr) then
-
+    -- if this stars is inside an or, we need to create extra nodes
     globalGraphNode = globalGraphNode + 1
 
-    for _, value in ipairs(child1) do
-      insertEdge (value[3], value[1], globalGraphNode, value[2])
+    for _, child in ipairs(children) do
+      insertEdge (child["currentGraphNode"], child["eventName"], globalGraphNode, child["threadIdTree"])
     end
+    
 
-    if (not plusCaseChild) then
-      local auxChild = deepcopy(child1)
+    if (not children["starChildName"]) then
+      -- if this star contains only an item
+      local auxChild = deepcopy(children)
 
-      for _, plusValue in ipairs(child1) do
-        for _, childValue2 in ipairs(child1) do
-          insertEdge (globalGraphNode, plusValue[1], globalGraphNode, plusValue[2])
-          childValue2[3] = globalGraphNode
+      for _, plusValue in pairs(children) do
+        for _, childValue in pairs(children) do
+          insertEdge (globalGraphNode, plusValue["eventName"], globalGraphNode, plusValue["threadIdTree"]) -- create a loop edge on globalGraphNode
+          childValue["currentGraphNode"] = globalGraphNode -- update child1 currentGraphNode
         end
       end
-      for _, value in ipairs(auxChild) do
-        table.insert(child1, value)
+      for _, value in pairs(auxChild) do
+        -- do this to return child1 original currentGraphNode and child1 updated currentGraphNode
+        table.insert(children, value)
       end
     else
-      for _, plusValue in ipairs(plusCaseChild) do
-        for _, childValue2 in ipairs(child1) do
-          print("aaaaa")
-          print(globalGraphNode, plusValue[1], childValue2[3], plusValue[3])
-          insertEdge (globalGraphNode, plusValue[1], childValue2[3], plusValue[2])
-        end
+      -- if this star contains other tags that are not items
+      local starChildDestinyNode = (children["starGrandChildDestiny"] or children["starChildDestiny"])
+      for _,starChild in pairs(children["starChildName"]) do
+          insertEdge (globalGraphNode, starChild["eventName"], starChildDestinyNode, starChild["threadIdTree"])
       end
     end
   else
-    for _, value in ipairs(child1) do
-      insertEdge (value[3], value[1], currentGraphNode, value[2])
+    -- just create a circle in the graph, linking the child's currentNode to star's currentNode
+    for _, child in ipairs(children) do
+      insertEdge (child["currentGraphNode"], child["eventName"], currentGraphNode, child["threadIdTree"])
     end
   end
 
-  return child1
+  return children
 end
   
 local function processTree (currentGraphNode, grammarTree, hasFatherOr)
-  local child1, child2
+  local children = {}
   if (grammarTree["tag"] == "item") then
-    if (eventInEventNameList (grammarTree[1]) == 0) then
+    if (eventInEventNameList (grammarTree[1]) == 0) then -- if there is a configuration file, check if this event exists
       os.exit()
     end
-    local threadIdTree = threadIdParser.threadIdParser(grammarTree[2])
+    local threadIdTree = threadIdParser.threadIdParser(grammarTree[2]) -- convert ThreadIdString into ThreadIdTree
 
-    return {{grammarTree[1], threadIdTree, currentGraphNode}}
+    local item = {}
+    item["eventName"] = grammarTree[1]
+    item["threadIdTree"] = threadIdTree
+    item["currentGraphNode"] = currentGraphNode
+    return {item}
   else
+    -- for other tags: grammarTree[1] is the first child and grammarTree[2] is the second one
     if(grammarTree["tag"] == "or") then
-      child1, _ = processTree (currentGraphNode, grammarTree[1], 1)
-      child2, _ = processTree (currentGraphNode, grammarTree[2], 1)
+      children["child1"] = processTree (currentGraphNode, grammarTree[1], 1)
+      children["child2"] = processTree (currentGraphNode, grammarTree[2], 1)
 
-      local childs = actionTagOr (currentGraphNode, child1, child2)
-      return childs, childs
+      children = actionTagOr (currentGraphNode, children)
+
+      return children
     else
       if(grammarTree["tag"] == "plus") then
         local plusCaseChild
-        child1, plusCaseChild = processTree (currentGraphNode, grammarTree[1], hasFatherOr)
-        actionTagPlus (currentGraphNode, child1, plusCaseChild, hasFatherOr)
+        children = processTree (currentGraphNode, grammarTree[1], hasFatherOr)
 
-        return child1
+        return actionTagPlus (currentGraphNode, children, hasFatherOr)
       else
         if(grammarTree["tag"] == "seq") then
-          child1, _ = processTree (currentGraphNode, grammarTree[1], hasFatherOr)
+          local childAux = processTree (currentGraphNode, grammarTree[1], hasFatherOr)
 
-          actionTagSeq (currentGraphNode, child1)
+          actionTagSeq (currentGraphNode, childAux) -- create a new node and link it
 
-          child2, _ = processTree (globalGraphNode, grammarTree[2], hasFatherOr)
+          children = processTree (globalGraphNode, grammarTree[2], hasFatherOr)
 
-          return child2, child1
+          children["starChildName"] = childAux
+          children["starGrandChildDestiny"] = children["starChildDestiny"]
+          children["starChildDestiny"] = childAux[1]["currentGraphNode"]
+
+          return children -- child2 needs to be linked by who called this function. If childAux exists, return it
         else
           print("Error creating graph --> Inexistent tag")
         end
@@ -179,11 +196,11 @@ function graphManager.createGraph (grammarTree, namesTable)
   globalGraphNode = 1
   eventsNamesTable = namesTable
 
-  local lastChild, _ = processTree(1, grammarTree, nil)
+  local lastChild = processTree(1, grammarTree, nil)
 
   if (lastChild) then
-    for _,value in ipairs(lastChild) do 
-      insertEdge (value[3], value[1], -1, value[2])
+    for _,child in ipairs(lastChild) do 
+      insertEdge (child["currentGraphNode"], child["eventName"], -1, child["threadIdTree"])
     end
   end
 

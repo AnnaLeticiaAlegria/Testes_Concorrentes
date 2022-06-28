@@ -220,5 +220,5 @@ end
 -- readEventsFile("../EventManager/test_or_plus.txt")
 -- readEventsFile("../ReaderWriter/EventsFiles/infinite.txt")
 
-readEventsFile("../EventManager/test_seq_plus.txt")
-graphManager.printGraph(graph)
+-- readEventsFile("../EventManager/test_seq_plus.txt")
+-- graphManager.printGraph(graph)
