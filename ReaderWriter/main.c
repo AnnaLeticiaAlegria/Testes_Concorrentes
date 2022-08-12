@@ -78,8 +78,8 @@ int main(int argc, char** argv)
   nWriters = strtol(argv[2], NULL, 10);
   initializeManager (argv[3], argv[4]);
 
-  rw = initializeSemaphore("/semRW2", 1);
-  mutexR = initializeSemaphore("/semActR2", 1);
+  rw = initializeSemaphore("/semRW3", 1);
+  mutexR = initializeSemaphore("/semActR3", 1);
 
   readersThreads = initializeThreads (nReaders, readersIdArray, readTask);
   writersThreads = initializeThreads (nWriters, writersIdArray, writeTask);
@@ -125,7 +125,6 @@ void* writeTask (void * num)
     checkCurrentEvent("WriterStarts");
     
     /* write the database */
-    // checkCurrentEvent("WriterWrites");
     element = rand()%200;
     buffer = element;
     printf("----Writer %d writes %d\n", id, element);

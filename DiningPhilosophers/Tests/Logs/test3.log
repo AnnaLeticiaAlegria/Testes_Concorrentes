@@ -1,20 +1,20 @@
-Starting1 --> Executed
+[114720768] executed Starting1
 --------------Philosopher 1 thinking--------------
-Starting2 --> Executed
+[115257344] executed Starting2
 --------------Philosopher 2 thinking--------------
-Starting3 --> Executed
+[115793920] executed Starting3
 --------------Philosopher 3 thinking--------------
-Starting4 --> Executed
+[116330496] executed Starting4
 --------------Philosopher 4 thinking--------------
-Starting5 --> Executed
+[116867072] executed Starting5
 --------------Philosopher 5 thinking--------------
-RightieWantsFork1 --> Executed
+[115257344] executed RightieWantsFork1
 --------------Philosopher 2 got fork 1--------------
-RightieGotFork1 --> Executed
-RightieWantsFork1 --> Executed
+[115257344] executed RightieGotFork1
+[115793920] executed RightieWantsFork1
 --------------Philosopher 3 got fork 2--------------
-RightieGotFork1 --> Executed
-RightieWantsFork2 --> Executed
+[115793920] executed RightieGotFork1
+[115793920] executed RightieWantsFork2
 
 
 

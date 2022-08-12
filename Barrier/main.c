@@ -243,7 +243,7 @@ void barrier_v3(int id, int numThreads) {
     checkCurrentEvent("ThreadPassed");
     arrived--;
     if (arrived==0) {
-      checkCurrentEvent("LastThreadPosts");
+      // checkCurrentEvent("LastThreadPosts");
       sem_post(mutex);
     }
     else {

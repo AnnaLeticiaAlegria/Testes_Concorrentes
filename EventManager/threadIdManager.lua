@@ -140,10 +140,12 @@ function notCase (term1, threadId)
     table.insert(aux, threadId)
   end
 
-  for key, value in pairs(term1) do
-    local index = existsInTable(aux, value)
-    if (index >= 0) then
-      table.remove(aux, index)
+  if (term1) then
+    for key, value in pairs(term1) do
+      local index = existsInTable(aux, value)
+      if (index >= 0) then
+        table.remove(aux, index)
+      end
     end
   end
   return aux

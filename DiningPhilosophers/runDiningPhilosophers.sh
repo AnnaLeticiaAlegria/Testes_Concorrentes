@@ -1,13 +1,11 @@
 #!/bin/bash
 
-gcc -Wall -o diningPhilosophers main.c ../EventManager/eventManager.c ../ConcurrencyModule/concurrency.c -I/$LUA_CDIR -llua5.3
+gcc -Wall -o ../DiningPhilosophers/diningPhilosophers ../DiningPhilosophers/main.c ../EventManager/eventManager.c ../ConcurrencyModule/concurrency.c -I/$LUA_CDIR -llua5.3
 
-./diningPhilosophers 5 ../diningPhilosophers/EventsFiles/eventOrder1.txt ../diningPhilosophers/EventsFiles/configFile1.txt >&1 | tee ./Tests/Logs/test1.log
-
-sleep 2
-
-./diningPhilosophers 5 ../diningPhilosophers/EventsFiles/eventOrder2.txt ../diningPhilosophers/EventsFiles/configFile2.txt >&1 | tee ./Tests/Logs/test2.log
-
-sleep 2
-
-./diningPhilosophers 5 ../diningPhilosophers/EventsFiles/eventOrder3.txt ../diningPhilosophers/EventsFiles/configFile2.txt >&1 | tee ./Tests/Logs/test3.log
+if [ $1 == 1 ]; then
+  ../DiningPhilosophers/diningPhilosophers 5 ../DiningPhilosophers/EventsFiles/eventOrder1.txt ../DiningPhilosophers/EventsFiles/configFile1.txt >&1 | tee ../DiningPhilosophers//Tests/Logs/test1.log
+elif [ $1 == 2 ]; then
+  ../DiningPhilosophers/diningPhilosophers 5 ../DiningPhilosophers/EventsFiles/eventOrder2.txt ../DiningPhilosophers/EventsFiles/configFile2.txt >&1 | tee ../DiningPhilosophers//Tests/Logs/test2.log
+else
+  ../DiningPhilosophers/diningPhilosophers 5 ../DiningPhilosophers/EventsFiles/eventOrder3.txt ../DiningPhilosophers/EventsFiles/configFile2.txt >&1 | tee ../DiningPhilosophers//Tests/Logs/test3.log
+fi

@@ -1,8 +1,8 @@
-ProducerWantsToStart --> Executed
-ProducerStarts --> Executed
-ProducerEnds --> Executed
-ProducerWantsToStart --> Executed
---------Producer 0 produced item 7--------
+[123924480] executed ProducerWantsToStart
+[123924480] executed ProducerStarts
+[123924480] executed ProducerEnds
+[124461056] executed ProducerWantsToStart
+--------Producer 0 produced item 49--------
 
 
 
@@ -11,9 +11,9 @@ END
 
 Possible blocking detected!!
 
-The input event order wasn't accepted by your program. Please note that:
--- If the input order was supposed to be invalid, this mean that your program might be ok.
--- If the input order was supposed to be valid, this means that your program might have some issues.
+The input event sequence wasn't accepted by your program. Please note that:
+-- If the input sequence was supposed to be invalid, this means that your program might be ok.
+-- If the input sequence was supposed to be valid, this means that your program might have some issues.
 
 Possible Events Expected:
 	 -> ProducerStarts

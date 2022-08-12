@@ -1,14 +1,14 @@
-DequeueWantsToStart --> Executed
-DequeueStarts --> Executed
-DequeueWaits --> Executed
-EnqueueWantsToStart --> Executed
-EnqueueStarts --> Executed
-EnqueueEnqueues --> Executed
+[236883968] executed DequeueWantsToStart
+[236883968] executed DequeueStarts
+[236883968] executed DequeueWaits
+[236347392] executed EnqueueWantsToStart
+[236347392] executed EnqueueStarts
+[236347392] executed EnqueueEnqueues
 EnqueueBroadcast --> Ignored
-EnqueueEnds --> Executed
+[236347392] executed EnqueueEnds
 ----------Thread 0 enqueued element 7
-DequeueContinues --> Executed
-DequeueDequeues --> Executed
+[236883968] executed DequeueContinues
+[236883968] executed DequeueDequeues
 DequeueBroadcast --> Ignored
-DequeueEnds --> Executed
+[236883968] executed DequeueEnds
 ----------Thread 1 dequeued element 7

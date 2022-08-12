@@ -136,7 +136,7 @@ function checkEvent (eventName, threadId)
   end
 
   if (next(nextNodeTable)) then
-    print(eventName .. " --> Executed")
+    print("["..tostring(threadId).."] executed " .. eventName)
     currentEvent = nextNodeTable
     return 1
   else
@@ -148,7 +148,7 @@ function expectedEvent ()
   local auxTable = {}
   local code = 0
 
-  graphManager.printGraph(graph)
+  -- graphManager.printGraph(graph)
 
   for _, stateValue in ipairs(currentEvent) do
     if (stateValue >= 0) then

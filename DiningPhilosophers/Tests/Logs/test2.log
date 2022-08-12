@@ -1,28 +1,28 @@
-Starting1 --> Executed
+[69517312] executed Starting1
 --------------Philosopher 1 thinking--------------
-Starting2 --> Executed
+[70053888] executed Starting2
 --------------Philosopher 2 thinking--------------
-Starting3 --> Executed
+[70590464] executed Starting3
 --------------Philosopher 3 thinking--------------
-Starting4 --> Executed
+[71127040] executed Starting4
 --------------Philosopher 4 thinking--------------
-Starting5 --> Executed
+[71663616] executed Starting5
 --------------Philosopher 5 thinking--------------
-LeftieWantsFork1 --> Executed
+[69517312] executed LeftieWantsFork1
 --------------Philosopher 1 got fork 4--------------
-LeftieGotFork1 --> Executed
-LeftieWantsFork2 --> Executed
+[69517312] executed LeftieGotFork1
+[69517312] executed LeftieWantsFork2
 --------------Philosopher 1 got fork 0--------------
-LeftieGotFork2 --> Executed
-RightieWantsFork1 --> Executed
+[69517312] executed LeftieGotFork2
+[70590464] executed RightieWantsFork1
 --------------Philosopher 3 got fork 2--------------
-RightieGotFork1 --> Executed
-RightieWantsFork2 --> Executed
+[70590464] executed RightieGotFork1
+[70590464] executed RightieWantsFork2
 --------------Philosopher 3 got fork 1--------------
-RightieGotFork2 --> Executed
-Eating --> Executed
+[70590464] executed RightieGotFork2
+[69517312] executed Eating
 --------------Philosopher 1 eating--------------
-Eating --> Executed
+[70590464] executed Eating
 --------------Philosopher 3 eating--------------
 
 

@@ -128,12 +128,6 @@ void checkCurrentEvent (const char * event) {
   while (1) {
     pthread_mutex_lock(&conditionLock); // P(conditionLock)
 
-    /* In case there are no events left */
-    // if (currentState == totalStates) {
-    //   pthread_mutex_unlock(&conditionLock); // V(conditionLock)
-    //   pthread_exit(NULL); // End thread
-    // }
-
     /* Check if it's this state's turn */
     if(compareEvents(event)) {
       // printf("%s\n", event);
