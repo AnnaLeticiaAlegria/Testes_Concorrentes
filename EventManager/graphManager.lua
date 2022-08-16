@@ -1,5 +1,6 @@
 package.path = package.path .. ';../EventManager/?.lua;'
 
+local graphChecker = require("graphChecker")
 local threadIdParser = require("threadIdParser")
 
 local graphManager = {}
@@ -27,7 +28,7 @@ local function deepcopy(orig)
 end
 
 local function existsInTable (searchedTable, element)
-  for _, value in ipairs(searchedTable) do
+  for key, value in pairs(searchedTable) do
     if (value == element) then
       return 1
     end
@@ -47,6 +48,7 @@ local function eventInEventNameList (event)
   return 1
 end
 
+
 local function insertEdge (entryNode, eventName, exitNode, eventRule)
   if (not graph[entryNode]) then
     graph[entryNode] = {}
@@ -56,6 +58,12 @@ local function insertEdge (entryNode, eventName, exitNode, eventRule)
   else
     if (existsInTable(graph[entryNode][eventName][1], exitNode) == 0) then
       table.insert(graph[entryNode][eventName][1], exitNode)
+    else
+      if not graphChecker.compareEvents (graph[entryNode][eventName][2], eventRule) then
+        print("Error: Unable to construct graph from this script")
+        print(eventName .. " has differents threads specifications")
+        os.exit()
+      end
     end
   end
 end
@@ -205,6 +213,13 @@ function graphManager.createGraph (grammarTree, namesTable)
   end
 
   table.insert(currentEvent, 1)
+
+  if not graphChecker.checkEdges(graph, currentEvent) then
+    print("Error: Unable to construct graph from this script")
+    os.exit()
+  end
+
+  graphManager.printGraph(graph)
 
   return graph, currentEvent
 end

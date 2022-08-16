@@ -222,3 +222,5 @@ end
 
 -- readEventsFile("../EventManager/test_seq_plus.txt")
 -- graphManager.printGraph(graph)
+
+readEventsFile("../EventManager/test_edges.txt")
