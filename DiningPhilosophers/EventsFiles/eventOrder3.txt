@@ -1,0 +1,17 @@
+(Starting1 [>> philosopher1]);
+(Starting2 [>> philosopher2]);
+(Starting3 [>> philosopher3]);
+(Starting4 [>> philosopher4]);
+(Starting5 [>> philosopher5]);
+
+(RightieWantsFork1 [philosopher2]);
+(RightieGotFork1 [philosopher2]);
+
+(RightieWantsFork1 [philosopher3]);
+(RightieGotFork1 [philosopher3]);
+
+(RightieWantsFork2 [philosopher3]);
+(RightieGotFork2 [philosopher3]);
+
+(Eating [philosopher2]);
+(Eating [philosopher3]);

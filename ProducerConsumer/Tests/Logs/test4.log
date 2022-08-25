@@ -1,0 +1,26 @@
+[3727360] executed ProducerWantsToStart
+[3727360] executed ProducerStarts
+[3727360] executed ProducerEnds
+--------Producer 0 produced item 7--------
+[4800512] executed ConsumerWantsToStart
+[4800512] executed ConsumerStarts
+[4800512] executed ConsumerEnds
+--------Consumer 0 consumed item 7--------
+[4800512] executed ConsumerWantsToStart
+
+
+
+END
+
+
+Possible blocking detected!!
+
+The input event sequence wasn't accepted by your program. Please note that:
+-- If the input sequence was supposed to be invalid, this means that your program might be ok.
+-- If the input sequence was supposed to be valid, this means that your program might have some issues.
+
+Possible Events Expected:
+	 -> ConsumerStarts
+
+
+

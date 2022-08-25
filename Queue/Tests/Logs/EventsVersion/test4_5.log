@@ -1,0 +1,87 @@
+EnqueueWantsToStart --> Executed
+DequeueWantsToStart --> Executed
+DequeueWantsToStart --> Executed
+DequeueWantsToStart --> Executed
+DequeueWantsToStart --> Executed
+EnqueueWantsToStart --> Executed
+DequeueWantsToStart --> Executed
+EnqueueWantsToStart --> Executed
+EnqueueWantsToStart --> Executed
+EnqueueWantsToStart --> Executed
+EnqueueWantsToStart --> Executed
+EnqueueWantsToStart --> Executed
+DequeueWantsToStart --> Executed
+DequeueWantsToStart --> Executed
+DequeueWantsToStart --> Executed
+DequeueWantsToStart --> Executed
+DequeueWantsToStart --> Executed
+EnqueueStarts --> Executed
+EnqueueEnqueues --> Executed
+EnqueueBroadcast --> Executed
+EnqueueEnds --> Executed
+----------Thread 1 enqueued element 49
+DequeueStarts --> Executed
+DequeueDequeues --> Executed
+DequeueBroadcast --> Executed
+DequeueEnds --> Executed
+----------Thread 10 dequeued element 49
+DequeueStarts --> Executed
+DequeueWaits --> Executed
+DequeueStarts --> Executed
+DequeueWaits --> Executed
+DequeueStarts --> Executed
+DequeueWaits --> Executed
+EnqueueStarts --> Executed
+EnqueueEnqueues --> Executed
+EnqueueBroadcast --> Executed
+EnqueueEnds --> Executed
+----------Thread 5 enqueued element 30
+DequeueStarts --> Executed
+DequeueDequeues --> Executed
+DequeueBroadcast --> Executed
+DequeueEnds --> Executed
+----------Thread 18 dequeued element 30
+EnqueueStarts --> Executed
+EnqueueEnqueues --> Executed
+EnqueueBroadcast --> Executed
+EnqueueEnds --> Executed
+----------Thread 8 enqueued element 78
+EnqueueStarts --> Executed
+EnqueueEnqueues --> Executed
+EnqueueBroadcast --> Executed
+EnqueueEnds --> Executed
+----------Thread 3 enqueued element 72
+EnqueueStarts --> Executed
+EnqueueEnqueues --> Executed
+EnqueueBroadcast --> Executed
+EnqueueEnds --> Executed
+----------Thread 7 enqueued element 9
+EnqueueStarts --> Executed
+EnqueueEnqueues --> Executed
+EnqueueBroadcast --> Executed
+EnqueueEnds --> Executed
+----------Thread 4 enqueued element 58
+EnqueueStarts --> Executed
+EnqueueWaits --> Executed
+DequeueStarts --> Executed
+DequeueDequeues --> Executed
+DequeueBroadcast --> Executed
+DequeueEnds --> Executed
+----------Thread 16 dequeued element 78
+
+
+
+END
+
+
+Possible blocking detected!!
+
+The input event sequence wasn't accepted by your program. Please note that:
+-- If the input sequence was supposed to be invalid, this means that your program might be ok.
+-- If the input sequence was supposed to be valid, this means that your program might have some issues.
+
+Possible Events Expected:
+	 -> EnqueueContinues
+
+
+

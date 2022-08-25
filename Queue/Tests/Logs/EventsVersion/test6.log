@@ -1,0 +1,27 @@
+[104222720] executed DequeueWantsToStart
+[104222720] executed DequeueStarts
+[104222720] executed DequeueWaits
+[103149568] executed EnqueueWantsToStart
+[103149568] executed EnqueueStarts
+[103149568] executed EnqueueEnqueues
+EnqueueBroadcast --> Ignored
+[103149568] executed EnqueueEnds
+[103686144] executed EnqueueWantsToStart
+----------Thread 0 enqueued element 49
+
+
+
+END
+
+
+Possible blocking detected!!
+
+The input event sequence wasn't accepted by your program. Please note that:
+-- If the input sequence was supposed to be invalid, this means that your program might be ok.
+-- If the input sequence was supposed to be valid, this means that your program might have some issues.
+
+Possible Events Expected:
+	 -> EnqueueStarts
+
+
+

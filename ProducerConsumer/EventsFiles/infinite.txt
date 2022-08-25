@@ -1,0 +1,9 @@
+(
+  (ProducerWantsToStart[~prod >>+ prod]); 
+  |
+  (ConsumerWantsToStart[~cons >>+ cons]);
+  |
+  (ProducerStarts[prod >>- prod]; ProducerEnds[>>aux];)
+  | 
+  (ConsumerStarts[cons >>- cons]; ConsumerEnds[>>aux];)
+)+

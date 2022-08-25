@@ -1,0 +1,11 @@
+(ProducerWantsToStart [>> producer1]);
+(ProducerStarts [producer1]);
+(ProducerEnds [producer1]);
+
+(ConsumerWantsToStart [>> consumer1]);
+(ConsumerStarts [consumer1]);
+(ConsumerEnds [consumer1]);
+
+(ConsumerWantsToStart [>> consumer2]);
+(ConsumerStarts [consumer2]);
+(ConsumerEnds [consumer2]);

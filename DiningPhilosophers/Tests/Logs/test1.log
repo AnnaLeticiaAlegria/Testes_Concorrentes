@@ -1,0 +1,40 @@
+Starting2 --> Ignored
+--------------Philosopher 2 thinking--------------
+Starting3 --> Ignored
+--------------Philosopher 3 thinking--------------
+Starting1 --> Ignored
+Starting4 --> Ignored
+--------------Philosopher 1 thinking--------------
+Starting5 --> Ignored
+--------------Philosopher 5 thinking--------------
+--------------Philosopher 4 thinking--------------
+[32198656] executed LeftieWantsFork1
+--------------Philosopher 1 got fork 4--------------
+[32198656] executed LeftieGotFork1
+[33271808] executed RightieWantsFork1
+--------------Philosopher 3 got fork 2--------------
+[32735232] executed RightieWantsFork1
+--------------Philosopher 2 got fork 1--------------
+[34344960] executed RightieWantsFork1
+[33808384] executed RightieWantsFork1
+--------------Philosopher 4 got fork 3--------------
+[32735232] executed RightieGotFork1
+[33808384] executed RightieGotFork1
+[33271808] executed RightieGotFork1
+
+
+
+END
+
+
+Possible blocking detected!!
+
+The input event sequence wasn't accepted by your program. Please note that:
+-- If the input sequence was supposed to be invalid, this means that your program might be ok.
+-- If the input sequence was supposed to be valid, this means that your program might have some issues.
+
+Possible Events Expected:
+	 -> RightieGotFork1
+
+
+

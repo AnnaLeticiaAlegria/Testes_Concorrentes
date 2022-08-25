@@ -1,0 +1,41 @@
+[69517312] executed Starting1
+--------------Philosopher 1 thinking--------------
+[70053888] executed Starting2
+--------------Philosopher 2 thinking--------------
+[70590464] executed Starting3
+--------------Philosopher 3 thinking--------------
+[71127040] executed Starting4
+--------------Philosopher 4 thinking--------------
+[71663616] executed Starting5
+--------------Philosopher 5 thinking--------------
+[69517312] executed LeftieWantsFork1
+--------------Philosopher 1 got fork 4--------------
+[69517312] executed LeftieGotFork1
+[69517312] executed LeftieWantsFork2
+--------------Philosopher 1 got fork 0--------------
+[69517312] executed LeftieGotFork2
+[70590464] executed RightieWantsFork1
+--------------Philosopher 3 got fork 2--------------
+[70590464] executed RightieGotFork1
+[70590464] executed RightieWantsFork2
+--------------Philosopher 3 got fork 1--------------
+[70590464] executed RightieGotFork2
+[69517312] executed Eating
+--------------Philosopher 1 eating--------------
+[70590464] executed Eating
+--------------Philosopher 3 eating--------------
+
+
+
+END
+
+
+Finished executing the script!!
+
+The input event sequence was accepted by your program. Please note that:
+-- If the input sequence was supposed to be invalid, this means that your program might have some issues.
+-- If the input sequence was supposed to be valid, this means that your program might be ok.
+
+
+
+

@@ -1,0 +1,11 @@
+(
+  (
+    (ProducerStarts [threadP >>+ groupP])*;
+    ProducerEnds [groupP];
+  )
+  |
+  (
+    (ConsumerStarts [threadC >>+ groupC])* ;
+    ConsumerEnds [threadP];
+  )
+) *;

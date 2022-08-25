@@ -1,0 +1,42 @@
+(
+  (
+    (
+      (ProducerWantsToStart [>> threadP]);
+      (ProducerStarts [threadP >>+ groupP]);
+    )* ;
+    (
+      (
+        (ProducerWaits [(groupP - auxP) >> auxP])* ;
+        (
+          (ConsumerWantsToStart [>>+ threadC]);
+          (ConsumerStarts [threadC]);
+          (ConsumerConsumes [threadC]);
+        )* ;
+        (ConsumerEnds [threadC])* ;
+        (ProducerProduces [threadP])* ;
+      ) |
+      (ProducerProduces [threadP])* ;
+    );
+    (ProducerEnds [threadP])* ;
+  ) * |
+  (
+    (
+      (ConsumerWantsToStart [>>+ threadC]);
+      (ConsumerStarts [threadC]);
+    )* ;
+    (
+      (
+        (ConsumerWaits [threadC])* ;
+        (
+          (ProducerWantsToStart [>>+ threadP]);
+          (ProducerStarts [threadP]);
+          (ProducerProduces [threadP]);
+        )* ;
+        (ProducerEnds [threadP])* ;
+        (ConsumerConsumes [threadC])* ;
+      ) |
+      (ConsumerConsumes [threadC])* ;
+    );
+    (ConsumerEnds [threadC])* ;
+  )*
+)*

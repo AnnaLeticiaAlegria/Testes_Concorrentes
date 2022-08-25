@@ -1,0 +1,4 @@
+DequeueWantsToStart [>>thread1];
+DequeueStarts [thread1];
+DequeueDequeues [thread1];
+DequeueEnds [thread1];

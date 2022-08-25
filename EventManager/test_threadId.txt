@@ -1,0 +1,21 @@
+(
+  WorkerArrives[>>+ workers1];
+)+;
+(
+  (CoordinatorPosted[>>coordinator]);
+  (
+    (
+      (WorkerArrives[((~workers1)) >>+ workers2]);
+    )
+    |
+    (WorkerPasses[workers1 >>- workers1]);
+  )+;
+  (CoordinatorPosted[>>coordinator]);
+  (
+    (
+      (WorkerArrives[((~workers2)) >>+ workers1]);
+    )
+    |
+    (WorkerPasses[workers2 >>- workers2]);
+  )+;
+)+   

@@ -2,7 +2,7 @@
 Module: main.c
 Author: Prof. Silvana Rossetto (this example is used by class Computacao Concorrente of UFRJ)
 Modified by: Anna Leticia Alegria
-Last Modified at: 25/06/2021
+Last Modified at: 23/12/2021
 
 ----------------------------------------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------------------------------------
@@ -20,15 +20,13 @@ There are 3 barrier's implementations on this module. Two of them are wrong and 
 #include <string.h>
 #include <semaphore.h>
 
-#include "../StateManager/stateManager.h"
+#include "../EventManager/eventManager.h"
+#include "../ConcurrencyModule/concurrency.h"
 
 /* Global variable's declaration */
 
-pthread_t * threadArray;
-int ** idArray;
-
 sem_t * mutex;
-sem_t * cond;
+sem_t * allArrived;
 
 int nThreads, nSteps;
 int functionToUse;
@@ -36,12 +34,7 @@ int arrived = 0;
 
 /* Encapsulated function's declarations */
 
-void initializeThreads (int nThreads);
-void freeThreads (int nThreads);
 void * threadFunction (void * id);
-char * nameRandomize (char * name, int nLetters);
-void initializeSemaphore (void);
-void freeSemaphore (void);
 
 void barrier_v1(int numThreads);
 void barrier_v2(int numThreads);
@@ -65,6 +58,9 @@ At last, the main function frees the memory spaces allocated and finalizes the m
 ----------------------------------------------------------------------------------------------------------------------
 */
 int main (int argc, char** argv) {
+  
+  pthread_t * threadArray;
+  int ** idArray = NULL;
 
   if (argc != 5) {
     printf("Program needs 4 parameters: functionToUse, nThreads, nSteps and statesFileName \n");
@@ -73,155 +69,23 @@ int main (int argc, char** argv) {
   functionToUse = strtol(argv[1], NULL, 10);
   nThreads = strtol(argv[2], NULL, 10);
   nSteps = strtol(argv[3], NULL, 10);
-  initializeManager (argv[4], nThreads);
-  initializeSemaphore();
-  initializeThreads (nThreads);
 
+  initializeManager (argv[4], NULL);
 
-  freeThreads (nThreads);
-  freeSemaphore();
+  mutex = initializeSemaphore("/mutex", 1);
+  allArrived = initializeSemaphore("/allArrived", 0);
+
+  threadArray = initializeThreads (nThreads, idArray, threadFunction);
+
+  joinThreads(threadArray, nThreads);
+
+  freeThreads (threadArray, nThreads, idArray);
+
+  freeSemaphore(mutex);
+  freeSemaphore(allArrived);
+
   finalizeManager();
   return 0;
-}
-
-/*
-----------------------------------------------------------------------------------------------------------------------
-Function: initializeThreads
-Parameters: 
-  -> nThreads: number of threads the user wants to create
-Returns: nothing
-
-Description: This function allocates the memory space to threadArray and to idArray (arrays with length of 'nThreads')
-It calls the thread's functions and make the main thread wait for their conclusion.
-----------------------------------------------------------------------------------------------------------------------
-*/
-void initializeThreads (int nThreads) {
-  int i;
-  int * id;
-
-  threadArray = (pthread_t*) malloc (nThreads * sizeof(pthread_t));
-  if (threadArray == NULL) {
-    printf("Error during threadArray alloc\n");
-  }
-
-  idArray = (int**) malloc (nThreads * sizeof(int*));
-  if (idArray == NULL) {
-    printf("Error during idArray alloc\n");
-  }
-
-  for (i = 0; i < nThreads ; i++) {
-    id = (int *) malloc (sizeof(int));
-    if (id == NULL) {
-      printf("Error during id alloc\n");
-    }
-    *id = i;
-    idArray[i] = id;
-    pthread_create(&threadArray[i], NULL, threadFunction, (void*) id);
-  }
-
-  for(i = 0; i < nThreads; i++) {
-    pthread_join(threadArray[i],NULL);
-  }
-}
-
-/*
-----------------------------------------------------------------------------------------------------------------------
-Function: freeThreads
-Parameters: 
-  -> nThreads: number of threads created by the program
-Returns: nothing
-
-Description: This function frees the memory space allocated by this program
-----------------------------------------------------------------------------------------------------------------------
-*/
-void freeThreads (int nThreads) {
-  free(threadArray);
-  for(int i=0;i<nThreads;i++) {
-    free(idArray[i]);
-  }
-  free(idArray);
-}
-
-/*
-----------------------------------------------------------------------------------------------------------------------
-Function: nameRandomize
-Parameters: 
-  -> name: string to be modified by adding random letters at it's end
-  -> nLetters: number of random letters to be added at the end of 'name'
-Returns:
-  -> randomName: A string containing the string 'name' + 'nLetters' number of letters after 'name'
-
-Description: This function copies the letters in 'name' and adds 'nLetters' of uppercase letters at it's end. In case
-the alloc of memory space of 'randomName' goes wrong, this function ends the program.
-----------------------------------------------------------------------------------------------------------------------
-*/
-char * nameRandomize (char * name, int nLetters) {
-  int i, nameSize;
-  char * randomName;
-  nameSize = strlen(name);
-  randomName = (char *) malloc ((nameSize + nLetters + 1) * sizeof(char));
-  if (randomName == NULL) {
-    printf("Error during randomName alloc\n");
-    exit(0);
-  }
-
-  strcpy(randomName, name);
-  for(i=0;i<nLetters;i++){
-    randomName[nameSize + i] = 'A' + rand()%26;
-  }
-  randomName[nameSize + i] = '\0'; // Add '\0' at the end so it is considered as a string
-
-  return randomName;
-}
-
-/*
-----------------------------------------------------------------------------------------------------------------------
-Function: initializeSemaphore
-Parameters: none
-Returns: nothing
-
-Description: This function initializes the semaphores used. Since this program can end without closing the semaphore 
-(in case of deadlocks), the name of the semaphore is random generated, so it doesn't choose a name that it was
-previously chosen and not released. The 'mutex' semaphore is used to protect the access to the variable 'arrived'.
-The 'cond' semaphore is used as the condition to all threads wait.
-----------------------------------------------------------------------------------------------------------------------
-*/
-void initializeSemaphore (void) {
-  char * semName;
-
-  semName = nameRandomize ("/mutex", 10);
-  sem_unlink(semName);
-  mutex = sem_open(semName, O_CREAT|O_EXCL, S_IRUSR | S_IWUSR, 1);
-  if (mutex == SEM_FAILED){
-    printf("Error opening semaphore mutex\n");
-    free(semName);
-    exit(0);
-  }
-  free(semName);
-
-  semName = nameRandomize ("/cond", 10);
-  sem_unlink(semName);
-  cond = sem_open(semName, O_CREAT|O_EXCL, S_IRUSR | S_IWUSR, 0);
-  if (cond == SEM_FAILED){
-    printf("Error opening semaphore cond\n");
-    free(semName);
-    exit(0);
-  }
-  free(semName);
-}
-
-/*
-----------------------------------------------------------------------------------------------------------------------
-Function: freeSemaphore
-Parameters: none
-Returns: nothing
-
-Description: This function calls the function sem_close to free the semaphores used.
-----------------------------------------------------------------------------------------------------------------------
-*/
-void freeSemaphore (void) {
-  sem_close(mutex);
-  sem_close(cond);
 }
 
 /*
@@ -242,7 +106,7 @@ void * threadFunction (void * id) {
 
   for (int i=0; i < nSteps; i++) {
     aux1++;
-    printf("Thread %d: step=%d\n", myId, i);
+    // printf("Thread %d: step=%d\n", myId, i);
 
     /* barreira */
     switch(functionToUse) {
@@ -272,33 +136,32 @@ Returns: nothing
 
 Description: This function is the first version of a barrier. It is incorrect.
 The thread gets the lock of semaphore 'mutex' to access the variable 'arrived'. If it isn't the last one to arrive,
-it releases the semaphore 'mutex' and waits on semaphore 'cond'. If it is the last one to arrive, it releases every
-thread that is waiting on 'cond', sets 'arrived' to 0 and releases the semaphore 'mutex'
+it releases the semaphore 'mutex' and waits on semaphore 'allArrived'. If it is the last one to arrive, it releases every
+thread that is waiting on 'allArrived', sets 'arrived' to 0 and releases the semaphore 'mutex'
 This version is wrong because the last thread to arrive stacks sem_post's calls and then, releases the semaphore 
-'mutex'. If this threads executes the next step before the other threads consume the sem_post on semaphore 'cond', it 
-can acquire the semaphore 'mutex' and will not wait on the barrier, since the sem_wait on 'cond' won't work.
+'mutex'. If this threads executes the next step before the other threads consume the sem_post on semaphore 'allArrived', it 
+can acquire the semaphore 'mutex' and will not wait on the barrier, since the sem_wait on 'allArrived' won't work.
 ----------------------------------------------------------------------------------------------------------------------
 */
 void barrier_v1(int numThreads) {
-  checkState("ThreadWantsToStart");
   sem_wait(mutex);
-  checkState("ThreadStarts");
+  checkCurrentEvent("ThreadStarts");
 
   arrived++;
   if (arrived < numThreads) {
     sem_post(mutex);
 
-    checkState("ThreadWaits");
-    sem_wait(cond);
+    checkCurrentEvent("ThreadWaits");
+    sem_wait(allArrived);
 
-    checkState("ThreadPassed");
+    checkCurrentEvent("ThreadPassed");
   } 
   else {
     for(int i=1; i<numThreads; i++)
     {
-      checkState("WantsToRelease");
-      sem_post(cond); 
-      checkState("ReleaseAThread");
+      checkCurrentEvent("WantsToRelease");
+      sem_post(allArrived); 
+      checkCurrentEvent("ReleaseAThread");
     }
     arrived = 0;
     sem_post(mutex);
@@ -315,8 +178,8 @@ Returns: nothing
 
 Description: This function is the second version of a barrier. It is incorrect.
 The thread gets the lock of semaphore 'mutex' to access the variable 'arrived'. If it isn't the last one to arrive,
-it releases the semaphore 'mutex' and waits on semaphore 'cond'. If it is the last one to arrive, it releases one 
-thread that is waiting on 'cond' and decrements 'arrived'.
+it releases the semaphore 'mutex' and waits on semaphore 'allArrived'. If it is the last one to arrive, it releases one 
+thread that is waiting on 'allArrived' and decrements 'arrived'.
 The thread that was waiting decrements 'arrived' and releases another thread. If it is the last Thread, it releases
 the semaphore 'mutex'.
 This version is wrong because the decrement of 'arrived' by the last thread to arrive is being done after the sem_post.
@@ -325,29 +188,28 @@ arrived == 0 condition, not releasing the semaphore 'mutex'. There will be a dea
 ----------------------------------------------------------------------------------------------------------------------
 */
 void barrier_v2(int numThreads) {
-  checkState("ThreadWantsToStart");
   sem_wait(mutex);
-  checkState("ThreadStarts");
+  checkCurrentEvent("ThreadStarts");
 
   arrived++;
   if (arrived < numThreads) {
     sem_post(mutex);
 
-    checkState("ThreadWaits");
-    sem_wait(cond);
+    checkCurrentEvent("ThreadWaits");
+    sem_wait(allArrived);
 
-    checkState("ThreadPassed");
+    checkCurrentEvent("ThreadPassed");
     arrived--;
     if (arrived==0) {
-      checkState("LastThreadPosts");
+      checkCurrentEvent("LastThreadPosts");
       sem_post(mutex);
     }
     else {
-      sem_post(cond); 
+      sem_post(allArrived); 
     }
   } else {
-    sem_post(cond); 
-    checkState("EveryThreadArrived");
+    sem_post(allArrived); 
+    checkCurrentEvent("EveryThreadArrived");
     arrived--; //it should have been called before previous line
   }
 }
@@ -361,36 +223,35 @@ Returns: nothing
 
 Description: This function is the second version of a barrier. It is correct!!!
 The thread gets the lock of semaphore 'mutex' to access the variable 'arrived'. If it isn't the last one to arrive,
-it releases the semaphore 'mutex' and waits on semaphore 'cond'. If it is the last one to arrive, it decrements 
-'arrived' and releases one thread that is waiting on 'cond'.
+it releases the semaphore 'mutex' and waits on semaphore 'allArrived'. If it is the last one to arrive, it decrements 
+'arrived' and releases one thread that is waiting on 'allArrived'.
 The thread that was waiting decrements 'arrived' and releases another thread. If it is the last Thread, it releases
 the semaphore 'mutex'.
 ----------------------------------------------------------------------------------------------------------------------
 */
 void barrier_v3(int id, int numThreads) {
-  checkState("ThreadWantsToStart");
   sem_wait(mutex);
-  checkState("ThreadStarts");
+  checkCurrentEvent("ThreadStarts");
 
   arrived++;
   if (arrived < numThreads) {
     sem_post(mutex);
 
-    checkState("ThreadWaits");
-    sem_wait(cond);
+    checkCurrentEvent("ThreadWaits");
+    sem_wait(allArrived);
 
-    checkState("ThreadPassed");
+    checkCurrentEvent("ThreadPassed");
     arrived--;
     if (arrived==0) {
-      checkState("LastThreadPosts");
+      // checkCurrentEvent("LastThreadPosts");
       sem_post(mutex);
     }
     else {
-      sem_post(cond); 
+      sem_post(allArrived); 
     }
   } else {
     arrived--;
-    sem_post(cond);
-    checkState("EveryThreadArrived");
+    sem_post(allArrived);
+    checkCurrentEvent("EveryThreadArrived");
   }
 }
