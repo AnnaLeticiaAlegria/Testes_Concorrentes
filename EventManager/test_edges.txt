@@ -1,8 +1,8 @@
 (
   (
     Event2 [>>thread2]+;
-    Event2 [thread2 >> thread2];
+    Event2 [>>thread2];
   )
   |
-  Event2 [>>thread2];
+  Event2 [>>thread3];
 );
