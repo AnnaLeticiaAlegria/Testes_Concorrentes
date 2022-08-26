@@ -219,7 +219,7 @@ function graphManager.createGraph (grammarTree, namesTable)
     os.exit()
   end
 
-  graphManager.printGraph(graph)
+  -- graphManager.printGraph(graph)
 
   return graph, currentEvent
 end
