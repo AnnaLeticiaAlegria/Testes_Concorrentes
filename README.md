@@ -1,105 +1,78 @@
-# Testes_Concorrentes
+# EventManager
 ## Descrição
 
-Este projeto tem como objetivo testar programas concorrentes desenvolvidos por alunos de graduação. Ele consiste em um módulo com funções a serem chamadas pelo programa do aluno que garantem que o mesmo siga uma determinada ordem de eventos. Essa ordem de eventos é criada em um arquivo de configuração e, se ela for aceita pelo programa do aluno ou não, é possível tirar conclusões acerca de sua corretude. 
+Esta ferramenta auxilia o teste de programas concorrentes e foi projetada para ser utilizada em ambiente didático. Ela consiste em uma biblioteca com funções a serem chamadas pelo programa do usuário. Essas funções controlam o andamento das threads do programa através de eventos e de sequências possíveis desses eventos, descritas em um script escrito pelo usuário.
 
 Apesar de ter sido desenvolvido pensando em ser utilizado em disciplinas de graduação, o módulo pode ser utilizado em qualquer programa concorrente que utilize a biblioteca pthread em C.
 
-### Escopo
+O usuário marca os eventos ao longo de seu código. Exemplos de eventos são pontos do programa antes da leitura de uma variável, antes e depois de uma região crítica, antes de uma thread ser colocada em espera, dentre outros. Cabe ao usuário definir estes eventos e especificar no script as ordens possíveis deles.
 
-O escopo do projeto consiste em desenvolver alguma ferramenta que fosse capaz de obrigar as threads de um programa a seguir determinada ordem de eventos, a fim de checar sua corretude. Assim, foi desenvolvido o módulo _StateManager_, cujas funções são chamadas pelo programa do usuário. 
+A ferramenta inclui alguns exemplos de uso que podem ajudar o usuário a determinar bons eventos para o seu programa e boas ordens para checar a corretude do mesmo. Eles estão documentados com explicações sobre seu funcionamento, forma de compilar e executar e com os testes realizados e seus significados.
 
-O usuário define pontos chaves em seu programa que devem ocorrer em ordens específicas, chamados de estados. Exemplos de estados são pontos do programa antes da leitura de uma variável, antes e depois de uma região crítica, antes de uma thread ser colocada em espera, dentre outros. Cabe ao usuário definir estes estados e colocar no arquivo de configuração a ordem em que deseja que eles sejam executados. O projeto permite que o usuário crie os estados que desejar e informe se deseja que determinados estados sejam executados pela mesma thread ou se algum estado não pode ser executado por determinada thread.
-
-O projeto inclui alguns exemplos de uso que podem ajudar o usuário a determinar bons estados para o seu programa e boas ordens para checar a corretude do mesmo. Eles estão documentados com explicações sobre seu funcionamento, forma de compilar e executar e com os testes realizados e seus significados.
-
-Além disso, na seção [Como utilizar o módulo StateManager](#como-utilizar-o-módulo-statemanager), o usuário encontra explicações de como aplicar o módulo a fim de testar seu próprio programa.
 
 ### Requisitos funcionais
 
-  * Fazer a leitura do arquivo de configuração do usuário.
+  * Fazer a leitura do script do usuário.
   * Garantir que o programa do usuário siga a ordem especificada pelo arquivo de configuração.
-  * Garantir que as threads executem os estados associados a elas pelo arquivo de configuração.
+  * Garantir que as threads executem os estados associados a elas pelo script.
   * Permitir que o usuário defina o tempo máximo de um estado.
-  * Finalizar o programa do usuário caso algum estado demore mais do que o tempo especificado.
-  * Mostrar o próximo estado esperado caso o programa seja encerrado por conta de algum estado demorar demais.
+  * Finalizar o programa do usuário caso algum evento demore mais do que o tempo especificado.
+  * Mostrar o possíveis próximos eventos esperados caso o programa seja encerrado por conta de algum bloqueio.
 
 ### Requisitos não funcionais
 
   * O programa do usuário deve implementar a concorrência utilizando a linguagem de programação C e a biblioteca pthread.
   * O programa deve executar em uma máquina com sistema operacional Linux ou MacOS.
   * O usuário deve instalar Lua 5.3 na máquina, caso já não esteja instalado.
-  * O usuário deve produzir um arquivo de configuração válido. Mais detalhes na seção [Como escrever o arquivo de configuração](#como-escrever-o-arquivo-de-configuração).
 
 ### Projeto do programa
 
-Este projeto consiste no módulo _StateManager_ que deve ser chamado pelo programa do usuário. O usuário pode nomear o arquivo de configuração (Arquivo de ordem dos estados) da forma que quiser, só deve informar ao módulo o caminho para o arquivo.
+Este projeto consiste no módulo _EventManager_ que deve ser chamado pelo programa do usuário. O usuário pode nomear o script da forma que quiser, só deve informar ao módulo o caminho para o arquivo.
 
-O programa assume que o módulo _StateManager_ está em um diretório diferente do diretório no qual o programa do usuário é compilado e executado, como mostrado a seguir. Entretanto, o usuário pode modificar este caminho no arquivo _stateManager.h_.
+O programa assume que o módulo _EventManager está em um diretório diferente do diretório no qual o programa do usuário é compilado e executado, como mostrado a seguir. Entretanto, o usuário pode modificar este caminho no arquivo _eventManager.h_.
 
 . <br/>
 |---Diretório externo <br/>
 | |---Pasta com programa do usuário <br/>
 | | |---main.c <br/>
-| | |---statesFile.txt <br/>
-| |---StateManager <br/>
-| | |---stateManager.c <br/>
-| | |---stateManager.h <br/>
-| | |---readStates.lua <br/>
-
-A imagem a seguir contém a arquitetura do projeto.
-
-![Arquitetura](./arquitetura.png)
+| | |---script.txt <br/>
+| |---EventManager <br/>
+| | |---eventManager.c <br/>
+| | |---eventManager.h <br/>
+| | |---luaMain.lua <br/>
+| | |---[outros módulos auxiliares]
 
 
-## Como utilizar o módulo StateManager
+## Como utilizar a EventManager
 
 ### Configuração
 
-Primeiramente, o usuário deve baixar a pasta com o módulo _StateManager_ e, idealmente, organizá-la como é descrito na seção [Projeto do programa](#projeto-do-programa). Para casos diferentes de organização, basta modificar a variável _readStatesFilePath_, presente no arquivo _stateManager.h_.
+Primeiramente, o usuário deve baixar a pasta com o módulo _EventManager_ e, idealmente, organizá-la como é descrito na seção [Projeto do programa](#projeto-do-programa). Para casos diferentes de organização, basta modificar a variável _luaMainFilePath_, presente no arquivo _eventManager.h_.
 
 Além disso, o usuário deve se certificar de que todos os [requisitos não funcionais](#requisitos-não-funcionais) foram cumpridos.
 
-### Como escrever o arquivo de configuração
+### Como escrever o script
 
-O próximo passo é escrever um arquivo de configuração válido. Este arquivo contém a ordem de todos os estados do programa e regras de execução para as threads.
+O próximo passo é escrever um script válido. Este arquivo contém as possíveis ordens de exeucução dos eventos do programa e regras de execução para as threads.
 
-Ele deve ser um .txt no qual cada linha segue o padrão:
-"Nome do Estado" "Espaço em branco" "Regra de execução"
-
-* Nome do Estado: O usuário deve se certificar de colocar um nome que não contenha espaços em branco nem caracteres como '\t', '\n' ou '\0'. Estes estados devem estar escritos da mesma forma como serão escritos no programa do usuário, cabendo ao usuário garantir isto.
-* Espaço em branco: Forma do programa reconhecer a separação entre o nome do estado e a regra de execução da thread. O usuário deve evitar realizar esta separação com '\t' ou outro caracter.
-* Regra de execução: Aqui, o usuário escolhe se deseja que uma mesma thread execute determinados estados ou se uma thread não pode executar determinado estado. Sendo assim, a "Regra de execução" pode ter os seguintes valores:
-  * Número inteiro positivo: Todos os estados com o mesmo número inteiro positivo serão executados pela mesma thread.
-  * '!' seguido por Número inteiro positivo: Todos os estados que possuírem essa identificação poderão ser executados por qualquer thread menos a que corresponde àquele número inteiro positivo. Esta identificação só pode ser utilizada caso o usuário tenha associado este número inteiro positivo a algum estado anterior no arquivo.
-  * '*': Indica que aquele estado pode ser realizado por qualquer thread, sem nenhuma regra.
-
-O exemplo a seguir mostra um arquivo de configuração válido:
-> EstadoA *<br/>EstadoB 1<br/>EstadoC 1<br/>EstadoE 2<br/>EstadoF !1<br/>EstadoG 2<br/>EstadoH *<br/>
-
-Neste exemplo, o EstadoA pode ser executado por qualquer thread. A seguir, o usuário definiu que o EstadoB e o EstadoC devem ser executados pela mesma thread. O número 1 não garante que a primeira thread criada é a que executará estes estados, ele somente os associa entre si. É importante notar que estes estados podem ser executados pela mesma thread que executou o EstadoA ou não, já que este estado não possui nenhuma restrição.
-
-Quanto ao EstadoE, por enquanto, o programa aceitaria que a mesma thread que executou o EstadoB e o EstadoC o executasse. Os números usados como regras de execução ainda possuem algumas limitações, discutidas melhor em [Passos futuros](#passos-futuros).
-
-Já o EstadoF poderia ser executado por qualquer thread menos pela thread que executou os estados EstadoB e EstadoC.
 
 ### Chamadas às funções
 
-Para utilizar o _StateManager_, o usuário deve fazer chamadas às suas funções no seu programa.
+Para utilizar o _EventManager_, o usuário deve fazer chamadas às suas funções no seu programa.
 
-Para inicializar o módulo, basta chamar a função _initializeManager_, passando como argumentos o caminho para o arquivo de configuração (também chamado de arquivo de ordem de estados) e o número de threads criadas pelo usuário.
+Para inicializar o módulo, basta chamar a função _initializeManager_, passando como argumentos o caminho para o script e o caminho para o arquivo de configuração (se existir).
 
-Chamadas à função _checkState_ devem ser feitas em pontos chave do programa, nos quais o usuário quer se certificar de que determinado estado ocorra em determinado momento. Ele deve passar como argumento para esta função o nome do estado que ele deseja que seja associado àquele ponto do programa. Este nome deve existir no arquivo de configuração.
+Chamadas à função _checkCurrentEvent_ devem ser feitas em pontos chave do programa, nos quais o usuário quer se certificar de que determinado evento ocorra em determinado momento. Ele deve passar como argumento para esta função o nome do evento que ele deseja que seja associado àquele ponto do programa. Este nome deve existir no script.
 
-Por último, antes de encerrar seu programa, o usuário deve chamar a função _finalizeManager_, para garantir que os espaços alocados pelo módulo _StateManager_ sejam liberados.
+Por último, antes de encerrar seu programa, o usuário deve chamar a função _finalizeManager_, para garantir que os espaços alocados pelo módulo _EventManager_ sejam liberados.
 
-Para mais detalhes acerca destas funções, cheque a [documentação](./StateManager/README.md) do módulo _StateManager_.
+Para mais detalhes acerca destas funções, cheque a [documentação](./EventManager/README.md) do módulo _EventManager_.
 
 Agora, o usuário está pronto para compilar, executar e interpretar os resultados obtidos.
 
 ### Compilando e executando
 
-É necessário compilar o código do _StateManager_ em conjunto com o código do usuário. Caso a disposição das pastas esteja de acordo com o que é mostrado em [Projeto do programa](#projeto-do-programa), para compilar o código, basta escrever o seguinte comando no terminal bash:
+É necessário compilar o código do _EventManager_ em conjunto com o código do usuário. Caso a disposição das pastas esteja de acordo com o que é mostrado em [Projeto do programa](#projeto-do-programa), para compilar o código, basta escrever o seguinte comando no terminal bash:
 
 > gcc -Wall -o programa main.c ../StateManager/stateManager.c -I/$LUA_CDIR -llua5.3
 
@@ -111,57 +84,8 @@ Após compilado o programa, basta executar, passando os argumentos pedidos pelo 
 
 ## Sobre os resultados
 
-Cabe ao usuário interpretar os resultados obtidos. Uma sequência de estados é dita aceita pelo programa caso ele tenha conseguido executar todos os estados da sequência sem entrar em _deadlock_.
+Cabe ao usuário interpretar os resultados obtidos. Uma sequência de eventos é dita aceita pelo programa caso ele tenha conseguido executar todos os eventos da sequência sem ocorrer nenhum bloqueio.
 
-Caso ele tenha feito uma sequência de eventos que sabe ser válida e o programa não aceitou, sabe que seu programa está errado. Entretanto, caso o programa tenha aceitado a sequência inteira, isto não significa, necessariamente, que o programa do usuário está correto. É necessário checar outras sequências de estados.
+Caso ele tenha feito uma sequência de eventos que sabe ser válida e o programa não aceitou, sabe que seu programa está errado. Entretanto, caso o programa tenha aceitado a sequência inteira, isto não significa, necessariamente, que o programa do usuário está correto. É necessário checar outras sequências de eventos.
 
-Caso o programa aceite alguma sequência que o usuário sabe estar errada, é garantido que o programa do usuário possui algum erro. Na próxima seção, são apresentados exemplos de uso que mostram testes realizados e seus resultados.
-
-## Exemplos de uso
-
-Este módulo foi implementado em quatro problemas para exemplificar seu modo de uso e a possibilidade de eventos a serem criados. Cada exemplo está nesse repositório separado em uma pasta que contém seu código fonte, arquivos de configuração utilizados nos testes, resultados dos testes, script para rodar os testes e um arquivo README contendo a documentação e explicação do exemplo.
-
-A seguir, é apresentado um resumo de cada exemplo, na ordem sugerida para o usuário conferir cada um:
-
-* [FirstExample](./FirstExample/README.md#exemplo-firstexample): Exemplo mais básico apresentado. Nele, um número de threads modificam a mesma variável global. É apresentada uma versão utilizando semáforos para realizar este controle e uma que não utiliza e verificado o valor desta variável _global_ ao final das execuções.
-
-* [ReaderWriter](./ReaderWriter/README.md#exemplo-readerwriter): Exemplo que utiliza o problema de leitores e escritores. Nesta versão, mais de um leitor pode ler o _buffer_ ao mesmo tempo. Entretanto, não é feito o controle completo na sincronização de leitores e escritores, sendo o módulo _StateManager_ perfeito para exemplificar os problemas que podem ocorrer. Além disso, em sua seção [Sobre pares de estados](./ReaderWriter/README.md#sobre-pares-de-estados) são apresentados os pares de estados.
-
-* [Barrier](./Barrier/README.md#exemplo-barrier): Exemplo que utiliza o problema de sincronização utilizando barreiras. O programa apresenta três funções de barreira, das quais duas são incorretas.
-
-* [ProducerConsumerPassingTheBaton](./ProducerConsumerPassingTheBaton/README.md#exemplo-producerconsumerpassingthebaton): Este exemplo é o exemplo apresentado mais complexo. Nele, produtores e consumidores escrevem em um _buffer_ circular utilizando a técnica de passagem de bastão. Graças a este exemplo, as regras de execução de uma thread foram vistas necessárias e implementadas.
-
-
-## Testes
-
-Os testes foram realizados em cada exemplo de uso. Foram analisados os resultados de testes com arquivos de ordens de estados que são conhecidamente corretos pra cada exemplo. Também foram utilizados arquivos com ordens de estados consideradas incorretas para verificar se cada exemplo as aceitava.
-
-* [Testes do exemplo FirstExample](./FirstExample/README.md#testes): Foram realizados 2 testes para cada uma das duas versões presentes neste exemplo. Os resultados deles foram comparados entre si.
-
-* [Testes do exemplo ReaderWriter](./ReaderWriter/README.md#testes): Foram realizados 6 testes deste exemplo, a fim de explorar as falhas do programa ao máximo. Estas falhas são derivadas da falta de sincronização entre o que um escritor escreve e o leitor lê.
-
-* [Testes do exemplo Barrier](./Barrier/README.md#testes): Foram realizados 4 testes com este exemplo. Um teste que mostra que a primeira função de barreira está incorreta, outro que mostra problemas na segunda função e os outros dois testes que comprovam que a terceira função está correta.
-
-* [Testes do exemplo ProducerConsumerPassingTheBaton](./ProducerConsumerPassingTheBaton/README.md#testes): Foram realizados 3 testes neste problema. Eles visam a verificação do funcionamento da técnica de passagem de bastão.
-
-## Passos futuros
-
-Como visto nos exemplos de uso, o módulo já consegue englobar uma boa quantidade de testes. Porém, ainda existem muitos testes interessantes a serem realizados.
-
-Os passos futuros envolvem melhorias no arquivo de configuração. O objetivo é que ele consiga expressar mais casos de testes.
-
-Uma ideia é separar o arquivo de configuração do arquivo de ordem de estados. No arquivo de configuração, o usuário escreve todos os eventos possíveis que podem aparecer no seu programa e talvez outras informações. Assim, o _StateManager_ só aceitaria estados do arquivo de ordem de estados que estivessem declarados no arquivo de configuração. Isso evitaria problemas causados por erros de digitação do nome do estado, por exemplo.
-
-Como é possível observar nos [exemplos de uso](#exemplos-de-uso), alguns estados são necessários estarem em pares (Como os estados que englobam uma chamada a uma função sem_wait de um semáforo. Mais detalhes podem ser encontrados no exemplo [ReaderWriter](./ReaderWriter/README.md)) e na seção [Sobre pares de estados](./ReaderWriter/README.md#sobre-pares-de-estados) deste mesmo exemplo. Uma melhoria seria uma forma melhor do usuário representar que estes eventos formam um par e que não pode haver nenhum evento entre eles.
-
-Da forma como o módulo está implementado atualmente, o usuário poderia fazer uma regra de execução de uma thread especificando que não quer que uma thread específica execute o estado antes de especificar um evento para esta thread. Ou seja, caso ele insira no arquivo de configuração algum estado com regra '!1' antes de um estado com regra '1', por exemplo, o programa aceitaria mas causaria erros de execução. Um passo futuro é fazer uma varredura no arquivo para verificar se casos semelhantes ocorrem.
-
-Como foi comentado na seção [Como escrever o arquivo de configuração](#como-escrever-o-arquivo-de-configuração), o programa permitiria que a thread associada ao _id_ 1 fosse a mesma a ser associada as _id_ 2, por exemplo. Isto poderia ser evitado percorrendo o vetor de _ids_ de threads cada vez que uma nova thread tentasse salvar seu _id_ no vetor.
-
-Para representar mais possibilidades, seria necessário criar uma linguagem para o arquivo de configuração a ser interpretada pelo arquivo em Lua a fim de gerar a ordem dos eventos em C. Pensando nisso, este módulo já foi implementado utilizando a biblioteca LPeg desde o início, o que permite modificações de forma mais fácil.
-
-Uma modificação seria permitir o uso de _loops_ de estados no arquivo, para facilitar o entendimento e ser menos trabalhoso ao usuário. Outra melhoria seria a utilização de variáveis. Elas poderiam ser utilizadas para associar que a quantidade de threads que realizaram tal evento deve ser a mesma a realizar outro evento, por exemplo.
-
-Com uma linguagem também seria possível especificar um grupo de threads que poderia executar determinado evento ou um grupo que seria proibido de executar outro evento. Atualmente, o programa só permite que uma thread seja escolhida para essas funcionalidades.
-
-Percebe-se que há muitas possibilidades de melhorias que, certamente, trarão novas ideias quando forem implementadas, mostrando como este projeto ainda pode crescer e se tornar mais complexo e mais completo como uma ferramenta de teste.
+Caso o programa aceite alguma sequência que o usuário sabe estar errada, é garantido que o programa do usuário possui algum erro. 
