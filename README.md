@@ -101,9 +101,10 @@ Agora, o usuário está pronto para compilar, executar e interpretar os resultad
 
 É necessário compilar o código do _StateManager_ em conjunto com o código do usuário. Caso a disposição das pastas esteja de acordo com o que é mostrado em [Projeto do programa](#projeto-do-programa), para compilar o código, basta escrever o seguinte comando no terminal bash:
 
-> gcc -Wall -o programa main.c ../StateManager/stateManager.c -I/$LUA_CDIR -llua5.3
+> gcc -Wall -o programa main.c ../StateManager/stateManager.c -I/$LUA_CDIR -L/$LUA_LDIR -llua5.3
 
-A variável de ambiente LUA_CDIR deve ser o local no qual os arquivos lua.h, lauxlib.h e lualib.h se encontram.
+A variável de ambiente LUA_CDIR deve ser o local no qual os arquivos lua.h, lauxlib.h e lualib.h se encontram (instalando via homebrew no MacOS, ficam em /opt/homebrew/opt/lua@5.3/include/lua5.3/).
+A variável de ambiente LUA_LDIR deve ser o local aonde ficam as bibliotecas dinâmicas de Lua (instalando via homebrew no MacOS, ficam em /opt/homebrew/opt/lua@5.3/lib/).
 
 Após compilado o programa, basta executar, passando os argumentos pedidos pelo programa do usuário via linha de comando.
 
